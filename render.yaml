@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: hamrobichar-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install; npm run build
+    startCommand: npm run start
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: CORS_ORIGIN
+        sync: false
+      - key: ADMIN_SEED_EMAIL
+        sync: false
+      - key: ADMIN_SEED_USERNAME
+        sync: false
+      - key: ADMIN_SEED_PASSWORD
+        sync: false
