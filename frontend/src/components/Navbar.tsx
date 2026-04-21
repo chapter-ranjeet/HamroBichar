@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -78,8 +79,16 @@ export default function Navbar() {
       <nav className="w-full px-4 py-2 sm:px-6 sm:py-3 lg:px-10">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <Link href="/" className="text-xl font-black tracking-tight text-rose-700 sm:text-3xl">
-              HamroBichar
+            <Link href="/" className="inline-flex items-center gap-2 text-xl font-black tracking-tight text-rose-700 sm:text-3xl">
+              <Image
+                src="/hamrobicharlogo.jpeg"
+                alt="HamroBichar logo"
+                width={40}
+                height={40}
+                className="h-9 w-9 rounded-full border border-slate-200 object-cover sm:h-10 sm:w-10"
+                priority
+              />
+              <span>HamroBichar</span>
             </Link>
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-[11px]">
               Voices and News from Nepal
