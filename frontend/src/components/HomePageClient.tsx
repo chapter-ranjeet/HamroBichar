@@ -12,6 +12,7 @@ export default function HomePageClient() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [showAllCategoryCards, setShowAllCategoryCards] = useState(false);
   const [showMobileCategories, setShowMobileCategories] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +55,8 @@ export default function HomePageClient() {
       count: articles.filter((article) => article.category === category).length
     }))
     .sort((a, b) => b.count - a.count);
+
+  const visibleCategoryStats = showAllCategoryCards ? categoryStats : categoryStats.slice(0, 4);
 
   return (
     <section className="py-8 sm:py-10">
@@ -125,37 +128,37 @@ export default function HomePageClient() {
       </section>
 
       {!loading && !error && categoryStats.length > 0 && (
-        <section className="mb-8 hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:block">
-          <div className="border-b border-slate-200 bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 px-4 py-4 text-white sm:px-6">
+        <section className="mb-6 hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
+          <div className="border-b border-slate-200 bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 px-4 py-3 text-white sm:px-5">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-lg font-black sm:text-xl">Browse By Category</h2>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
+                <h2 className="text-base font-black sm:text-lg">Browse By Category</h2>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300 sm:text-[11px]">
                   Pick a desk and filter stories instantly
                 </p>
               </div>
-              <p className="text-sm font-bold text-amber-300">
+              <p className="text-xs font-bold text-amber-300 sm:text-sm">
                 {articles.length} Total {articles.length === 1 ? "Story" : "Stories"}
               </p>
             </div>
           </div>
 
-          <div className="p-4 sm:p-6">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {categoryStats.map((category) => (
+          <div className="p-3 sm:p-4">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {visibleCategoryStats.map((category) => (
                 <button
                   key={category.name}
                   onClick={() => setSelectedCategory(category.name)}
-                  className={`group rounded-xl border p-4 text-left transition ${
+                  className={`group rounded-lg border p-3 text-left transition ${
                     selectedCategory === category.name
                       ? "border-rose-500 bg-rose-50 shadow-[inset_0_0_0_1px_rgba(190,18,60,0.12)]"
                       : "border-slate-200 bg-slate-50 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
                   }`}
                 >
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm font-black text-slate-800">{category.name}</span>
+                    <span className="text-xs font-black text-slate-800 sm:text-sm">{category.name}</span>
                     <span
-                      className={`rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-wider ${
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${
                         selectedCategory === category.name
                           ? "bg-rose-600 text-white"
                           : "bg-slate-200 text-slate-700 group-hover:bg-slate-300"
@@ -172,12 +175,24 @@ export default function HomePageClient() {
                       style={{ width: `${Math.max(12, Math.min(100, category.count * 16))}%` }}
                     />
                   </div>
-                  <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     {category.count} {category.count === 1 ? "article" : "articles"}
                   </p>
                 </button>
               ))}
             </div>
+
+            {categoryStats.length > 4 && (
+              <div className="mt-3 text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowAllCategoryCards((prev) => !prev)}
+                  className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-slate-700 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+                >
+                  {showAllCategoryCards ? "Show Less" : `View All (${categoryStats.length})`}
+                </button>
+              </div>
+            )}
           </div>
         </section>
       )}
