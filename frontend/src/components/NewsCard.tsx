@@ -18,16 +18,19 @@ const getExcerpt = (content: string): string => {
 export default function NewsCard({ article }: NewsCardProps) {
   return (
     <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-      <Link href={`/article/${article.slug}`} className="block h-44 w-full overflow-hidden bg-slate-100">
+      <Link
+        href={`/article/${article.slug}`}
+        className="relative block w-full min-h-44 overflow-hidden bg-slate-100 aspect-video"
+      >
         {article.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={article.image}
             alt={article.title}
-            className="h-full w-full object-cover transition duration-300 hover:scale-105"
+            className="absolute inset-0 h-full w-full object-cover transition duration-300 hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-linear-to-br from-rose-100 to-amber-100 text-sm font-semibold text-slate-600">
+          <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-rose-100 to-amber-100 text-sm font-semibold text-slate-600">
             No image available
           </div>
         )}

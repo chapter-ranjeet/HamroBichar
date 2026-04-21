@@ -72,12 +72,14 @@ export default function ArticlePage() {
         By {article.author} • {new Date(article.createdAt).toLocaleString()}
       </p>
       {article.image && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={article.image}
-          alt={article.title}
-          className="my-5 h-52 w-full rounded-xl object-cover sm:my-6 sm:h-72"
-        />
+        <div className="relative my-5 w-full min-h-52 overflow-hidden rounded-xl bg-slate-100 sm:my-6 sm:min-h-72 aspect-video">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={article.image}
+            alt={article.title}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </div>
       )}
       <div
         className="prose prose-slate max-w-none text-slate-700"
