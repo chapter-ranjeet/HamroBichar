@@ -4,16 +4,18 @@ import { v2 as cloudinary } from "cloudinary";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/apiError";
 
+const cloudinaryCloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUD_NAME;
+const cloudinaryApiKey = process.env.CLOUDINARY_API_KEY || process.env.API_KEY;
+const cloudinaryApiSecret = process.env.CLOUDINARY_API_SECRET || process.env.API_SECRET;
+
 const hasCloudinaryConfig =
-  Boolean(process.env.CLOUDINARY_CLOUD_NAME) &&
-  Boolean(process.env.CLOUDINARY_API_KEY) &&
-  Boolean(process.env.CLOUDINARY_API_SECRET);
+  Boolean(cloudinaryCloudName) && Boolean(cloudinaryApiKey) && Boolean(cloudinaryApiSecret);
 
 if (hasCloudinaryConfig) {
   cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
+    cloud_name: cloudinaryCloudName,
+    api_key: cloudinaryApiKey,
+    api_secret: cloudinaryApiSecret
   });
 }
 

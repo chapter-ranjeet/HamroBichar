@@ -6,10 +6,11 @@ import { uploadImage } from "../controllers/upload.controller";
 import { protect, requireAdmin } from "../middlewares/auth.middleware";
 
 const uploadsDir = path.resolve(process.cwd(), "uploads");
+const cloudinaryCloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUD_NAME;
+const cloudinaryApiKey = process.env.CLOUDINARY_API_KEY || process.env.API_KEY;
+const cloudinaryApiSecret = process.env.CLOUDINARY_API_SECRET || process.env.API_SECRET;
 const useCloudinary =
-  Boolean(process.env.CLOUDINARY_CLOUD_NAME) &&
-  Boolean(process.env.CLOUDINARY_API_KEY) &&
-  Boolean(process.env.CLOUDINARY_API_SECRET);
+  Boolean(cloudinaryCloudName) && Boolean(cloudinaryApiKey) && Boolean(cloudinaryApiSecret);
 
 const diskStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
