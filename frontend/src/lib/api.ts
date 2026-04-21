@@ -72,8 +72,13 @@ export const uploadArticleImage = async (file: File, token: string): Promise<str
 
   const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api";
   const backendOrigin = base.replace(/\/api\/?$/, "");
+  const imageUrl = response.data.data.imageUrl;
 
-  return `${backendOrigin}${response.data.data.imageUrl}`;
+  if (/^https?:\/\//i.test(imageUrl)) {
+    return imageUrl;
+  }
+
+  return `${backendOrigin}${imageUrl}`;
 };
 
 export const getAdminUsers = async (token: string): Promise<AdminUser[]> => {

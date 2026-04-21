@@ -6,8 +6,12 @@ import { uploadImage } from "../controllers/upload.controller";
 import { protect, requireAdmin } from "../middlewares/auth.middleware";
 
 const uploadsDir = path.resolve(process.cwd(), "uploads");
+const useCloudinary =
+  Boolean(process.env.CLOUDINARY_CLOUD_NAME) &&
+  Boolean(process.env.CLOUDINARY_API_KEY) &&
+  Boolean(process.env.CLOUDINARY_API_SECRET);
 
-const storage = multer.diskStorage({
+const diskStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, uploadsDir);
   },
@@ -20,7 +24,7 @@ const storage = multer.diskStorage({
 const allowedMimeTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
 const upload = multer({
-  storage,
+  storage: useCloudinary ? multer.memoryStorage() : diskStorage,
   limits: {
     fileSize: 5 * 1024 * 1024
   },
