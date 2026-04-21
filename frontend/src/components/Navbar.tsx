@@ -8,19 +8,9 @@ import { getArticles } from "@/lib/api";
 import { Article } from "@/types";
 
 export default function Navbar() {
-  const nepalTimeZone = "Asia/Kathmandu";
-  const [now, setNow] = useState(() => new Date());
   const [articles, setArticles] = useState<Article[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     const loadArticles = async () => {
@@ -40,7 +30,7 @@ export default function Navbar() {
   ).sort((a, b) => a.localeCompare(b));
 
   const remainingArticles = articles.slice(6);
-  const englishDate = now.toLocaleDateString("en-US", {
+  const englishDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -53,8 +43,7 @@ export default function Navbar() {
         <div className="flex w-full items-center justify-between px-4 py-1.5 text-[11px] sm:px-6 sm:text-xs lg:px-10">
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wide">
             <span>EN: {englishDate}</span>
-            <span className="text-slate-400">|</span>
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="text-slate-400">|</span>   
             
           </p>
           <p className="flex items-center gap-2 font-semibold uppercase tracking-wider text-emerald-300">
