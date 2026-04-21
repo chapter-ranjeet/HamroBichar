@@ -35,28 +35,16 @@ export default function Navbar() {
     void loadArticles();
   }, []);
 
-  const englishDate = now.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: nepalTimeZone
-  });
-
-  const nepaliDate = "२०८३ बैशाख ७ गते, सोमबार";
-
   const categories = Array.from(
     new Set(articles.map((article) => article.category).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
 
   const remainingArticles = articles.slice(6);
-
-  const nepaliTime = now.toLocaleTimeString("ne-NP", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-    timeZone: nepalTimeZone
+  const englishDate = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric"
   });
 
   return (
@@ -66,8 +54,8 @@ export default function Navbar() {
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wide">
             <span>EN: {englishDate}</span>
             <span className="text-slate-400">|</span>
-            <span>नेपाली मिति: {nepaliDate}</span>
-            <span>समय: {nepaliTime} NPT</span>
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            
           </p>
           <p className="flex items-center gap-2 font-semibold uppercase tracking-wider text-emerald-300">
             <span className="h-2 w-2 rounded-full bg-emerald-400" />
