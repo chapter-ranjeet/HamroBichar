@@ -128,7 +128,7 @@ export default function HomePageClient() {
       </section>
 
       {!loading && !error && categoryStats.length > 0 && (
-        <section className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <section className="mb-6 hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm sm:block">
           <div className="border-b border-slate-200 bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 px-4 py-3 text-white sm:px-5">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
