@@ -182,7 +182,7 @@ export default function HomePageClient() {
               ))}
             </div>
 
-            {categoryStats.length > 4 && (
+            {categoryStats.length > 0 && (
               <div className="mt-3 text-center">
                 <button
                   type="button"
