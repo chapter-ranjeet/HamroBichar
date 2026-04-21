@@ -98,7 +98,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setMobileNavOpen((prev) => !prev)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700 sm:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700"
             aria-label="Toggle navigation"
             aria-expanded={mobileNavOpen}
           >
@@ -111,7 +111,7 @@ export default function Navbar() {
         </div>
 
         <div
-          className={`relative mt-2 w-full items-center gap-2 sm:mt-3 sm:flex sm:w-auto sm:gap-3 ${
+          className={`relative mt-2 w-full items-center gap-2 sm:mt-3 sm:w-auto sm:gap-3 ${
             mobileNavOpen ? "flex" : "hidden"
           }`}
         >
