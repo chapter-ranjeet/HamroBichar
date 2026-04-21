@@ -37,6 +37,8 @@ export default function HomePage() {
       ? articles
       : articles.filter((article) => article.category === selectedCategory);
 
+  const latestArticles = visibleArticles.slice(0, 6);
+
   const categoryStats = categories
     .filter((category) => category !== "All")
     .map((category) => ({
@@ -203,10 +205,10 @@ export default function HomePage() {
 
       {!loading && !error && (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {visibleArticles.map((article) => (
+          {latestArticles.map((article) => (
             <NewsCard key={article._id} article={article} />
           ))}
-          {visibleArticles.length === 0 && (
+          {latestArticles.length === 0 && (
             <p className="text-slate-600">No news in this category yet.</p>
           )}
         </div>
