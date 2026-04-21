@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import NewsCard from "@/components/NewsCard";
 import { getArticles } from "@/lib/api";
 import { Article } from "@/types";
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -31,6 +33,12 @@ export default function HomePage() {
 
     void fetchArticles();
   }, []);
+
+  useEffect(() => {
+    const categoryFromQuery = searchParams.get("category");
+
+    setSelectedCategory(categoryFromQuery ?? "All");
+  }, [searchParams]);
 
   const visibleArticles =
     selectedCategory === "All"

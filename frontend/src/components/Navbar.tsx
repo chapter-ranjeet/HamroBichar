@@ -43,6 +43,10 @@ export default function Navbar() {
 
   const nepaliDate = "२०८३ बैशाख ७ गते, सोमबार";
 
+  const categories = Array.from(
+    new Set(articles.map((article) => article.category).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b));
+
   const remainingArticles = articles.slice(6);
 
   const nepaliTime = now.toLocaleTimeString("ne-NP", {
@@ -81,52 +85,64 @@ export default function Navbar() {
         </div>
 
         <div className="relative flex w-full items-center gap-2 sm:w-auto sm:gap-3">
-          <Link
-            className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-rose-300 hover:text-rose-700"
-            href="/"
-          >
-            Home
-          </Link>
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+            <Link
+              className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-rose-300 hover:text-rose-700"
+              href="/"
+            >
+              Home
+            </Link>
 
-          {remainingArticles.length > 0 && (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setMenuOpen((prev) => !prev)}
-                className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-rose-300 hover:text-rose-700"
+            {categories.map((category) => (
+              <Link
+                key={category}
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+                href={`/?category=${encodeURIComponent(category)}`}
               >
-                More News ({remainingArticles.length})
-              </button>
+                {category}
+              </Link>
+            ))}
 
-              {menuOpen && (
-                <div className="absolute right-0 top-full z-40 mt-2 w-[min(92vw,20rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl sm:w-80">
-                  <div className="border-b border-slate-100 bg-slate-50 px-4 py-3">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
-                      Older Headlines
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-slate-700">
-                      Articles beyond the latest six
-                    </p>
+            {remainingArticles.length > 0 && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((prev) => !prev)}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-rose-300 hover:text-rose-700"
+                >
+                  More News ({remainingArticles.length})
+                </button>
+
+                {menuOpen && (
+                  <div className="absolute right-0 top-full z-40 mt-2 w-[min(92vw,20rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl sm:w-80">
+                    <div className="border-b border-slate-100 bg-slate-50 px-4 py-3">
+                      <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                        Older Headlines
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-700">
+                        Articles beyond the latest six
+                      </p>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto p-2">
+                      {remainingArticles.map((article) => (
+                        <Link
+                          key={article._id}
+                          href={`/article/${article.slug}`}
+                          onClick={() => setMenuOpen(false)}
+                          className="block rounded-xl px-3 py-3 transition hover:bg-rose-50"
+                        >
+                          <p className="line-clamp-2 text-sm font-semibold text-slate-800">
+                            {article.title}
+                          </p>
+                          <p className="mt-1 text-xs font-medium text-slate-500">{article.category}</p>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                  <div className="max-h-80 overflow-y-auto p-2">
-                    {remainingArticles.map((article) => (
-                      <Link
-                        key={article._id}
-                        href={`/article/${article.slug}`}
-                        onClick={() => setMenuOpen(false)}
-                        className="block rounded-xl px-3 py-3 transition hover:bg-rose-50"
-                      >
-                        <p className="line-clamp-2 text-sm font-semibold text-slate-800">
-                          {article.title}
-                        </p>
-                        <p className="mt-1 text-xs font-medium text-slate-500">{article.category}</p>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </nav>
     </header>
