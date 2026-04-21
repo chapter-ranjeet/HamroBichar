@@ -20,9 +20,9 @@ export const metadata: Metadata = {
   title: "HamroBichar",
   description: "Modern Nepal news platform",
   icons: {
-    icon: "/icon.jpg",
-    shortcut: "/icon.jpg",
-    apple: "/icon.jpg"
+    icon: "/favicon.ico?v=2",
+    shortcut: "/favicon.ico?v=2",
+    apple: "/favicon.ico?v=2"
   }
 };
 
