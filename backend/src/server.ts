@@ -63,6 +63,9 @@ const startServer = async (): Promise<void> => {
     });
   } catch (error) {
     console.error("Failed to start server", error);
+    console.error(
+      "Deployment hint: verify Render env vars (MONGODB_URI, JWT_SECRET, CORS_ORIGIN) and allow Render IPs in MongoDB Atlas Network Access."
+    );
     process.exit(1);
   }
 };
