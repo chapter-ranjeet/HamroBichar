@@ -29,6 +29,14 @@ interface PasswordFormState {
   confirmPassword: string;
 }
 
+const slugify = (value: string): string =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+
 const emptyForm: FormState = {
   title: "",
   author: "",
@@ -61,6 +69,12 @@ export default function AdminDashboardPage() {
   const [passwordForm, setPasswordForm] = useState<PasswordFormState>(emptyPasswordForm);
 
   const isEditing = useMemo(() => Boolean(editingId), [editingId]);
+  const availableCategories = useMemo(
+    () => Array.from(new Set(articles.map((article) => article.category).filter(Boolean))).sort((a, b) => a.localeCompare(b)),
+    [articles]
+  );
+  const estimatedSlug = useMemo(() => slugify(form.title), [form.title]);
+  const canSubmit = Boolean(form.title.trim() && form.content.trim() && form.category.trim()) && !uploadingImage;
 
   const loadArticles = async () => {
     try {
@@ -232,6 +246,9 @@ export default function AdminDashboardPage() {
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
             placeholder="Article title"
           />
+          <p className="text-xs font-medium text-slate-500">
+            Slug preview: <span className="font-semibold text-slate-700">{estimatedSlug || "article-title"}</span>
+          </p>
           <input
             value={form.author}
             onChange={(event) => setForm((prev) => ({ ...prev, author: event.target.value }))}
@@ -242,46 +259,58 @@ export default function AdminDashboardPage() {
             <div className="mb-2 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => document.execCommand("bold")}
+                onClick={() => setForm((prev) => ({ ...prev, content: `${prev.content}<p><strong>Bold headline:</strong> </p>` }))}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Bold
+                Add Bold Block
               </button>
               <button
                 type="button"
-                onClick={() => document.execCommand("italic")}
+                onClick={() =>
+                  setForm((prev) => ({
+                    ...prev,
+                    content: `${prev.content}<blockquote><em>Quote or key statement...</em></blockquote>`
+                  }))
+                }
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Italic
+                Add Quote
               </button>
               <button
                 type="button"
-                onClick={() => document.execCommand("insertUnorderedList")}
+                onClick={() =>
+                  setForm((prev) => ({
+                    ...prev,
+                    content: `${prev.content}<ul><li>Point one</li><li>Point two</li></ul>`
+                  }))
+                }
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Bullet List
+                Add Bullet List
               </button>
             </div>
-            <div
-              contentEditable
-              suppressContentEditableWarning
-              onInput={(event) =>
-                setForm((prev) => ({
-                  ...prev,
-                  content: (event.target as HTMLDivElement).innerHTML
-                }))
-              }
-              dangerouslySetInnerHTML={{ __html: form.content }}
-              className="min-h-44 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+            <textarea
+              required
+              value={form.content}
+              onChange={(event) => setForm((prev) => ({ ...prev, content: event.target.value }))}
+              className="min-h-52 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+              placeholder="Write article body. You can paste HTML or plain text."
             />
+            <p className="mt-1 text-xs text-slate-500">Tip: Plain text is automatically rendered with line breaks on article page.</p>
           </div>
           <input
+            list="category-suggestions"
             required
             value={form.category}
             onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
             placeholder="Category"
           />
+          <datalist id="category-suggestions">
+            {availableCategories.map((category) => (
+              <option key={category} value={category} />
+            ))}
+          </datalist>
           <input
             value={form.image}
             onChange={(event) => setForm((prev) => ({ ...prev, image: event.target.value }))}
@@ -303,7 +332,7 @@ export default function AdminDashboardPage() {
           <div className="flex flex-wrap gap-2">
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !canSubmit}
               className="rounded-lg bg-rose-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? "Submitting..." : isEditing ? "Update Article" : "Create Article"}

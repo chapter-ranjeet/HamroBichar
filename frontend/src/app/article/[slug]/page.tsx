@@ -61,6 +61,24 @@ const fetchArticle = async (slug: string): Promise<Article | null> => {
   }
 };
 
+const fetchRelatedData = async (category: string): Promise<{
+  relatedArticles: Article[];
+  popularArticles: Article[];
+}> => {
+  try {
+    const data = await fetchArticlesServer({ category });
+    return {
+      relatedArticles: data.articles,
+      popularArticles: data.popularArticles ?? []
+    };
+  } catch {
+    return {
+      relatedArticles: [],
+      popularArticles: []
+    };
+  }
+};
+
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
   const article = await fetchArticle(slug);
@@ -117,9 +135,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const articleUrl = `${siteUrl}/article/${article.slug}`;
   const imageUrl = resolveImageUrl(article.image);
   const articleDescription = toTextSnippet(article.content).slice(0, 170);
-  const relatedData = await fetchArticlesServer({ category: article.category });
-  const relatedArticles = relatedData.articles.filter((item) => item.slug !== article.slug).slice(0, 3);
-  const popularArticles = (relatedData.popularArticles ?? [])
+  const relatedData = await fetchRelatedData(article.category);
+  const relatedArticles = relatedData.relatedArticles.filter((item) => item.slug !== article.slug).slice(0, 3);
+  const popularArticles = relatedData.popularArticles
     .filter((item) => item.slug !== article.slug)
     .slice(0, 4);
   const articleSchema = {
@@ -167,7 +185,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <div className="relative my-5 aspect-video w-full min-h-52 overflow-hidden rounded-xl bg-slate-100 sm:my-6 sm:min-h-72">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={article.image}
+              src={imageUrl ?? article.image}
               alt={article.title}
               className="absolute inset-0 h-full w-full object-cover"
             />
@@ -187,6 +205,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     <h2 className="mt-2 line-clamp-3 text-sm font-bold text-slate-900">{related.title}</h2>
                   </Link>
                 ))}
+                {relatedArticles.length === 0 && (
+                  <p className="text-sm text-slate-500 md:col-span-3">No related articles found yet.</p>
+                )}
               </div>
             </div>
 
@@ -204,6 +225,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     </div>
                   </Link>
                 ))}
+                {popularArticles.length === 0 && (
+                  <p className="text-sm text-slate-500">Popular articles are updating.</p>
+                )}
               </div>
             </div>
           </div>
