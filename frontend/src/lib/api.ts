@@ -4,17 +4,48 @@ import {
   ApiResponse,
   Article,
   ArticleListPayload,
+  ArticleViewPayload,
+  Comment,
   LoginPayload,
   UploadImagePayload
 } from "@/types";
 
-export const getArticles = async (): Promise<ArticleListPayload> => {
-  const response = await api.get<ApiResponse<ArticleListPayload>>("/articles");
+export const getArticles = async (params?: { category?: string; q?: string }): Promise<ArticleListPayload> => {
+  const searchParams = new URLSearchParams();
+
+  if (params?.category) {
+    searchParams.set("category", params.category);
+  }
+
+  if (params?.q) {
+    searchParams.set("q", params.q);
+  }
+
+  const query = searchParams.toString();
+  const response = await api.get<ApiResponse<ArticleListPayload>>(query ? `/articles?${query}` : "/articles");
   return response.data.data;
 };
 
 export const getArticleBySlug = async (slug: string): Promise<Article> => {
   const response = await api.get<ApiResponse<Article>>(`/articles/${slug}`);
+  return response.data.data;
+};
+
+export const trackArticleView = async (slug: string): Promise<ArticleViewPayload> => {
+  const response = await api.post<ApiResponse<ArticleViewPayload>>(`/articles/${slug}/view`);
+  return response.data.data;
+};
+
+export const getArticleComments = async (slug: string): Promise<Comment[]> => {
+  const response = await api.get<ApiResponse<Comment[]>>(`/articles/${slug}/comments`);
+  return response.data.data;
+};
+
+export const createArticleComment = async (
+  slug: string,
+  payload: { name: string; message: string }
+): Promise<Comment> => {
+  const response = await api.post<ApiResponse<Comment>>(`/articles/${slug}/comments`, payload);
   return response.data.data;
 };
 

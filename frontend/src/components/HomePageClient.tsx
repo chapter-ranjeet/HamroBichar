@@ -1,131 +1,259 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { FormEvent, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 import NewsCard from "@/components/NewsCard";
-import { getArticles } from "@/lib/api";
+import { slugify } from "@/lib/slug";
 import { Article } from "@/types";
 
-export default function HomePageClient() {
+interface HomePageClientProps {
+  initialArticles: Article[];
+  initialCategories: string[];
+  initialPopularArticles: Article[];
+  initialBreakingArticles: Article[];
+}
+
+const toExcerpt = (content: string): string => {
+  const plain = content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+
+  if (plain.length <= 180) {
+    return plain;
+  }
+
+  return `${plain.slice(0, 180)}...`;
+};
+
+export default function HomePageClient({
+  initialArticles,
+  initialCategories,
+  initialPopularArticles,
+  initialBreakingArticles
+}: HomePageClientProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("q") ?? "");
+  const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") ?? "All");
   const [showMobileCategories, setShowMobileCategories] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await getArticles();
-        setArticles(response.articles);
-        setCategories(["All", ...response.categories]);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch articles");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const categories = useMemo(() => ["All", ...initialCategories], [initialCategories]);
 
-    void fetchArticles();
-  }, []);
+  const categoryScopedArticles =
+    selectedCategory === "All"
+      ? initialArticles
+      : initialArticles.filter((article) => article.category === selectedCategory);
 
-  useEffect(() => {
-    const categoryFromQuery = searchParams.get("category");
-
-    setSelectedCategory(categoryFromQuery ?? "All");
-  }, [searchParams]);
+  const featuredArticle = categoryScopedArticles[0];
+  const topStories = categoryScopedArticles.slice(1, 5);
+  const breakingArticles = initialBreakingArticles.length > 0 ? initialBreakingArticles : initialArticles.slice(0, 4);
+  const popularArticles =
+    initialPopularArticles.length > 0
+      ? initialPopularArticles
+      : [...initialArticles].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0)).slice(0, 5);
 
   const visibleArticles =
-    selectedCategory === "All"
-      ? articles
-      : articles.filter((article) => article.category === selectedCategory);
+    categoryScopedArticles.slice(0, 9);
 
-  const latestArticles = visibleArticles.slice(0, 6);
+  const onSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const query = searchTerm.trim();
+    router.push(query ? `/search?q=${encodeURIComponent(query)}` : "/");
+  };
 
   return (
-    <section className="py-8 sm:py-10">
-      <div className="mb-8 space-y-3">
-        <p className="inline-block rounded-full border border-rose-200 bg-rose-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-rose-700">
-          Nepal Headlines
-        </p>
-        <h1 className="max-w-3xl text-2xl font-black tracking-tight text-slate-900 sm:text-4xl">
-          Latest News from HamroBichar
-        </h1>
-        <p className="max-w-2xl text-sm font-medium text-slate-600 sm:text-base">
-          Stay close to politics, economy, culture, and community stories shaping modern Nepal.
-        </p>
+    <section className="py-6 sm:py-10">
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-3">
+          <p className="inline-flex rounded-full border border-rose-200 bg-rose-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-rose-700">
+            Nepal Headlines
+          </p>
+          <h1 className="max-w-4xl text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">
+            Breaking Nepal news, analysis, and stories that matter.
+          </h1>
+          <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+            A newsroom-style home for politics, business, education, technology, and local updates presented
+            with cleaner spacing, stronger hierarchy, and faster discovery.
+          </p>
+        </div>
+
+        <form onSubmit={onSearchSubmit} className="w-full max-w-xl">
+          <label className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500" htmlFor="home-search">
+            Search articles
+          </label>
+          <div className="flex gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+            <input
+              id="home-search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search politics, articles, authors..."
+              className="min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-slate-400"
+            />
+            <button
+              type="submit"
+              className="shrink-0 rounded-xl bg-rose-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-rose-800"
+            >
+              Search
+            </button>
+          </div>
+        </form>
       </div>
 
-      <section className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:hidden">
-        <div className="bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 px-4 py-4 text-white">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-300">Mobile Edition</p>
-          <h2 className="mt-1 text-lg font-black">Today&apos;s Top Stories</h2>
-        </div>
-        <div className="px-4 py-4">
-          <p className="text-sm font-medium leading-relaxed text-slate-600">
-            A cleaner reading flow for smaller screens. Scroll down to explore the latest verified
-            headlines from across Nepal.
-          </p>
-          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">
-                  Selected Category
+      <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:grid-cols-[1.4fr,0.9fr]">
+        <div className="p-5 sm:p-6 lg:p-8">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+            <span className="rounded-full bg-rose-100 px-2.5 py-1 text-rose-700">Breaking News</span>
+            <span>Live editorial picks</span>
+          </div>
+
+          {featuredArticle ? (
+            <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
+              <div className="space-y-4">
+                <p className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-800">
+                  {featuredArticle.category}
                 </p>
-                <p className="mt-1 text-sm font-bold text-slate-800">{selectedCategory}</p>
+                <Link href={`/article/${featuredArticle.slug}`} className="block">
+                  <h2 className="text-2xl font-black leading-tight text-slate-900 transition hover:text-rose-700 sm:text-4xl">
+                    {featuredArticle.title}
+                  </h2>
+                </Link>
+                <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+                  {toExcerpt(featuredArticle.content)}
+                </p>
+                <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
+                  <span>By {featuredArticle.author}</span>
+                  <span className="h-1 w-1 rounded-full bg-slate-300" />
+                  <span>{new Date(featuredArticle.createdAt).toLocaleDateString()}</span>
+                  <span className="h-1 w-1 rounded-full bg-slate-300" />
+                  <span>{featuredArticle.viewCount ?? 0} views</span>
+                </div>
+                <Link
+                  href={`/article/${featuredArticle.slug}`}
+                  className="inline-flex rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-rose-700"
+                >
+                  Read full story
+                </Link>
               </div>
-              <button
-                onClick={() => setShowMobileCategories((prev) => !prev)}
-                className="rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-black uppercase tracking-wide text-rose-700"
-              >
-                {showMobileCategories ? "Hide" : "Choose"}
-              </button>
+
+              <div className="grid gap-3">
+                {topStories.map((article) => (
+                  <Link
+                    key={article._id}
+                    href={`/article/${article.slug}`}
+                    className="group flex gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 transition hover:border-rose-200 hover:bg-rose-50"
+                  >
+                    <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-200">
+                      {article.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={article.image} alt={article.title} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-500">
+                          No image
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-black uppercase tracking-[0.18em] text-rose-700">
+                        {article.category}
+                      </p>
+                      <h3 className="mt-1 line-clamp-2 text-sm font-bold leading-5 text-slate-900 group-hover:text-rose-700">
+                        {article.title}
+                      </h3>
+                      <p className="mt-1 text-xs text-slate-500">{article.author}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-slate-500">
+              No articles are available yet.
+            </div>
+          )}
+        </div>
+
+        <aside className="border-t border-slate-200 bg-slate-50 p-5 sm:p-6 lg:border-t-0 lg:border-l lg:p-8">
+          <div className="space-y-6">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Popular</p>
+              <div className="mt-3 space-y-3">
+                {popularArticles.map((article, index) => (
+                  <Link
+                    href={`/article/${article.slug}`}
+                    key={article._id}
+                    className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition hover:border-rose-200 hover:bg-rose-50"
+                  >
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-100 text-sm font-black text-rose-700">
+                      {index + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="line-clamp-2 text-sm font-bold text-slate-900">{article.title}</p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {article.category} · {article.viewCount ?? 0} views
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
 
-            {showMobileCategories && (
-              <div className="mt-3 flex flex-wrap gap-2">
+            <div>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Categories</p>
+                <button
+                  type="button"
+                  onClick={() => setShowMobileCategories((prev) => !prev)}
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700 lg:hidden"
+                >
+                  {showMobileCategories ? "Hide" : "Show"}
+                </button>
+              </div>
+              <div className={`mt-3 flex flex-wrap gap-2 ${showMobileCategories ? "" : "hidden lg:flex"}`}>
                 {categories.map((category) => (
                   <button
                     key={category}
-                    onClick={() => {
-                      setSelectedCategory(category);
-                      setShowMobileCategories(false);
-                    }}
-                    className={`rounded-full px-3 py-1 text-xs font-bold transition ${
+                    onClick={() => setSelectedCategory(category)}
+                    className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
                       selectedCategory === category
-                        ? "bg-rose-700 text-white"
-                        : "border border-slate-200 bg-white text-slate-700"
+                        ? "bg-rose-700 text-white shadow-sm"
+                        : "border border-slate-200 bg-white text-slate-700 hover:bg-rose-50"
                     }`}
                   >
                     {category}
                   </button>
                 ))}
               </div>
-            )}
+
+              <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Why this layout</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  The home page now prioritizes the top story, then moves into breaking items, popular reads,
+                  and category filtering to match a real newsroom flow.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="mt-3 flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-rose-500" />
-            <span className="h-2 w-2 rounded-full bg-amber-500" />
-            <span className="h-2 w-2 rounded-full bg-slate-400" />
-          </div>
-        </div>
+        </aside>
       </section>
 
-      <div className="mb-8 hidden sm:block">
-        <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">
-          Quick Filters
-        </p>
-        <div className="flex gap-2 overflow-x-auto pb-1">
+      <section className="mb-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-8">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Latest</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-900">Fresh stories by category</h2>
+          </div>
+          <Link href="/search" className="text-sm font-bold text-rose-700 hover:text-rose-800">
+            Search all
+          </Link>
+        </div>
+
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-sm font-semibold transition ${
+              className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold transition ${
                 selectedCategory === category
                   ? "bg-rose-700 text-white shadow-sm"
                   : "border border-slate-200 bg-white text-slate-700 hover:bg-rose-50"
@@ -135,26 +263,49 @@ export default function HomePageClient() {
             </button>
           ))}
         </div>
-      </div>
 
-      {loading && <p className="text-slate-600">Loading latest news...</p>}
-
-      {error && (
-        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
-          <p className="font-semibold text-rose-700">{error}</p>
-        </div>
-      )}
-
-      {!loading && !error && (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {latestArticles.map((article) => (
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {visibleArticles.map((article) => (
             <NewsCard key={article._id} article={article} />
           ))}
-          {latestArticles.length === 0 && (
-            <p className="text-slate-600">No news in this category yet.</p>
+          {visibleArticles.length === 0 && (
+            <p className="text-slate-600">No articles found for this category.</p>
           )}
         </div>
-      )}
+      </section>
+
+      <section className="grid gap-5 lg:grid-cols-2">
+        <div className="rounded-3xl border border-slate-200 bg-slate-900 p-5 text-white shadow-sm sm:p-6 lg:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">Breaking News</p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {breakingArticles.map((article) => (
+              <Link key={article._id} href={`/article/${article.slug}`} className="rounded-2xl bg-white/5 p-4 transition hover:bg-white/10">
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-300">{article.category}</p>
+                <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-6 text-white">{article.title}</h3>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Read Next</p>
+          <div className="mt-4 space-y-3">
+            {initialArticles.slice(0, 4).map((article) => (
+              <Link
+                key={article._id}
+                href={`/article/${article.slug}`}
+                className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-rose-200 hover:bg-rose-50"
+              >
+                <div className="min-w-0">
+                  <p className="line-clamp-1 text-sm font-bold text-slate-900">{article.title}</p>
+                  <p className="mt-1 text-xs text-slate-500">{article.author} · {article.category}</p>
+                </div>
+                <span className="text-sm font-black text-rose-700">↗</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
     </section>
   );
 }

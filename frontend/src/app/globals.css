@@ -3,19 +3,17 @@
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
-  --font-sans-base: "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
-  --font-mono-base: "Consolas", "Cascadia Mono", "Courier New", monospace;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans-base);
-  --font-mono: var(--font-mono-base);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans-base);
+  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
 }

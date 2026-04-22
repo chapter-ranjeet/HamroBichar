@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
+import Link from "next/link";
 
-import { getArticleBySlug } from "@/lib/api";
+import ArticleComments from "@/components/ArticleComments";
+import ArticleViewTracker from "@/components/ArticleViewTracker";
+import { fetchArticleServer, fetchArticlesServer } from "@/lib/server-content";
 import { Article } from "@/types";
+
+export const dynamic = "force-dynamic";
 
 const toRenderableHtml = (content: string): string => {
   const hasHtmlTags = /<[^>]+>/.test(content);
@@ -50,7 +55,7 @@ type ArticlePageProps = {
 
 const fetchArticle = async (slug: string): Promise<Article | null> => {
   try {
-    return await getArticleBySlug(slug);
+    return await fetchArticleServer(slug);
   } catch {
     return null;
   }
@@ -112,6 +117,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const articleUrl = `${siteUrl}/article/${article.slug}`;
   const imageUrl = resolveImageUrl(article.image);
   const articleDescription = toTextSnippet(article.content).slice(0, 170);
+  const relatedData = await fetchArticlesServer({ category: article.category });
+  const relatedArticles = relatedData.articles.filter((item) => item.slug !== article.slug).slice(0, 3);
+  const popularArticles = (relatedData.popularArticles ?? [])
+    .filter((item) => item.slug !== article.slug)
+    .slice(0, 4);
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -138,12 +148,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <>
+      <ArticleViewTracker slug={article.slug} />
       <Script
         id={`article-schema-${article.slug}`}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
-      <article className="mx-auto my-6 w-full max-w-4xl rounded-2xl bg-white p-4 shadow-sm sm:my-8 sm:p-8 lg:p-10">
+      <article className="mx-auto my-6 grid w-full max-w-6xl gap-6 lg:grid-cols-[1fr,0.72fr] sm:my-8">
+        <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-8 lg:p-10">
         <p className="mb-3 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-800">
           {article.category}
         </p>
@@ -162,9 +174,43 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         )}
         <div
-          className="prose prose-slate max-w-none text-slate-700"
+          className="prose prose-slate max-w-none text-slate-700 prose-p:leading-8"
           dangerouslySetInnerHTML={{ __html: toRenderableHtml(article.content) }}
         />
+          <div className="mt-8 grid gap-6 lg:grid-cols-[1fr,0.8fr]">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Related Articles</p>
+              <div className="mt-4 grid gap-4 md:grid-cols-3">
+                {relatedArticles.map((related) => (
+                  <Link key={related._id} href={`/article/${related.slug}`} className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-rose-200 hover:bg-rose-50">
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-rose-700">{related.category}</p>
+                    <h2 className="mt-2 line-clamp-3 text-sm font-bold text-slate-900">{related.title}</h2>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Popular Now</p>
+              <div className="mt-4 space-y-3">
+                {popularArticles.map((popular, index) => (
+                  <Link key={popular._id} href={`/article/${popular.slug}`} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 transition hover:border-rose-200 hover:bg-rose-50">
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-100 text-sm font-black text-rose-700">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <p className="line-clamp-2 text-sm font-bold text-slate-900">{popular.title}</p>
+                      <p className="mt-1 text-xs text-slate-500">{popular.viewCount ?? 0} views</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-6 lg:pt-0">
+          <ArticleComments slug={article.slug} />
+        </div>
       </article>
     </>
   );

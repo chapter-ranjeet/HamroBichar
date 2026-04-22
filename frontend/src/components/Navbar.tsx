@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { getArticles } from "@/lib/api";
+import { slugify } from "@/lib/slug";
 import { Article } from "@/types";
 
 export default function Navbar() {
@@ -101,11 +102,19 @@ export default function Navbar() {
               Home
             </Link>
 
+            <Link
+              className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 sm:px-4 sm:py-2 sm:text-sm"
+              href="/search"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              Search
+            </Link>
+
             {categories.map((category) => (
               <Link
                 key={category}
                 className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 sm:px-4 sm:py-2 sm:text-sm"
-                href={`/?category=${encodeURIComponent(category)}`}
+                href={`/category/${slugify(category)}`}
                 onClick={() => setMobileNavOpen(false)}
               >
                 {category}

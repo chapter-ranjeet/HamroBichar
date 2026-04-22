@@ -40,18 +40,38 @@ export const createArticle = asyncHandler(async (req: Request, res: Response) =>
 
 export const getAllArticles = asyncHandler(async (req: Request, res: Response) => {
   const category = req.query.category as string | undefined;
+  const q = req.query.q as string | undefined;
 
-  const filter = category ? { category } : {};
+  const filter: Record<string, unknown> = {};
+
+  if (category) {
+    filter.category = category;
+  }
+
+  if (q) {
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } },
+      { content: { $regex: q, $options: "i" } },
+      { author: { $regex: q, $options: "i" } },
+      { category: { $regex: q, $options: "i" } }
+    ];
+  }
+
   const articles = await Article.find(filter).sort({ createdAt: -1 });
+  const allCategories = await Article.find({}, { category: 1 }).sort({ category: 1 });
+  const popularArticles = await Article.find().sort({ viewCount: -1, createdAt: -1 }).limit(6);
+  const breakingArticles = await Article.find(filter).sort({ createdAt: -1 }).limit(4);
 
-  const categories = [...new Set(articles.map((article) => article.category))];
+  const categories = [...new Set(allCategories.map((article) => article.category))];
 
   res.status(200).json({
     success: true,
     message: "Articles fetched",
     data: {
       articles,
-      categories
+      categories,
+      popularArticles,
+      breakingArticles
     }
   });
 });
@@ -68,6 +88,27 @@ export const getArticleBySlug = asyncHandler(async (req: Request, res: Response)
     success: true,
     message: "Article fetched",
     data: article
+  });
+});
+
+export const incrementArticleViews = asyncHandler(async (req: Request, res: Response) => {
+  const slug = String(req.params.slug ?? "");
+  const article = await Article.findOneAndUpdate(
+    { slug },
+    { $inc: { viewCount: 1 } },
+    { new: true }
+  );
+
+  if (!article) {
+    throw new ApiError(404, "Article not found");
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Article view tracked",
+    data: {
+      viewCount: article.viewCount
+    }
   });
 });
 

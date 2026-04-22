@@ -7,6 +7,7 @@ export interface IArticle extends Document {
   category: string;
   image?: string;
   author: string;
+  viewCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,7 +21,8 @@ const articleSchema = new Schema<IArticle, IArticleModel>(
     content: { type: String, required: true },
     category: { type: String, required: true, trim: true },
     image: { type: String, trim: true },
-    author: { type: String, required: true, trim: true }
+    author: { type: String, required: true, trim: true },
+    viewCount: { type: Number, required: true, default: 0, min: 0 }
   },
   { timestamps: true }
 );

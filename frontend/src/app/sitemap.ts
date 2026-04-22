@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { Article, ArticleListPayload, ApiResponse } from "@/types";
+import { slugify } from "@/lib/slug";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
 const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api";
@@ -24,11 +25,19 @@ const getArticles = async (): Promise<Article[]> => {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articles = await getArticles();
+  const categories = [...new Set(articles.map((article) => article.category))];
   const articleRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
     url: `${siteUrl}/article/${article.slug}`,
     lastModified: article.updatedAt,
     changeFrequency: "hourly",
     priority: 0.8
+  }));
+
+  const categoryRoutes: MetadataRoute.Sitemap = categories.map((category) => ({
+    url: `${siteUrl}/category/${slugify(category)}`,
+    lastModified: new Date().toISOString(),
+    changeFrequency: "daily",
+    priority: 0.7
   }));
 
   return [
@@ -56,6 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.5
     },
+    ...categoryRoutes,
     ...articleRoutes
   ];
 }

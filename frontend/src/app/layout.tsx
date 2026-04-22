@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 
 import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
 
@@ -33,12 +44,21 @@ export const metadata: Metadata = {
     siteName: "HamroBichar",
     title: "HamroBichar | Nepal News & Views",
     description: "HamroBichar brings you timely Nepal news, politics, education, business, and technology updates.",
-    locale: "en_US"
+    locale: "en_US",
+    images: [
+      {
+        url: "/hamrobicharlogo.jpeg",
+        width: 512,
+        height: 512,
+        alt: "HamroBichar"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "HamroBichar | Nepal News & Views",
-    description: "HamroBichar brings you timely Nepal news, politics, education, business, and technology updates."
+    description: "HamroBichar brings you timely Nepal news, politics, education, business, and technology updates.",
+    images: ["/hamrobicharlogo.jpeg"]
   },
   robots: {
     index: true,
@@ -65,7 +85,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
       <body className="min-h-full bg-slate-50 text-slate-900">
         <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#fff1f2,#f8fafc_42%,#ffffff)]">
           <Navbar />

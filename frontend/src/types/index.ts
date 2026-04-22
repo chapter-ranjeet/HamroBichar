@@ -6,6 +6,7 @@ export interface Article {
   category: string;
   image?: string;
   author: string;
+  viewCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -19,6 +20,8 @@ export interface ApiResponse<T> {
 export interface ArticleListPayload {
   articles: Article[];
   categories: string[];
+  popularArticles?: Article[];
+  breakingArticles?: Article[];
 }
 
 export interface LoginPayload {
@@ -41,4 +44,17 @@ export interface AdminUser {
 
 export interface UploadImagePayload {
   imageUrl: string;
+}
+
+export interface ArticleViewPayload {
+  viewCount: number;
+}
+
+export interface Comment {
+  _id: string;
+  articleSlug: string;
+  name: string;
+  message: string;
+  createdAt: string;
+  updatedAt: string;
 }
