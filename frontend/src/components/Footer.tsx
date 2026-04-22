@@ -30,36 +30,36 @@ export default function Footer() {
 
           <div className="flex flex-col gap-2">
             <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Follow HamroBichar</p>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-start gap-3">
               <a
                 href="https://www.facebook.com/profile.php?id=61565276758903"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 font-semibold text-slate-700 transition hover:border-rose-300 hover:text-rose-700"
+                className="inline-flex min-w-24 flex-col items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center font-semibold text-slate-700 transition hover:border-rose-300 hover:text-rose-700"
               >
                 <Image
                   src="/hamrobicharlogo.jpeg"
                   alt="HamroBichar app icon"
-                  width={18}
-                  height={18}
-                  className="h-[18px] w-[18px] rounded-full object-cover"
+                  width={22}
+                  height={22}
+                  className="h-[22px] w-[22px] rounded-full object-cover"
                 />
-                Facebook
+                <span className="text-xs">Facebook</span>
               </a>
               <a
                 href="https://www.instagram.com/hamrobichar/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 font-semibold text-slate-700 transition hover:border-rose-300 hover:text-rose-700"
+                className="inline-flex min-w-24 flex-col items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-center font-semibold text-slate-700 transition hover:border-rose-300 hover:text-rose-700"
               >
                 <Image
                   src="/hamrobicharlogo.jpeg"
                   alt="HamroBichar app icon"
-                  width={18}
-                  height={18}
-                  className="h-[18px] w-[18px] rounded-full object-cover"
+                  width={22}
+                  height={22}
+                  className="h-[22px] w-[22px] rounded-full object-cover"
                 />
-                Instagram
+                <span className="text-xs">Instagram</span>
               </a>
             </div>
           </div>

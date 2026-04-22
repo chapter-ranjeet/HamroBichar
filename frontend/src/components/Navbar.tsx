@@ -151,6 +151,41 @@ export default function Navbar() {
                 )}
               </div>
             )}
+
+            <div className="ml-auto flex items-start gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5">
+              <a
+                href="https://www.facebook.com/profile.php?id=61565276758903"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-w-20 flex-col items-center gap-1 rounded-lg px-2 py-1 text-center text-slate-700 transition hover:bg-rose-50 hover:text-rose-700"
+                onClick={() => setMobileNavOpen(false)}
+              >
+                <Image
+                  src="/hamrobicharlogo.jpeg"
+                  alt="HamroBichar app icon"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 rounded-full object-cover"
+                />
+                <span className="text-[11px] font-semibold">Facebook</span>
+              </a>
+              <a
+                href="https://www.instagram.com/hamrobichar/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-w-20 flex-col items-center gap-1 rounded-lg px-2 py-1 text-center text-slate-700 transition hover:bg-rose-50 hover:text-rose-700"
+                onClick={() => setMobileNavOpen(false)}
+              >
+                <Image
+                  src="/hamrobicharlogo.jpeg"
+                  alt="HamroBichar app icon"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 rounded-full object-cover"
+                />
+                <span className="text-[11px] font-semibold">Instagram</span>
+              </a>
+            </div>
           </div>
         </div>
       </nav>
