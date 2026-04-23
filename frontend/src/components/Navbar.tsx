@@ -59,11 +59,11 @@ export default function Navbar() {
           <div>
             <Link href="/" className="inline-flex items-center gap-2 text-xl font-black tracking-tight text-rose-700 sm:text-3xl">
               <Image
-                src="/HBlogo-square.png"
+                src="/HBLogo2.png"
                 alt="HamroBichar logo"
                 width={56}
                 height={56}
-                className="h-12 w-12 rounded-2xl border border-slate-200 bg-white p-0.5 object-contain sm:h-14 sm:w-14"
+                className="h-12 w-12 rounded-full border border-slate-200 bg-white p-0.5 object-contain sm:h-14 sm:w-14"
                 priority
               />
               <span>HamroBichar</span>
@@ -170,11 +170,11 @@ export default function Navbar() {
                 onClick={() => setMobileNavOpen(false)}
               >
                 <Image
-                  src="/HBlogo-square.png"
+                  src="/HBLogo2.png"
                   alt="HamroBichar app icon"
                   width={28}
                   height={28}
-                  className="h-7 w-7 rounded-lg border border-slate-200 bg-white p-0.5 object-contain"
+                  className="h-7 w-7 rounded-full border border-slate-200 bg-white p-0.5 object-contain"
                 />
                 <span className="text-[11px] font-semibold">Facebook</span>
               </a>
@@ -186,11 +186,11 @@ export default function Navbar() {
                 onClick={() => setMobileNavOpen(false)}
               >
                 <Image
-                  src="/HBlogo-square.png"
+                  src="/HBLogo2.png"
                   alt="HamroBichar app icon"
                   width={28}
                   height={28}
-                  className="h-7 w-7 rounded-lg border border-slate-200 bg-white p-0.5 object-contain"
+                  className="h-7 w-7 rounded-full border border-slate-200 bg-white p-0.5 object-contain"
                 />
                 <span className="text-[11px] font-semibold">Instagram</span>
               </a>

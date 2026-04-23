@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/HBlogo-square.png",
+        url: "/HBLogo2.png",
         width: 512,
         height: 512,
         alt: "HamroBichar"
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "HamroBichar | Nepal News & Views",
     description: "HamroBichar brings you timely Nepal news, politics, education, business, and technology updates.",
-    images: ["/HBlogo-square.png"]
+    images: ["/HBLogo2.png"]
   },
   robots: {
     index: true,
@@ -73,11 +73,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/HBlogo-square.png?v=3", sizes: "512x512", type: "image/png" },
-      { url: "/HBlogo.ico?v=3", type: "image/x-icon" }
+      { url: "/HBLogo2.png?v=1", sizes: "512x512", type: "image/png" },
+      { url: "/HBLogo2.ico?v=1", type: "image/x-icon" }
     ],
-    shortcut: "/HBlogo-square.png?v=3",
-    apple: [{ url: "/HBlogo-square.png?v=3", sizes: "180x180", type: "image/png" }]
+    shortcut: "/HBLogo2.png?v=1",
+    apple: [{ url: "/HBLogo2.png?v=1", sizes: "180x180", type: "image/png" }]
   },
   category: "news"
 };
