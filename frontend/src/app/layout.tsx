@@ -74,9 +74,9 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/HBLogo2.png?v=1", sizes: "512x512", type: "image/png" },
-      { url: "/HBLogo2.ico?v=1", type: "image/x-icon" }
+      { url: "/favicon.ico?v=2", type: "image/x-icon" }
     ],
-    shortcut: "/HBLogo2.png?v=1",
+    shortcut: "/favicon.ico?v=2",
     apple: [{ url: "/HBLogo2.png?v=1", sizes: "180x180", type: "image/png" }]
   },
   category: "news"

@@ -22,7 +22,7 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "maskable"
       },
       {
-        src: "/HBLogo2.ico?v=1",
+        src: "/favicon.ico?v=2",
         sizes: "48x48",
         type: "image/x-icon"
       }
