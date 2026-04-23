@@ -20,30 +20,10 @@ export default function Footer() {
               </div>
 
               <p className="max-w-xl text-sm leading-6 text-slate-300 sm:text-[15px]">
-                Independent reporting, thoughtful analysis, and timely updates presented in a clean, readable format
-                that works equally well on mobile and desktop.
+                HamroBichar is a news platform dedicated to delivering authentic and engaging content
               </p>
 
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/about"
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/10"
-                >
-                  About
-                </Link>
-                <Link
-                  href="/contact"
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/10"
-                >
-                  Contact
-                </Link>
-                <Link
-                  href="/privacy-policy"
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/10"
-                >
-                  Privacy Policy
-                </Link>
-              </div>
+              
             </div>
 
             <div className="grid gap-8 sm:grid-cols-2 xl:col-span-2 xl:grid-cols-2 xl:gap-10">
@@ -109,7 +89,7 @@ export default function Footer() {
 
           <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
             <p>© {year} HamroBichar. All rights reserved.</p>
-            <p>Built for clean reading on every screen size.</p>
+            <p>Voices and News from Nepal.</p>
           </div>
         </div>
       </div>
