@@ -338,7 +338,7 @@ export default function HomePageClient({
       </section>
 
       <section className="mt-8">
-        <NepaliCalendarWidget className="mx-auto max-w-xl" showAdDate />
+        <NepaliCalendarWidget className="mx-auto max-w-5xl" showAdDate />
       </section>
     </section>
   );
