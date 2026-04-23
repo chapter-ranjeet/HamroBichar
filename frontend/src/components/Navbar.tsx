@@ -59,11 +59,11 @@ export default function Navbar() {
           <div>
             <Link href="/" className="inline-flex items-center gap-2 text-xl font-black tracking-tight text-rose-700 sm:text-3xl">
               <Image
-                src="/HBlogo.png"
+                src="/HBlogo-square.png"
                 alt="HamroBichar logo"
-                width={44}
-                height={44}
-                className="h-10 w-10 rounded-xl border border-slate-200 bg-white p-0.5 object-contain sm:h-11 sm:w-11"
+                width={56}
+                height={56}
+                className="h-12 w-12 rounded-2xl border border-slate-200 bg-white p-0.5 object-contain sm:h-14 sm:w-14"
                 priority
               />
               <span>HamroBichar</span>
@@ -170,11 +170,11 @@ export default function Navbar() {
                 onClick={() => setMobileNavOpen(false)}
               >
                 <Image
-                  src="/HBlogo.png"
+                  src="/HBlogo-square.png"
                   alt="HamroBichar app icon"
-                  width={24}
-                  height={24}
-                  className="h-6 w-6 rounded-lg border border-slate-200 bg-white p-0.5 object-contain"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 rounded-lg border border-slate-200 bg-white p-0.5 object-contain"
                 />
                 <span className="text-[11px] font-semibold">Facebook</span>
               </a>
@@ -186,11 +186,11 @@ export default function Navbar() {
                 onClick={() => setMobileNavOpen(false)}
               >
                 <Image
-                  src="/HBlogo.png"
+                  src="/HBlogo-square.png"
                   alt="HamroBichar app icon"
-                  width={24}
-                  height={24}
-                  className="h-6 w-6 rounded-lg border border-slate-200 bg-white p-0.5 object-contain"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 rounded-lg border border-slate-200 bg-white p-0.5 object-contain"
                 />
                 <span className="text-[11px] font-semibold">Instagram</span>
               </a>

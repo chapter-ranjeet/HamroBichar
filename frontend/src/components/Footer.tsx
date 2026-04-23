@@ -11,13 +11,13 @@ export default function Footer() {
           <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-[1.6fr_1fr_1fr] xl:gap-10">
             <div className="space-y-5">
               <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                <span className="inline-flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-white/25 bg-white shadow-lg shadow-rose-500/20">
+                <span className="inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/25 bg-white shadow-lg shadow-rose-500/20">
                   <Image
-                    src="/HBlogo.png"
+                    src="/HBlogo-square.png"
                     alt="HamroBichar logo"
-                    width={48}
-                    height={48}
-                    className="h-11 w-11 object-contain"
+                    width={64}
+                    height={64}
+                    className="h-12 w-12 object-contain"
                     priority
                   />
                 </span>

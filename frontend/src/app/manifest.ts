@@ -11,18 +11,18 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#be123c",
     icons: [
       {
-        src: "/HBlogo.png?v=2",
+        src: "/HBlogo-square.png?v=3",
         sizes: "192x192",
         type: "image/png"
       },
       {
-        src: "/HBlogo.png?v=2",
+        src: "/HBlogo-square.png?v=3",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable"
       },
       {
-        src: "/HBlogo.ico?v=2",
+        src: "/HBlogo.ico?v=3",
         sizes: "48x48",
         type: "image/x-icon"
       }
