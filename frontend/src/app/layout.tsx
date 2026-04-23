@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/hamrobicharlogo.jpeg",
+        url: "/HBlogo.png",
         width: 512,
         height: 512,
         alt: "HamroBichar"
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "HamroBichar | Nepal News & Views",
     description: "HamroBichar brings you timely Nepal news, politics, education, business, and technology updates.",
-    images: ["/hamrobicharlogo.jpeg"]
+    images: ["/HBlogo.png"]
   },
   robots: {
     index: true,
@@ -72,9 +72,9 @@ export const metadata: Metadata = {
     }
   },
   icons: {
-    icon: "/favicon.ico?v=3",
-    shortcut: "/favicon.ico?v=3",
-    apple: "/favicon.ico?v=3"
+    icon: "/HBlogo.ico?v=1",
+    shortcut: "/HBlogo.ico?v=1",
+    apple: "/HBlogo.ico?v=1"
   },
   category: "news"
 };

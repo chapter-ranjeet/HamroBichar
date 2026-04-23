@@ -59,7 +59,7 @@ export default function Navbar() {
           <div>
             <Link href="/" className="inline-flex items-center gap-2 text-xl font-black tracking-tight text-rose-700 sm:text-3xl">
               <Image
-                src="/hamrobicharlogo.jpeg"
+                src="/HBlogo.png"
                 alt="HamroBichar logo"
                 width={40}
                 height={40}
@@ -170,7 +170,7 @@ export default function Navbar() {
                 onClick={() => setMobileNavOpen(false)}
               >
                 <Image
-                  src="/hamrobicharlogo.jpeg"
+                  src="/HBlogo.png"
                   alt="HamroBichar app icon"
                   width={20}
                   height={20}
@@ -186,7 +186,7 @@ export default function Navbar() {
                 onClick={() => setMobileNavOpen(false)}
               >
                 <Image
-                  src="/hamrobicharlogo.jpeg"
+                  src="/HBlogo.png"
                   alt="HamroBichar app icon"
                   width={20}
                   height={20}

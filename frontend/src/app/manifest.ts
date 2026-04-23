@@ -11,7 +11,7 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#be123c",
     icons: [
       {
-        src: "/favicon.ico?v=3",
+        src: "/HBlogo.ico?v=1",
         sizes: "48x48",
         type: "image/x-icon"
       }
