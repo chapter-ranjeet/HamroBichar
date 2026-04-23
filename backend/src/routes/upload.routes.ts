@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 
 import { uploadImage } from "../controllers/upload.controller";
-import { protect, requireAdmin } from "../middlewares/auth.middleware";
+import { protect, requireEditor } from "../middlewares/auth.middleware";
 
 const uploadsDir = path.resolve(process.cwd(), "uploads");
 const cloudinaryCloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUD_NAME;
@@ -41,6 +41,6 @@ const upload = multer({
 
 const router = Router();
 
-router.post("/image", protect, requireAdmin, upload.single("image"), uploadImage);
+router.post("/image", protect, requireEditor, upload.single("image"), uploadImage);
 
 export default router;

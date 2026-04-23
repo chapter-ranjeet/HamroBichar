@@ -71,7 +71,7 @@ export default function AdminDashboardPage() {
   const pathname = usePathname();
 
   const tokenRef = useRef<string>("");
-  const editorRef = useRef<HTMLTextAreaElement | null>(null);
+  const editorRef = useRef<HTMLDivElement | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [articles, setArticles] = useState<Article[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -157,6 +157,44 @@ export default function AdminDashboardPage() {
     return false;
   };
 
+  const syncEditorContent = () => {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+
+    setForm((prev) => ({ ...prev, content: editor.innerHTML }));
+  };
+
+  const execEditorCommand = (command: string, value?: string) => {
+    editorRef.current?.focus();
+    document.execCommand(command, false, value);
+    syncEditorContent();
+  };
+
+  const changeFontSize = (direction: "increase" | "decrease") => {
+    const currentSize = Number(window.prompt("Enter font size in px (for example 16)", "16"));
+    if (!currentSize || Number.isNaN(currentSize)) {
+      return;
+    }
+
+    const nextSize = direction === "increase" ? currentSize + 2 : Math.max(10, currentSize - 2);
+    execEditorCommand("fontSize", "7");
+
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+
+    const fonts = editor.querySelectorAll("font[size='7']");
+    fonts.forEach((font) => {
+      (font as HTMLElement).removeAttribute("size");
+      (font as HTMLElement).style.fontSize = `${nextSize}px`;
+    });
+
+    syncEditorContent();
+  };
+
   const insertAtCursor = (value: string) => {
     const editor = editorRef.current;
     if (!editor) {
@@ -164,20 +202,12 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    const start = editor.selectionStart ?? form.content.length;
-    const end = editor.selectionEnd ?? form.content.length;
-    const before = form.content.slice(0, start);
-    const selected = form.content.slice(start, end);
-    const after = form.content.slice(end);
-    const nextValue = `${before}${value.replace("{{text}}", selected || "")}${after}`;
-
-    setForm((prev) => ({ ...prev, content: nextValue }));
-
-    requestAnimationFrame(() => {
-      editor.focus();
-      const cursor = start + value.length;
-      editor.setSelectionRange(cursor, cursor);
-    });
+    editor.focus();
+    const selection = window.getSelection();
+    const selectedText = selection?.toString() || "";
+    const html = value.replace("{{text}}", selectedText || "text");
+    document.execCommand("insertHTML", false, html);
+    syncEditorContent();
   };
 
   const wrapSelection = (openTag: string, closeTag: string) => {
@@ -186,19 +216,10 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    const start = editor.selectionStart ?? 0;
-    const end = editor.selectionEnd ?? 0;
-    const before = form.content.slice(0, start);
-    const selected = form.content.slice(start, end) || "text";
-    const after = form.content.slice(end);
-    const nextValue = `${before}${openTag}${selected}${closeTag}${after}`;
-
-    setForm((prev) => ({ ...prev, content: nextValue }));
-
-    requestAnimationFrame(() => {
-      editor.focus();
-      editor.setSelectionRange(start + openTag.length, start + openTag.length + selected.length);
-    });
+    editor.focus();
+    const selectedText = window.getSelection()?.toString() || "text";
+    document.execCommand("insertHTML", false, `${openTag}${selectedText}${closeTag}`);
+    syncEditorContent();
   };
 
   const addLink = () => {
@@ -207,7 +228,8 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    wrapSelection(`<a href=\"${url}\" target=\"_blank\" rel=\"noopener noreferrer\">`, "</a>");
+    const selectedText = window.getSelection()?.toString() || "link";
+    execEditorCommand("insertHTML", `<a href=\"${url}\" target=\"_blank\" rel=\"noopener noreferrer\">${selectedText}</a>`);
   };
 
   const loadArticles = async () => {
@@ -283,6 +305,9 @@ export default function AdminDashboardPage() {
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
+    if (editorRef.current) {
+      editorRef.current.innerHTML = "";
+    }
   };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -315,6 +340,12 @@ export default function AdminDashboardPage() {
       content: article.content,
       category: article.category,
       image: article.image ?? ""
+    });
+
+    requestAnimationFrame(() => {
+      if (editorRef.current) {
+        editorRef.current.innerHTML = article.content;
+      }
     });
   };
 
@@ -529,56 +560,56 @@ export default function AdminDashboardPage() {
             <div className="mb-2 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => wrapSelection("<strong>", "</strong>")}
+                onClick={() => execEditorCommand("bold")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
                 Bold
               </button>
               <button
                 type="button"
-                onClick={() => wrapSelection("<em>", "</em>")}
+                onClick={() => execEditorCommand("italic")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
                 Italic
               </button>
               <button
                 type="button"
-                onClick={() => wrapSelection("<u>", "</u>")}
+                onClick={() => execEditorCommand("underline")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
                 Underline
               </button>
               <button
                 type="button"
-                onClick={() => wrapSelection("<h2>", "</h2>")}
+                onClick={() => execEditorCommand("formatBlock", "h2")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
                 H2
               </button>
               <button
                 type="button"
-                onClick={() => wrapSelection("<h3>", "</h3>")}
+                onClick={() => execEditorCommand("formatBlock", "h3")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
                 H3
               </button>
               <button
                 type="button"
-                onClick={() => insertAtCursor("<blockquote>{{text}}</blockquote>")}
+                onClick={() => execEditorCommand("formatBlock", "blockquote")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
                 Quote
               </button>
               <button
                 type="button"
-                onClick={() => insertAtCursor("<ul>\n  <li>{{text}}</li>\n  <li></li>\n</ul>")}
+                onClick={() => execEditorCommand("insertUnorderedList")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
                 Bullet List
               </button>
               <button
                 type="button"
-                onClick={() => insertAtCursor("<ol>\n  <li>{{text}}</li>\n  <li></li>\n</ol>")}
+                onClick={() => execEditorCommand("insertOrderedList")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
                 Numbered List
@@ -592,21 +623,43 @@ export default function AdminDashboardPage() {
               </button>
               <button
                 type="button"
-                onClick={() => insertAtCursor("<img src=\"\" alt=\"{{text}}\" />")}
+                onClick={() => {
+                  const url = window.prompt("Paste image URL", "https://");
+                  if (!url) {
+                    return;
+                  }
+
+                  execEditorCommand("insertHTML", `<img src=\"${url}\" alt=\"article image\" style=\"max-width:100%;height:auto;\" />`);
+                }}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
                 Image Tag
               </button>
+              <button
+                type="button"
+                onClick={() => changeFontSize("increase")}
+                className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
+              >
+                A+
+              </button>
+              <button
+                type="button"
+                onClick={() => changeFontSize("decrease")}
+                className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
+              >
+                A-
+              </button>
             </div>
-            <textarea
-              required
+            <div
               ref={editorRef}
-              value={form.content}
-              onChange={(event) => setForm((prev) => ({ ...prev, content: event.target.value }))}
+              contentEditable
+              suppressContentEditableWarning
+              onInput={syncEditorContent}
+              dangerouslySetInnerHTML={{ __html: form.content || "" }}
               className="min-h-52 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-              placeholder="Write article body. You can paste HTML or plain text."
+              data-placeholder="Write article body. You can use the toolbar like WordPad."
             />
-            <p className="mt-1 text-xs text-slate-500">Word-like editing tools are available above. Plain text is also supported.</p>
+            <p className="mt-1 text-xs text-slate-500">Use the toolbar to style text directly. Content is saved as formatted HTML.</p>
 
             <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
               <p className="mb-2 text-xs font-black uppercase tracking-[0.15em] text-slate-500">Live Preview</p>

@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
 
   return (
     <section className="mx-auto my-12 w-full max-w-md rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-      <h1 className="text-2xl font-black text-slate-900">{isSubAdminPage ? "Subadmin Login" : "Super Admin Login"}</h1>
+      <h1 className="text-2xl font-black text-slate-900">{isSubAdminPage ? "Subadmin Portal" : "Super Admin Portal"}</h1>
       <p className="mt-1 text-sm text-slate-600">
         {isSubAdminPage
           ? "Sign in to post and edit your own articles."
