@@ -167,7 +167,7 @@ export default function NepaliCalendarWidget({ className = "", showAdDate = true
   };
 
   return (
-    <section className={`grid gap-4 lg:grid-cols-[1.2fr,0.8fr] ${className}`}>
+    <section className={`grid gap-4 md:grid-cols-[1.2fr,0.8fr] ${className}`}>
       <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
@@ -239,7 +239,7 @@ export default function NepaliCalendarWidget({ className = "", showAdDate = true
         </div>
       </div>
 
-      <aside className="rounded-3xl border border-rose-200 bg-linear-to-b from-rose-50 to-white p-3.5 shadow-sm sm:p-4 lg:p-5">
+      <aside className="rounded-3xl border border-rose-200 bg-linear-to-b from-rose-50 to-white p-3.5 shadow-sm sm:p-4 md:p-5">
           <div className="mb-3 flex items-center justify-between gap-2">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700">Events & Festivals</p>
