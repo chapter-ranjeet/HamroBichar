@@ -121,7 +121,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       "Nepal news",
       article.category,
       `${article.category} news Nepal`,
-      `${article.title} Nepal",
+      `${article.title} Nepal`,
       article.author,
       ...titleTerms
     ])
