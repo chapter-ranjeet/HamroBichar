@@ -1,78 +1,115 @@
 import Link from "next/link";
 
 export default function Footer() {
-  return (
-    <footer className="mt-16 border-t border-slate-200 bg-linear-to-b from-white via-slate-50 to-slate-100">
-      <div className="w-full px-4 py-8 sm:px-6 lg:px-10">
-        <div className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur-sm sm:p-6 lg:p-8">
-          <div className="grid gap-8 md:grid-cols-[1.3fr,1fr,1fr] md:items-start">
-            <div className="space-y-3">
-              <div>
-                <p className="text-xl font-black tracking-tight text-slate-900">HamroBichar</p>
-                <p className="mt-1 text-sm font-medium text-rose-700">Voices and News from Nepal</p>
-              </div>
-              <p className="max-w-md text-sm leading-6 text-slate-600">
-                Independent reporting, meaningful analysis, and timely updates from Nepal. Built to stay clean,
-                useful, and easy to read on every device.
-              </p>
-              <p className="text-xs font-semibold text-slate-500">
-                © {new Date().getFullYear()} HamroBichar. All rights reserved.
-              </p>
-            </div>
+  const year = new Date().getFullYear();
 
-            <div className="space-y-3">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Quick Links</p>
-              <div className="flex flex-col items-start gap-2">
-                <Link href="/about" className="font-semibold text-slate-700 transition hover:text-rose-700">
+  return (
+    <footer className="mt-16 border-t border-slate-200 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+      <div className="w-full px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
+        <div className="rounded-4xl border border-white/10 bg-white/5 p-4 shadow-[0_20px_80px_rgba(2,6,23,0.25)] backdrop-blur md:p-6 lg:p-8">
+          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-[1.6fr_1fr_1fr] xl:gap-10">
+            <div className="space-y-5">
+              <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-rose-500 to-orange-400 text-sm font-black text-white shadow-lg shadow-rose-500/25">
+                  HB
+                </span>
+                <div>
+                  <p className="text-base font-extrabold tracking-tight text-white">HamroBichar</p>
+                  <p className="text-xs font-medium text-rose-200/90">Voices and News from Nepal</p>
+                </div>
+              </div>
+
+              <p className="max-w-xl text-sm leading-6 text-slate-300 sm:text-[15px]">
+                Independent reporting, thoughtful analysis, and timely updates presented in a clean, readable format
+                that works equally well on mobile and desktop.
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/about"
+                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/10"
+                >
                   About
                 </Link>
-                <Link href="/contact" className="font-semibold text-slate-700 transition hover:text-rose-700">
+                <Link
+                  href="/contact"
+                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/10"
+                >
                   Contact
                 </Link>
-                <Link href="/privacy-policy" className="font-semibold text-slate-700 transition hover:text-rose-700">
+                <Link
+                  href="/privacy-policy"
+                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-white/20 hover:bg-white/10"
+                >
                   Privacy Policy
                 </Link>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Social Media</p>
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href="https://www.facebook.com/profile.php?id=61565276758903"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-w-28 flex-col items-center rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center transition hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50"
-                  aria-label="HamroBichar Facebook"
-                >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white shadow-sm">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4.5 w-4.5" aria-hidden="true">
-                      <path d="M13.5 9H16V6h-2.5C10.9 6 9 7.9 9 10.5V13H7v3h2v6h3v-6h2.4l.6-3H12v-2.5c0-.8.7-1.5 1.5-1.5Z" />
-                    </svg>
-                  </span>
-                  <span className="mt-2 text-xs font-bold text-slate-700">Facebook</span>
-                  <span className="text-[11px] text-slate-500">hamrobichar</span>
-                </a>
+            <div className="grid gap-8 sm:grid-cols-2 xl:col-span-2 xl:grid-cols-2 xl:gap-10">
+              <div className="space-y-4 rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Quick Links</p>
+                <div className="grid gap-3 text-sm font-semibold text-slate-200">
+                  <Link className="transition hover:text-white" href="/about">
+                    About HamroBichar
+                  </Link>
+                  <Link className="transition hover:text-white" href="/contact">
+                    Contact the Team
+                  </Link>
+                  <Link className="transition hover:text-white" href="/privacy-policy">
+                    Privacy Policy
+                  </Link>
+                </div>
+              </div>
 
-                <a
-                  href="https://www.instagram.com/hamrobichar/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-w-28 flex-col items-center rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-center transition hover:-translate-y-0.5 hover:border-pink-300 hover:bg-pink-50"
-                  aria-label="HamroBichar Instagram"
-                >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-fuchsia-500 via-pink-500 to-orange-400 text-white shadow-sm">
-                    <svg viewBox="0 0 24 24" fill="none" className="h-4.5 w-4.5" aria-hidden="true">
-                      <rect x="5" y="5" width="14" height="14" rx="4" stroke="currentColor" strokeWidth="2" />
-                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-                      <circle cx="16.5" cy="7.5" r="1" fill="currentColor" />
-                    </svg>
-                  </span>
-                  <span className="mt-2 text-xs font-bold text-slate-700">Instagram</span>
-                  <span className="text-[11px] text-slate-500">@hamrobichar</span>
-                </a>
+              <div className="space-y-4 rounded-3xl border border-white/10 bg-slate-900/70 p-5">
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Follow Us</p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <a
+                    href="https://www.facebook.com/profile.php?id=61565276758903"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-blue-400/50 hover:bg-blue-500/10"
+                    aria-label="HamroBichar Facebook"
+                  >
+                    <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/25 transition group-hover:scale-105">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden="true">
+                        <path d="M13.5 9H16V6h-2.5C10.9 6 9 7.9 9 10.5V13H7v3h2v6h3v-6h2.4l.6-3H12v-2.5c0-.8.7-1.5 1.5-1.5Z" />
+                      </svg>
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-white">Facebook</p>
+                      <p className="truncate text-xs text-slate-400">hamrobichar</p>
+                    </div>
+                  </a>
+
+                  <a
+                    href="https://www.instagram.com/hamrobichar/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-pink-400/50 hover:bg-pink-500/10"
+                    aria-label="HamroBichar Instagram"
+                  >
+                    <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-fuchsia-500 via-pink-500 to-orange-400 text-white shadow-lg shadow-pink-500/25 transition group-hover:scale-105">
+                      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
+                        <rect x="5" y="5" width="14" height="14" rx="4" stroke="currentColor" strokeWidth="2" />
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                        <circle cx="16.5" cy="7.5" r="1" fill="currentColor" />
+                      </svg>
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-white">Instagram</p>
+                      <p className="truncate text-xs text-slate-400">@hamrobichar</p>
+                    </div>
+                  </a>
+                </div>
               </div>
             </div>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {year} HamroBichar. All rights reserved.</p>
+            <p>Built for clean reading on every screen size.</p>
           </div>
         </div>
       </div>
