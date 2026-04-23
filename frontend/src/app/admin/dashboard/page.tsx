@@ -55,6 +55,7 @@ export default function AdminDashboardPage() {
   const router = useRouter();
 
   const tokenRef = useRef<string>("");
+  const editorRef = useRef<HTMLTextAreaElement | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [articles, setArticles] = useState<Article[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -75,6 +76,59 @@ export default function AdminDashboardPage() {
   );
   const estimatedSlug = useMemo(() => slugify(form.title), [form.title]);
   const canSubmit = Boolean(form.title.trim() && form.content.trim() && form.category.trim()) && !uploadingImage;
+
+  const insertAtCursor = (value: string) => {
+    const editor = editorRef.current;
+    if (!editor) {
+      setForm((prev) => ({ ...prev, content: `${prev.content}${value}` }));
+      return;
+    }
+
+    const start = editor.selectionStart ?? form.content.length;
+    const end = editor.selectionEnd ?? form.content.length;
+    const before = form.content.slice(0, start);
+    const selected = form.content.slice(start, end);
+    const after = form.content.slice(end);
+    const nextValue = `${before}${value.replace("{{text}}", selected || "")}${after}`;
+
+    setForm((prev) => ({ ...prev, content: nextValue }));
+
+    requestAnimationFrame(() => {
+      editor.focus();
+      const cursor = start + value.length;
+      editor.setSelectionRange(cursor, cursor);
+    });
+  };
+
+  const wrapSelection = (openTag: string, closeTag: string) => {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+
+    const start = editor.selectionStart ?? 0;
+    const end = editor.selectionEnd ?? 0;
+    const before = form.content.slice(0, start);
+    const selected = form.content.slice(start, end) || "text";
+    const after = form.content.slice(end);
+    const nextValue = `${before}${openTag}${selected}${closeTag}${after}`;
+
+    setForm((prev) => ({ ...prev, content: nextValue }));
+
+    requestAnimationFrame(() => {
+      editor.focus();
+      editor.setSelectionRange(start + openTag.length, start + openTag.length + selected.length);
+    });
+  };
+
+  const addLink = () => {
+    const url = window.prompt("Enter URL", "https://");
+    if (!url) {
+      return;
+    }
+
+    wrapSelection(`<a href=\"${url}\" target=\"_blank\" rel=\"noopener noreferrer\">`, "</a>");
+  };
 
   const loadArticles = async () => {
     try {
@@ -259,44 +313,89 @@ export default function AdminDashboardPage() {
             <div className="mb-2 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => setForm((prev) => ({ ...prev, content: `${prev.content}<p><strong>Bold headline:</strong> </p>` }))}
+                onClick={() => wrapSelection("<strong>", "</strong>")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Add Bold Block
+                Bold
               </button>
               <button
                 type="button"
-                onClick={() =>
-                  setForm((prev) => ({
-                    ...prev,
-                    content: `${prev.content}<blockquote><em>Quote or key statement...</em></blockquote>`
-                  }))
-                }
+                onClick={() => wrapSelection("<em>", "</em>")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Add Quote
+                Italic
               </button>
               <button
                 type="button"
-                onClick={() =>
-                  setForm((prev) => ({
-                    ...prev,
-                    content: `${prev.content}<ul><li>Point one</li><li>Point two</li></ul>`
-                  }))
-                }
+                onClick={() => wrapSelection("<u>", "</u>")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Add Bullet List
+                Underline
+              </button>
+              <button
+                type="button"
+                onClick={() => wrapSelection("<h2>", "</h2>")}
+                className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
+              >
+                H2
+              </button>
+              <button
+                type="button"
+                onClick={() => wrapSelection("<h3>", "</h3>")}
+                className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
+              >
+                H3
+              </button>
+              <button
+                type="button"
+                onClick={() => insertAtCursor("<blockquote>{{text}}</blockquote>")}
+                className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
+              >
+                Quote
+              </button>
+              <button
+                type="button"
+                onClick={() => insertAtCursor("<ul>\n  <li>{{text}}</li>\n  <li></li>\n</ul>")}
+                className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
+              >
+                Bullet List
+              </button>
+              <button
+                type="button"
+                onClick={() => insertAtCursor("<ol>\n  <li>{{text}}</li>\n  <li></li>\n</ol>")}
+                className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
+              >
+                Numbered List
+              </button>
+              <button
+                type="button"
+                onClick={addLink}
+                className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
+              >
+                Link
+              </button>
+              <button
+                type="button"
+                onClick={() => insertAtCursor("<img src=\"\" alt=\"{{text}}\" />")}
+                className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
+              >
+                Image Tag
               </button>
             </div>
             <textarea
               required
+              ref={editorRef}
               value={form.content}
               onChange={(event) => setForm((prev) => ({ ...prev, content: event.target.value }))}
               className="min-h-52 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
               placeholder="Write article body. You can paste HTML or plain text."
             />
-            <p className="mt-1 text-xs text-slate-500">Tip: Plain text is automatically rendered with line breaks on article page.</p>
+            <p className="mt-1 text-xs text-slate-500">Word-like editing tools are available above. Plain text is also supported.</p>
+
+            <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <p className="mb-2 text-xs font-black uppercase tracking-[0.15em] text-slate-500">Live Preview</p>
+              <div className="prose prose-slate max-w-none rounded bg-white p-3 text-sm" dangerouslySetInnerHTML={{ __html: form.content || "<p>Preview will appear here...</p>" }} />
+            </div>
           </div>
           <input
             list="category-suggestions"

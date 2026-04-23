@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -36,6 +36,7 @@ export default function HomePageClient({
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") ?? "");
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") ?? "All");
   const [showMobileCategories, setShowMobileCategories] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(6);
 
   const categories = useMemo(() => ["All", ...initialCategories], [initialCategories]);
 
@@ -52,8 +53,12 @@ export default function HomePageClient({
       ? initialPopularArticles
       : [...initialArticles].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0)).slice(0, 5);
 
-  const visibleArticles =
-    categoryScopedArticles.slice(0, 9);
+  const visibleArticles = categoryScopedArticles.slice(0, visibleCount);
+  const hasMoreArticles = visibleCount < categoryScopedArticles.length;
+
+  useEffect(() => {
+    setVisibleCount(6);
+  }, [selectedCategory]);
 
   const onSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -272,6 +277,30 @@ export default function HomePageClient({
             <p className="text-slate-600">No articles found for this category.</p>
           )}
         </div>
+
+        {categoryScopedArticles.length > 0 && (
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            {hasMoreArticles && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount((prev) => prev + 5)}
+                className="rounded-full bg-rose-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-rose-800"
+              >
+                Load More Image Preview (+5)
+              </button>
+            )}
+
+            {visibleCount > 6 && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount(6)}
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+              >
+                Re-Load Latest 6
+              </button>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="grid gap-5 lg:grid-cols-2">
