@@ -11,6 +11,10 @@ import { Article } from "@/types";
 export const dynamic = "force-dynamic";
 
 const toRenderableHtml = (content: string): string => {
+  if (!content?.trim()) {
+    return "<p>Content is being updated. Please check back shortly.</p>";
+  }
+
   const hasHtmlTags = /<[^>]+>/.test(content);
   if (hasHtmlTags) {
     return content;
@@ -28,6 +32,15 @@ const toTextSnippet = (content: string): string =>
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+
+const formatReadableDate = (value: string): string => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "Recently";
+  }
+
+  return parsed.toLocaleString();
+};
 
 const resolveImageUrl = (image?: string): string | undefined => {
   if (!image) {
@@ -172,14 +185,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
-      <article className="mx-auto my-6 grid w-full max-w-6xl gap-6 lg:grid-cols-[1fr,0.72fr] sm:my-8">
-        <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-8 lg:p-10">
+      <article className="mx-auto my-4 grid w-full max-w-6xl gap-4 sm:my-6 sm:gap-6 lg:grid-cols-[1fr,0.72fr]">
+        <div className="overflow-hidden rounded-2xl bg-white p-4 shadow-sm sm:p-6 lg:p-8">
         <p className="mb-3 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-800">
           {article.category}
         </p>
-        <h1 className="text-2xl font-black leading-tight text-slate-900 sm:text-3xl lg:text-4xl">{article.title}</h1>
+        <h1 className="break-words text-2xl font-black leading-tight text-slate-900 sm:text-3xl lg:text-4xl">{article.title}</h1>
         <p className="mt-3 text-sm text-slate-500">
-          By {article.author} • {new Date(article.createdAt).toLocaleString()}
+          By {article.author || "HamroBichar Team"} • {formatReadableDate(article.createdAt)}
         </p>
         {article.image && (
           <div className="relative my-5 aspect-video w-full min-h-52 overflow-hidden rounded-xl bg-slate-100 sm:my-6 sm:min-h-72">
@@ -188,21 +201,22 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               src={imageUrl ?? article.image}
               alt={article.title}
               className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
             />
           </div>
         )}
         <div
-          className="prose prose-slate max-w-none text-slate-700 prose-p:leading-8"
+          className="prose prose-slate max-w-none break-words text-slate-700 prose-img:rounded-xl prose-img:shadow-sm prose-p:leading-7 prose-a:break-all sm:prose-p:leading-8"
           dangerouslySetInnerHTML={{ __html: toRenderableHtml(article.content) }}
         />
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr,0.8fr]">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Related Articles</p>
-              <div className="mt-4 grid gap-4 md:grid-cols-3">
+              <div className="mt-4 grid gap-3 sm:gap-4 md:grid-cols-3">
                 {relatedArticles.map((related) => (
-                  <Link key={related._id} href={`/article/${related.slug}`} className="rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-rose-200 hover:bg-rose-50">
+                  <Link key={related._id} href={`/article/${related.slug}`} className="rounded-2xl border border-slate-200 bg-white p-3 transition hover:border-rose-200 hover:bg-rose-50 sm:p-4">
                     <p className="text-[11px] font-black uppercase tracking-[0.18em] text-rose-700">{related.category}</p>
-                    <h2 className="mt-2 line-clamp-3 text-sm font-bold text-slate-900">{related.title}</h2>
+                    <h2 className="mt-2 line-clamp-3 break-words text-sm font-bold text-slate-900">{related.title}</h2>
                   </Link>
                 ))}
                 {relatedArticles.length === 0 && (
@@ -211,7 +225,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Popular Now</p>
               <div className="mt-4 space-y-3">
                 {popularArticles.map((popular, index) => (
@@ -219,8 +233,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-100 text-sm font-black text-rose-700">
                       {index + 1}
                     </span>
-                    <div>
-                      <p className="line-clamp-2 text-sm font-bold text-slate-900">{popular.title}</p>
+                    <div className="min-w-0">
+                      <p className="line-clamp-2 break-words text-sm font-bold text-slate-900">{popular.title}</p>
                       <p className="mt-1 text-xs text-slate-500">{popular.viewCount ?? 0} views</p>
                     </div>
                   </Link>

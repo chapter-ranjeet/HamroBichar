@@ -56,10 +56,10 @@ export default function ArticleComments({ slug }: ArticleCommentsProps) {
 
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-8">
-      <div className="flex items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Comments</p>
-          <h2 className="mt-1 text-2xl font-black text-slate-900">Join the discussion</h2>
+          <h2 className="mt-1 text-xl font-black text-slate-900 sm:text-2xl">Join the discussion</h2>
         </div>
         <p className="text-sm font-semibold text-slate-500">{comments.length} comments</p>
       </div>
@@ -80,7 +80,7 @@ export default function ArticleComments({ slug }: ArticleCommentsProps) {
           rows={4}
           className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-rose-300"
         />
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-slate-500">Keep comments respectful and on topic.</p>
           <button
             type="submit"
@@ -101,11 +101,11 @@ export default function ArticleComments({ slug }: ArticleCommentsProps) {
 
         {comments.map((comment) => (
           <div key={comment._id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <p className="font-bold text-slate-900">{comment.name}</p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="max-w-full break-words font-bold text-slate-900">{comment.name}</p>
               <p className="text-xs text-slate-500">{new Date(comment.createdAt).toLocaleString()}</p>
             </div>
-            <p className="mt-2 text-sm leading-7 text-slate-700">{comment.message}</p>
+            <p className="mt-2 break-words text-sm leading-7 text-slate-700">{comment.message}</p>
           </div>
         ))}
       </div>

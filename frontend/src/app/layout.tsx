@@ -73,11 +73,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/HBLogo2.png?v=1", sizes: "512x512", type: "image/png" },
-      { url: "/favicon.ico?v=2", type: "image/x-icon" }
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/favicon.ico", type: "image/x-icon" }
     ],
-    shortcut: "/favicon.ico?v=2",
-    apple: [{ url: "/HBLogo2.png?v=1", sizes: "180x180", type: "image/png" }]
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/HBLogo2.png", sizes: "180x180", type: "image/png" }]
   },
   category: "news"
 };
