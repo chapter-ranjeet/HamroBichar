@@ -72,9 +72,12 @@ export const metadata: Metadata = {
     }
   },
   icons: {
-    icon: "/HBlogo.ico?v=1",
-    shortcut: "/HBlogo.ico?v=1",
-    apple: "/HBlogo.ico?v=1"
+    icon: [
+      { url: "/HBlogo.ico?v=2", type: "image/x-icon" },
+      { url: "/HBlogo.png?v=2", sizes: "512x512", type: "image/png" }
+    ],
+    shortcut: "/HBlogo.ico?v=2",
+    apple: [{ url: "/HBlogo.png?v=2", sizes: "180x180", type: "image/png" }]
   },
   category: "news"
 };

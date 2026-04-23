@@ -61,9 +61,9 @@ export default function Navbar() {
               <Image
                 src="/HBlogo.png"
                 alt="HamroBichar logo"
-                width={40}
-                height={40}
-                className="h-9 w-9 rounded-full border border-slate-200 object-cover sm:h-10 sm:w-10"
+                width={44}
+                height={44}
+                className="h-10 w-10 rounded-xl border border-slate-200 bg-white p-0.5 object-contain sm:h-11 sm:w-11"
                 priority
               />
               <span>HamroBichar</span>
@@ -172,9 +172,9 @@ export default function Navbar() {
                 <Image
                   src="/HBlogo.png"
                   alt="HamroBichar app icon"
-                  width={20}
-                  height={20}
-                  className="h-5 w-5 rounded-full object-cover"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6 rounded-lg border border-slate-200 bg-white p-0.5 object-contain"
                 />
                 <span className="text-[11px] font-semibold">Facebook</span>
               </a>
@@ -188,9 +188,9 @@ export default function Navbar() {
                 <Image
                   src="/HBlogo.png"
                   alt="HamroBichar app icon"
-                  width={20}
-                  height={20}
-                  className="h-5 w-5 rounded-full object-cover"
+                  width={24}
+                  height={24}
+                  className="h-6 w-6 rounded-lg border border-slate-200 bg-white p-0.5 object-contain"
                 />
                 <span className="text-[11px] font-semibold">Instagram</span>
               </a>

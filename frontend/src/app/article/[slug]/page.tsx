@@ -157,7 +157,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       name: "HamroBichar",
       logo: {
         "@type": "ImageObject",
-        url: `${siteUrl}/HBlogo.ico`
+        url: `${siteUrl}/HBlogo.png`
       }
     },
     mainEntityOfPage: articleUrl,
