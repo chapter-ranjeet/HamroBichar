@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
@@ -10,8 +11,15 @@ export default function Footer() {
           <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-[1.6fr_1fr_1fr] xl:gap-10">
             <div className="space-y-5">
               <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-rose-500 to-orange-400 text-sm font-black text-white shadow-lg shadow-rose-500/25">
-                  HB
+                <span className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/25 bg-white/10 shadow-lg shadow-rose-500/20">
+                  <Image
+                    src="/hamrobicharlogo.jpeg"
+                    alt="HamroBichar logo"
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 object-cover"
+                    priority
+                  />
                 </span>
                 <div>
                   <p className="text-base font-extrabold tracking-tight text-white">HamroBichar</p>
