@@ -110,10 +110,27 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   const articleUrl = `${siteUrl}/article/${article.slug}`;
   const description = toTextSnippet(article.content).slice(0, 170);
   const image = resolveImageUrl(article.image);
+  const titleTerms = article.title
+    .split(/\s+/)
+    .map((term) => term.replace(/[^\w-]/g, "").trim())
+    .filter((term) => term.length >= 4)
+    .slice(0, 8);
+  const keywords = Array.from(
+    new Set([
+      "HamroBichar",
+      "Nepal news",
+      article.category,
+      `${article.category} news Nepal`,
+      `${article.title} Nepal",
+      article.author,
+      ...titleTerms
+    ])
+  );
 
   return {
     title: article.title,
     description,
+    keywords,
     alternates: {
       canonical: articleUrl
     },
