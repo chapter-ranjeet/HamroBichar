@@ -88,6 +88,10 @@ export default function AdminDashboardPage() {
   const [creatingSubAdmin, setCreatingSubAdmin] = useState(false);
   const [subAdminMessage, setSubAdminMessage] = useState<string | null>(null);
   const [managingSubAdmin, setManagingSubAdmin] = useState<string | null>(null);
+  const [articleSearchTerm, setArticleSearchTerm] = useState("");
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+  const [showUserManagementPanel, setShowUserManagementPanel] = useState(false);
+  const [showAccountSettingsPanel, setShowAccountSettingsPanel] = useState(false);
 
   const isEditing = useMemo(() => Boolean(editingId), [editingId]);
   const currentUser = useMemo(() => {
@@ -114,6 +118,33 @@ export default function AdminDashboardPage() {
   );
   const estimatedSlug = useMemo(() => slugify(form.title), [form.title]);
   const canSubmit = Boolean(form.title.trim() && form.content.trim() && form.category.trim()) && !uploadingImage;
+  const isMasterRoute = pathname.startsWith("/master");
+  const filteredArticles = useMemo(() => {
+    const query = articleSearchTerm.trim().toLowerCase();
+    if (!query) {
+      return articles;
+    }
+
+    return articles.filter((article) => {
+      return (
+        article.title.toLowerCase().includes(query) ||
+        article.category.toLowerCase().includes(query) ||
+        article.author.toLowerCase().includes(query)
+      );
+    });
+  }, [articleSearchTerm, articles]);
+  const groupedFilteredArticles = useMemo(() => {
+    const groups = filteredArticles.reduce<Record<string, Article[]>>((acc, article) => {
+      if (!acc[article.category]) {
+        acc[article.category] = [];
+      }
+
+      acc[article.category].push(article);
+      return acc;
+    }, {});
+
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+  }, [filteredArticles]);
   const canModifyArticle = (article: Article): boolean => {
     if (isSuperAdmin) {
       return true;
@@ -419,6 +450,13 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const onToggleCategory = (category: string) => {
+    setOpenCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+  };
+
   const onLogout = () => {
     localStorage.removeItem("hamrobichar_token");
     localStorage.removeItem("hamrobichar_user");
@@ -427,12 +465,47 @@ export default function AdminDashboardPage() {
 
   return (
     <section className="mx-auto my-6 w-full max-w-6xl space-y-6 px-4 lg:my-8 sm:px-6">
+      {isSuperAdmin && isMasterRoute && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={onLogout}
+              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+            >
+              Logout
+            </button>
+            <button
+              onClick={() => setShowUserManagementPanel((prev) => !prev)}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                showUserManagementPanel
+                  ? "border-rose-300 bg-rose-50 text-rose-700"
+                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              User Management
+            </button>
+            <button
+              onClick={() => setShowAccountSettingsPanel((prev) => !prev)}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                showAccountSettingsPanel
+                  ? "border-rose-300 bg-rose-50 text-rose-700"
+                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              Account Settings
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-xl font-black text-slate-900">{isEditing ? "Edit Article" : "Create Article"}</h1>
-          <button onClick={onLogout} className="text-sm font-semibold text-rose-700">
-            Logout
-          </button>
+          {!isMasterRoute && (
+            <button onClick={onLogout} className="text-sm font-semibold text-rose-700">
+              Logout
+            </button>
+          )}
         </div>
 
         <form onSubmit={onSubmit} className="space-y-3">
@@ -594,35 +667,72 @@ export default function AdminDashboardPage() {
 
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black text-slate-900">Existing Articles</h2>
+        <div className="mt-4">
+          <input
+            value={articleSearchTerm}
+            onChange={(event) => setArticleSearchTerm(event.target.value)}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+            placeholder="Search posted articles by title, category, or author"
+          />
+        </div>
 
         {loading ? (
           <p className="mt-4 text-slate-600">Loading articles...</p>
         ) : (
-          <ul className="mt-4 space-y-3">
-            {articles.length === 0 && <li className="text-slate-500">No articles found.</li>}
-            {articles.map((article) => (
-              <li key={article._id} className="rounded-xl border border-slate-200 p-3">
-                <p className="font-bold text-slate-800">{article.title}</p>
-                <p className="text-xs text-slate-500">{article.category}</p>
-                <p className="text-xs text-slate-500">Author: {article.author}</p>
-                <div className="mt-2 flex gap-3 text-sm font-semibold">
-                  <button onClick={() => onEdit(article)} disabled={!canModifyArticle(article)} className="text-amber-700 disabled:cursor-not-allowed disabled:opacity-40">
-                    Edit
-                  </button>
+          <div className="mt-4 space-y-3">
+            {groupedFilteredArticles.length === 0 && <p className="text-slate-500">No articles found.</p>}
+
+            {groupedFilteredArticles.map(([category, categoryArticles]) => {
+              const isOpen = openCategories[category] ?? false;
+
+              return (
+                <div key={category} className="rounded-xl border border-slate-200">
                   <button
-                    onClick={() => void onDelete(article._id)}
-                    disabled={!isSuperAdmin}
-                    className="text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    type="button"
+                    onClick={() => onToggleCategory(category)}
+                    className="flex w-full items-center justify-between px-4 py-3 text-left"
                   >
-                    Delete
+                    <span className="font-bold text-slate-800">{category}</span>
+                    <span className="text-xs font-semibold text-slate-500">
+                      {categoryArticles.length} article{categoryArticles.length > 1 ? "s" : ""} {isOpen ? "▲" : "▼"}
+                    </span>
                   </button>
+
+                  {isOpen && (
+                    <ul className="space-y-2 border-t border-slate-200 px-3 py-3">
+                      {categoryArticles.map((article) => (
+                        <li key={article._id} className="rounded-lg border border-slate-200 p-3">
+                          <p className="font-bold text-slate-800">{article.title}</p>
+                          <p className="text-xs text-slate-500">Author: {article.author}</p>
+                          <div className="mt-2 flex gap-3 text-sm font-semibold">
+                            <button
+                              onClick={() => onEdit(article)}
+                              disabled={!canModifyArticle(article)}
+                              className="text-amber-700 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => void onDelete(article._id)}
+                              disabled={!isSuperAdmin}
+                              className="text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                          {!isSuperAdmin && !canModifyArticle(article) && (
+                            <p className="mt-1 text-xs font-semibold text-slate-500">
+                              Subadmin can edit only own articles.
+                            </p>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-                {!isSuperAdmin && !canModifyArticle(article) && (
-                  <p className="mt-1 text-xs font-semibold text-slate-500">Subadmin can edit only own articles.</p>
-                )}
-              </li>
-            ))}
-          </ul>
+              );
+            })}
+          </div>
         )}
       </div>
 
@@ -671,7 +781,7 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {isSuperAdmin && (
+      {isSuperAdmin && showUserManagementPanel && (
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black text-slate-900">User Management</h2>
         {usersLoading ? (
@@ -768,6 +878,7 @@ export default function AdminDashboardPage() {
       </div>
       )}
 
+      {(showAccountSettingsPanel || !isMasterRoute) && (
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black text-slate-900">Account Settings</h2>
         <p className="mt-1 text-sm text-slate-600">Use these actions to secure or end your admin session.</p>
@@ -823,6 +934,7 @@ export default function AdminDashboardPage() {
 
         {accountMessage && <p className="mt-3 text-sm font-semibold text-slate-700">{accountMessage}</p>}
       </div>
+      )}
     </section>
   );
 }
