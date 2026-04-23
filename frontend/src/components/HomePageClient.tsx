@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+import NepaliCalendarWidget from "@/components/NepaliCalendarWidget";
 import NewsCard from "@/components/NewsCard";
 import { slugify } from "@/lib/slug";
 import { Article } from "@/types";
@@ -334,6 +335,10 @@ export default function HomePageClient({
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="mt-8">
+        <NepaliCalendarWidget className="mx-auto max-w-xl" showAdDate />
       </section>
     </section>
   );
