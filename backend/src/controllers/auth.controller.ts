@@ -36,8 +36,8 @@ export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(401, "Invalid credentials");
   }
 
-  if (user.role !== "admin") {
-    throw new ApiError(403, "Only admin can access dashboard");
+  if (!["admin", "superadmin", "subadmin"].includes(user.role)) {
+    throw new ApiError(403, "Only admin or subadmin can access dashboard");
   }
 
   const token = signToken({
@@ -98,6 +98,42 @@ export const registerAdmin = asyncHandler(async (req: Request, res: Response) =>
   });
 });
 
+export const createSubAdmin = asyncHandler(async (req: Request, res: Response) => {
+  const { username, email, password } = req.body as {
+    username?: string;
+    email?: string;
+    password?: string;
+  };
+
+  if (!username || !email || !password) {
+    throw new ApiError(400, "Username, email and password are required");
+  }
+
+  const exists = await User.findOne({ email });
+  if (exists) {
+    throw new ApiError(409, "User already exists with this email");
+  }
+
+  const user = await User.create({
+    username,
+    email,
+    password,
+    role: "subadmin"
+  });
+
+  res.status(201).json({
+    success: true,
+    message: "Subadmin created",
+    data: {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt
+    }
+  });
+});
+
 export const getAllUsers = asyncHandler(async (_req: Request, res: Response) => {
   const users = await User.find({}, { password: 0 }).sort({ createdAt: -1 });
 
@@ -110,14 +146,14 @@ export const getAllUsers = asyncHandler(async (_req: Request, res: Response) => 
 
 export const updateUserRole = asyncHandler(async (req: Request, res: Response) => {
   const id = String(req.params.id ?? "");
-  const { role } = req.body as { role?: "admin" | "user" };
+  const { role } = req.body as { role?: "admin" | "superadmin" | "subadmin" | "user" };
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new ApiError(400, "Invalid user id");
   }
 
-  if (!role || !["admin", "user"].includes(role)) {
-    throw new ApiError(400, "Role must be admin or user");
+  if (!role || !["admin", "superadmin", "subadmin", "user"].includes(role)) {
+    throw new ApiError(400, "Role must be superadmin, admin, subadmin or user");
   }
 
   const user = await User.findById(id);

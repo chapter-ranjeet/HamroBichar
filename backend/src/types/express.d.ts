@@ -4,7 +4,7 @@ declare global {
   namespace Express {
     interface UserPayload extends JwtPayload {
       userId: string;
-      role: "admin" | "user";
+      role: "superadmin" | "admin" | "subadmin" | "user";
       username: string;
       email: string;
     }

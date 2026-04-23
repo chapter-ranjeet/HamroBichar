@@ -27,8 +27,24 @@ export const protect = (req: Request, _res: Response, next: NextFunction): void 
 };
 
 export const requireAdmin = (req: Request, _res: Response, next: NextFunction): void => {
-  if (!req.user || req.user.role !== "admin") {
+  if (!req.user || !["admin", "superadmin"].includes(req.user.role)) {
     return next(new ApiError(403, "Forbidden: admin access required"));
+  }
+
+  return next();
+};
+
+export const requireEditor = (req: Request, _res: Response, next: NextFunction): void => {
+  if (!req.user || !["admin", "superadmin", "subadmin"].includes(req.user.role)) {
+    return next(new ApiError(403, "Forbidden: editor access required"));
+  }
+
+  return next();
+};
+
+export const requireSuperAdmin = (req: Request, _res: Response, next: NextFunction): void => {
+  if (!req.user || !["admin", "superadmin"].includes(req.user.role)) {
+    return next(new ApiError(403, "Forbidden: super admin access required"));
   }
 
   return next();

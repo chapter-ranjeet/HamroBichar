@@ -1,12 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 import { loginAdmin } from "@/lib/api";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +23,17 @@ export default function AdminLoginPage() {
       const response = await loginAdmin(email, password);
       localStorage.setItem("hamrobichar_token", response.token);
       localStorage.setItem("hamrobichar_user", JSON.stringify(response.user));
+
+      if (response.user.role === "subadmin") {
+        router.push("/subadmin/dashboard");
+        return;
+      }
+
+      if (pathname.startsWith("/subadmin")) {
+        router.push("/master/dashboard");
+        return;
+      }
+
       router.push("/master/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

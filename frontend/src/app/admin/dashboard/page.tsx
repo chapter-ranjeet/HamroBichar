@@ -1,10 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   changeAdminPassword,
+  createSubAdmin,
   createArticle,
   deleteArticle,
   getAdminUsers,
@@ -29,6 +30,12 @@ interface PasswordFormState {
   confirmPassword: string;
 }
 
+interface SubAdminFormState {
+  username: string;
+  email: string;
+  password: string;
+}
+
 const slugify = (value: string): string =>
   value
     .toLowerCase()
@@ -51,8 +58,15 @@ const emptyPasswordForm: PasswordFormState = {
   confirmPassword: ""
 };
 
+const emptySubAdminForm: SubAdminFormState = {
+  username: "",
+  email: "",
+  password: ""
+};
+
 export default function AdminDashboardPage() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const tokenRef = useRef<string>("");
   const editorRef = useRef<HTMLTextAreaElement | null>(null);
@@ -68,14 +82,46 @@ export default function AdminDashboardPage() {
   const [accountMessage, setAccountMessage] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [passwordForm, setPasswordForm] = useState<PasswordFormState>(emptyPasswordForm);
+  const [subAdminForm, setSubAdminForm] = useState<SubAdminFormState>(emptySubAdminForm);
+  const [creatingSubAdmin, setCreatingSubAdmin] = useState(false);
+  const [subAdminMessage, setSubAdminMessage] = useState<string | null>(null);
 
   const isEditing = useMemo(() => Boolean(editingId), [editingId]);
+  const currentUser = useMemo(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    const saved = localStorage.getItem("hamrobichar_user");
+    if (!saved) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(saved) as { id: string; role: "superadmin" | "admin" | "subadmin" | "user" };
+    } catch {
+      return null;
+    }
+  }, []);
+  const isSuperAdmin = currentUser?.role === "admin" || currentUser?.role === "superadmin";
+  const isSubAdmin = currentUser?.role === "subadmin";
   const availableCategories = useMemo(
     () => Array.from(new Set(articles.map((article) => article.category).filter(Boolean))).sort((a, b) => a.localeCompare(b)),
     [articles]
   );
   const estimatedSlug = useMemo(() => slugify(form.title), [form.title]);
   const canSubmit = Boolean(form.title.trim() && form.content.trim() && form.category.trim()) && !uploadingImage;
+  const canModifyArticle = (article: Article): boolean => {
+    if (isSuperAdmin) {
+      return true;
+    }
+
+    if (isSubAdmin && currentUser?.id) {
+      return article.createdBy === currentUser.id;
+    }
+
+    return false;
+  };
 
   const insertAtCursor = (value: string) => {
     const editor = editorRef.current;
@@ -157,17 +203,38 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     const savedToken = localStorage.getItem("hamrobichar_token");
+    const savedUser = localStorage.getItem("hamrobichar_user");
     if (!savedToken) {
-      router.replace("/master");
+      router.replace(pathname.startsWith("/subadmin") ? "/subadmin" : "/master");
+      return;
+    }
+
+    if (!savedUser) {
+      router.replace(pathname.startsWith("/subadmin") ? "/subadmin" : "/master");
+      return;
+    }
+
+    const parsed = JSON.parse(savedUser) as { role: "superadmin" | "admin" | "subadmin" | "user" };
+    const isSuper = parsed.role === "admin" || parsed.role === "superadmin";
+
+    if (pathname.startsWith("/subadmin") && parsed.role !== "subadmin") {
+      router.replace("/master/dashboard");
+      return;
+    }
+
+    if (pathname.startsWith("/master") && !isSuper) {
+      router.replace("/subadmin/dashboard");
       return;
     }
 
     tokenRef.current = savedToken;
     queueMicrotask(() => {
       void loadArticles();
-      void loadUsers();
+      if (isSuper) {
+        void loadUsers();
+      }
     });
-  }, [router]);
+  }, [pathname, router]);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -236,7 +303,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const onRoleChange = async (userId: string, role: "admin" | "user") => {
+  const onRoleChange = async (userId: string, role: "superadmin" | "admin" | "subadmin" | "user") => {
     try {
       setError(null);
       await updateAdminUserRole(userId, role, tokenRef.current);
@@ -276,6 +343,32 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const onCreateSubAdmin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+      setCreatingSubAdmin(true);
+      setSubAdminMessage(null);
+
+      await createSubAdmin(
+        {
+          username: subAdminForm.username,
+          email: subAdminForm.email,
+          password: subAdminForm.password
+        },
+        tokenRef.current
+      );
+
+      setSubAdminForm(emptySubAdminForm);
+      setSubAdminMessage("Subadmin created successfully.");
+      await loadUsers();
+    } catch (err) {
+      setSubAdminMessage(err instanceof Error ? err.message : "Failed to create subadmin");
+    } finally {
+      setCreatingSubAdmin(false);
+    }
+  };
+
   const onLogout = () => {
     localStorage.removeItem("hamrobichar_token");
     localStorage.removeItem("hamrobichar_user");
@@ -283,7 +376,7 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <section className="mx-auto my-6 grid w-full max-w-6xl gap-6 px-4 lg:my-8 lg:grid-cols-[1fr,1.1fr] sm:px-6">
+    <section className="mx-auto my-6 w-full max-w-6xl space-y-6 px-4 lg:my-8 sm:px-6">
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-xl font-black text-slate-900">{isEditing ? "Edit Article" : "Create Article"}</h1>
@@ -461,21 +554,75 @@ export default function AdminDashboardPage() {
               <li key={article._id} className="rounded-xl border border-slate-200 p-3">
                 <p className="font-bold text-slate-800">{article.title}</p>
                 <p className="text-xs text-slate-500">{article.category}</p>
+                <p className="text-xs text-slate-500">Author: {article.author}</p>
                 <div className="mt-2 flex gap-3 text-sm font-semibold">
-                  <button onClick={() => onEdit(article)} className="text-amber-700">
+                  <button onClick={() => onEdit(article)} disabled={!canModifyArticle(article)} className="text-amber-700 disabled:cursor-not-allowed disabled:opacity-40">
                     Edit
                   </button>
-                  <button onClick={() => void onDelete(article._id)} className="text-rose-700">
+                  <button
+                    onClick={() => void onDelete(article._id)}
+                    disabled={!isSuperAdmin}
+                    className="text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
                     Delete
                   </button>
                 </div>
+                {!isSuperAdmin && !canModifyArticle(article) && (
+                  <p className="mt-1 text-xs font-semibold text-slate-500">Subadmin can edit only own articles.</p>
+                )}
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      <div className="rounded-2xl bg-white p-5 shadow-sm lg:col-span-2 sm:p-6">
+      {isSuperAdmin && (
+        <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+          <h2 className="text-xl font-black text-slate-900">Create Subadmin</h2>
+          <p className="mt-1 text-sm text-slate-600">Subadmins can post articles and edit only their own posts.</p>
+
+          <form onSubmit={onCreateSubAdmin} className="mt-4 grid gap-3 sm:grid-cols-3">
+            <input
+              required
+              value={subAdminForm.username}
+              onChange={(event) => setSubAdminForm((prev) => ({ ...prev, username: event.target.value }))}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+              placeholder="Username"
+            />
+            <input
+              type="email"
+              required
+              value={subAdminForm.email}
+              onChange={(event) => setSubAdminForm((prev) => ({ ...prev, email: event.target.value }))}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+              placeholder="Email"
+            />
+            <input
+              type="password"
+              required
+              minLength={6}
+              value={subAdminForm.password}
+              onChange={(event) => setSubAdminForm((prev) => ({ ...prev, password: event.target.value }))}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+              placeholder="Password"
+            />
+            <div className="sm:col-span-3">
+              <button
+                type="submit"
+                disabled={creatingSubAdmin}
+                className="rounded-lg bg-rose-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {creatingSubAdmin ? "Creating..." : "Create Subadmin"}
+              </button>
+            </div>
+          </form>
+
+          {subAdminMessage && <p className="mt-3 text-sm font-semibold text-slate-700">{subAdminMessage}</p>}
+        </div>
+      )}
+
+      {isSuperAdmin && (
+      <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black text-slate-900">User Management</h2>
         {usersLoading ? (
           <p className="mt-4 text-slate-600">Loading users...</p>
@@ -490,10 +637,10 @@ export default function AdminDashboardPage() {
                     {user.role}
                   </p>
                   <button
-                    onClick={() => onRoleChange(user._id, user.role === "admin" ? "user" : "admin")}
+                    onClick={() => onRoleChange(user._id, user.role === "subadmin" ? "user" : "subadmin")}
                     className="mt-2 rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
                   >
-                    Make {user.role === "admin" ? "User" : "Admin"}
+                    Make {user.role === "subadmin" ? "User" : "Subadmin"}
                   </button>
                 </li>
               ))}
@@ -517,10 +664,10 @@ export default function AdminDashboardPage() {
                     <td className="py-2 pr-3 uppercase text-xs font-bold text-slate-500">{user.role}</td>
                     <td className="py-2">
                       <button
-                        onClick={() => onRoleChange(user._id, user.role === "admin" ? "user" : "admin")}
+                        onClick={() => onRoleChange(user._id, user.role === "subadmin" ? "user" : "subadmin")}
                         className="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
                       >
-                        Make {user.role === "admin" ? "User" : "Admin"}
+                        Make {user.role === "subadmin" ? "User" : "Subadmin"}
                       </button>
                     </td>
                   </tr>
@@ -531,19 +678,11 @@ export default function AdminDashboardPage() {
           </>
         )}
       </div>
+      )}
 
-      <div className="rounded-2xl bg-white p-5 shadow-sm lg:col-span-2 sm:p-6">
+      <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black text-slate-900">Account Settings</h2>
         <p className="mt-1 text-sm text-slate-600">Use these actions to secure or end your admin session.</p>
-
-        <div className="mt-4">
-          <button
-            onClick={onLogout}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
-          >
-            Logout
-          </button>
-        </div>
 
         <form onSubmit={onChangePassword} className="mt-6 grid gap-3 sm:grid-cols-2">
           <input

@@ -6,6 +6,7 @@ export interface Article {
   category: string;
   image?: string;
   author: string;
+  createdBy?: string;
   viewCount: number;
   createdAt: string;
   updatedAt: string;
@@ -30,7 +31,7 @@ export interface LoginPayload {
     id: string;
     username: string;
     email: string;
-    role: "admin" | "user";
+    role: "superadmin" | "admin" | "subadmin" | "user";
   };
 }
 
@@ -38,7 +39,7 @@ export interface AdminUser {
   _id: string;
   username: string;
   email: string;
-  role: "admin" | "user";
+  role: "superadmin" | "admin" | "subadmin" | "user";
   createdAt: string;
 }
 

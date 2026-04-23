@@ -7,6 +7,7 @@ export interface IArticle extends Document {
   category: string;
   image?: string;
   author: string;
+  createdBy?: mongoose.Types.ObjectId;
   viewCount: number;
   createdAt: Date;
   updatedAt: Date;
@@ -22,6 +23,7 @@ const articleSchema = new Schema<IArticle, IArticleModel>(
     category: { type: String, required: true, trim: true },
     image: { type: String, trim: true },
     author: { type: String, required: true, trim: true },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User" },
     viewCount: { type: Number, required: true, default: 0, min: 0 }
   },
   { timestamps: true }

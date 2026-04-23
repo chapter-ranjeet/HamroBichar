@@ -2,19 +2,21 @@ import { Router } from "express";
 
 import {
 	changePassword,
+	createSubAdmin,
 	getAllUsers,
 	loginAdmin,
 	registerAdmin,
 	updateUserRole
 } from "../controllers/auth.controller";
-import { protect, requireAdmin } from "../middlewares/auth.middleware";
+import { protect, requireSuperAdmin } from "../middlewares/auth.middleware";
 
 const router = Router();
 
 router.post("/login", loginAdmin);
 router.patch("/change-password", protect, changePassword);
-router.post("/register-admin", protect, requireAdmin, registerAdmin);
-router.get("/users", protect, requireAdmin, getAllUsers);
-router.patch("/users/:id/role", protect, requireAdmin, updateUserRole);
+router.post("/register-admin", protect, requireSuperAdmin, registerAdmin);
+router.post("/subadmin", protect, requireSuperAdmin, createSubAdmin);
+router.get("/users", protect, requireSuperAdmin, getAllUsers);
+router.patch("/users/:id/role", protect, requireSuperAdmin, updateUserRole);
 
 export default router;

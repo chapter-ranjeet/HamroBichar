@@ -124,7 +124,7 @@ export const getAdminUsers = async (token: string): Promise<AdminUser[]> => {
 
 export const updateAdminUserRole = async (
   userId: string,
-  role: "admin" | "user",
+  role: "superadmin" | "admin" | "subadmin" | "user",
   token: string
 ): Promise<AdminUser> => {
   const response = await api.patch<ApiResponse<AdminUser>>(
@@ -136,6 +136,19 @@ export const updateAdminUserRole = async (
       }
     }
   );
+
+  return response.data.data;
+};
+
+export const createSubAdmin = async (
+  payload: { username: string; email: string; password: string },
+  token: string
+): Promise<AdminUser> => {
+  const response = await api.post<ApiResponse<AdminUser>>("/auth/subadmin", payload, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
 
   return response.data.data;
 };

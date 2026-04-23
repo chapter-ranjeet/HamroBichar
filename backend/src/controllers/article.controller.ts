@@ -28,7 +28,8 @@ export const createArticle = asyncHandler(async (req: Request, res: Response) =>
     content,
     category,
     image,
-    author: normalizedAuthor || req.user?.username || "Admin"
+    author: normalizedAuthor || req.user?.username || "Admin",
+    createdBy: req.user?.userId
   });
 
   res.status(201).json({
@@ -131,6 +132,17 @@ export const updateArticle = asyncHandler(async (req: Request, res: Response) =>
     throw new ApiError(404, "Article not found");
   }
 
+  const requester = req.user;
+  const isSuperAdmin = requester && ["admin", "superadmin"].includes(requester.role);
+  const isSubAdminOwner =
+    requester?.role === "subadmin" &&
+    article.createdBy &&
+    article.createdBy.toString() === requester.userId;
+
+  if (!isSuperAdmin && !isSubAdminOwner) {
+    throw new ApiError(403, "Forbidden: you can edit only your own articles");
+  }
+
   if (title && title !== article.title) {
     article.slug = await generateUniqueSlug(title, article._id.toString());
     article.title = title;
@@ -168,10 +180,19 @@ export const deleteArticle = asyncHandler(async (req: Request, res: Response) =>
     throw new ApiError(400, "Invalid article id");
   }
 
-  const article = await Article.findByIdAndDelete(id);
+  const article = await Article.findById(id);
   if (!article) {
     throw new ApiError(404, "Article not found");
   }
+
+  const requester = req.user;
+  const isSuperAdmin = requester && ["admin", "superadmin"].includes(requester.role);
+
+  if (!isSuperAdmin) {
+    throw new ApiError(403, "Forbidden: only super admin can delete articles");
+  }
+
+  await article.deleteOne();
 
   res.status(200).json({
     success: true,
