@@ -153,6 +153,30 @@ export const createSubAdmin = async (
   return response.data.data;
 };
 
+export const resetSubAdminPassword = async (
+  userId: string,
+  newPassword: string,
+  token: string
+): Promise<void> => {
+  await api.patch(
+    `/auth/subadmin/${userId}/password`,
+    { newPassword },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+};
+
+export const deleteSubAdmin = async (userId: string, token: string): Promise<void> => {
+  await api.delete(`/auth/subadmin/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+};
+
 export const changeAdminPassword = async (
   currentPassword: string,
   newPassword: string,

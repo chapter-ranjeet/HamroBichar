@@ -176,6 +176,60 @@ export const updateUserRole = asyncHandler(async (req: Request, res: Response) =
   });
 });
 
+export const resetSubAdminPassword = asyncHandler(async (req: Request, res: Response) => {
+  const id = String(req.params.id ?? "");
+  const { newPassword } = req.body as { newPassword?: string };
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid user id");
+  }
+
+  if (!newPassword || newPassword.length < 6) {
+    throw new ApiError(400, "New password must be at least 6 characters");
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (user.role !== "subadmin") {
+    throw new ApiError(400, "Password reset is allowed only for subadmins");
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Subadmin password updated"
+  });
+});
+
+export const deleteSubAdmin = asyncHandler(async (req: Request, res: Response) => {
+  const id = String(req.params.id ?? "");
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid user id");
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (user.role !== "subadmin") {
+    throw new ApiError(400, "Only subadmin accounts can be deleted here");
+  }
+
+  await user.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    message: "Subadmin deleted"
+  });
+});
+
 export const changePassword = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   const { currentPassword, newPassword } = req.body as {

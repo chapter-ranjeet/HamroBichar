@@ -8,6 +8,7 @@ import { loginAdmin } from "@/lib/api";
 export default function AdminLoginPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const isSubAdminPage = pathname.startsWith("/subadmin");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,8 +45,12 @@ export default function AdminLoginPage() {
 
   return (
     <section className="mx-auto my-12 w-full max-w-md rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-      <h1 className="text-2xl font-black text-slate-900">Admin Login</h1>
-      <p className="mt-1 text-sm text-slate-600">Sign in to manage news content.</p>
+      <h1 className="text-2xl font-black text-slate-900">{isSubAdminPage ? "Subadmin Login" : "Super Admin Login"}</h1>
+      <p className="mt-1 text-sm text-slate-600">
+        {isSubAdminPage
+          ? "Sign in to post and edit your own articles."
+          : "Sign in to manage full newsroom access and subadmins."}
+      </p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <div>
@@ -59,7 +64,7 @@ export default function AdminLoginPage() {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-rose-300 focus:ring"
-            placeholder="admin@hamrobichar.com"
+            placeholder="xxxxxx@hamrobichar.com"
           />
         </div>
 
@@ -85,7 +90,7 @@ export default function AdminLoginPage() {
           disabled={loading}
           className="w-full rounded-lg bg-rose-700 px-4 py-2 font-semibold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "Signing in..." : isSubAdminPage ? "Sign in as Subadmin" : "Sign in as Super Admin"}
         </button>
       </form>
     </section>

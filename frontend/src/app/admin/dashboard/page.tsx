@@ -6,10 +6,12 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "re
 import {
   changeAdminPassword,
   createSubAdmin,
+  deleteSubAdmin,
   createArticle,
   deleteArticle,
   getAdminUsers,
   getArticles,
+  resetSubAdminPassword,
   updateAdminUserRole,
   updateArticle,
   uploadArticleImage
@@ -85,6 +87,7 @@ export default function AdminDashboardPage() {
   const [subAdminForm, setSubAdminForm] = useState<SubAdminFormState>(emptySubAdminForm);
   const [creatingSubAdmin, setCreatingSubAdmin] = useState(false);
   const [subAdminMessage, setSubAdminMessage] = useState<string | null>(null);
+  const [managingSubAdmin, setManagingSubAdmin] = useState<string | null>(null);
 
   const isEditing = useMemo(() => Boolean(editingId), [editingId]);
   const currentUser = useMemo(() => {
@@ -214,7 +217,17 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    const parsed = JSON.parse(savedUser) as { role: "superadmin" | "admin" | "subadmin" | "user" };
+    let parsed: { role: "superadmin" | "admin" | "subadmin" | "user" };
+
+    try {
+      parsed = JSON.parse(savedUser) as { role: "superadmin" | "admin" | "subadmin" | "user" };
+    } catch {
+      localStorage.removeItem("hamrobichar_token");
+      localStorage.removeItem("hamrobichar_user");
+      router.replace(pathname.startsWith("/subadmin") ? "/subadmin" : "/master");
+      return;
+    }
+
     const isSuper = parsed.role === "admin" || parsed.role === "superadmin";
 
     if (pathname.startsWith("/subadmin") && parsed.role !== "subadmin") {
@@ -369,10 +382,47 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const onResetSubAdminPassword = async (userId: string) => {
+    const nextPassword = window.prompt("Enter new password for subadmin (min 6 chars)");
+    if (!nextPassword) {
+      return;
+    }
+
+    try {
+      setManagingSubAdmin(userId);
+      setSubAdminMessage(null);
+      await resetSubAdminPassword(userId, nextPassword, tokenRef.current);
+      setSubAdminMessage("Subadmin password updated successfully.");
+    } catch (err) {
+      setSubAdminMessage(err instanceof Error ? err.message : "Failed to reset password");
+    } finally {
+      setManagingSubAdmin(null);
+    }
+  };
+
+  const onDeleteSubAdmin = async (userId: string) => {
+    const confirmed = window.confirm("Delete this subadmin account?");
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setManagingSubAdmin(userId);
+      setSubAdminMessage(null);
+      await deleteSubAdmin(userId, tokenRef.current);
+      setSubAdminMessage("Subadmin deleted successfully.");
+      await loadUsers();
+    } catch (err) {
+      setSubAdminMessage(err instanceof Error ? err.message : "Failed to delete subadmin");
+    } finally {
+      setManagingSubAdmin(null);
+    }
+  };
+
   const onLogout = () => {
     localStorage.removeItem("hamrobichar_token");
     localStorage.removeItem("hamrobichar_user");
-    router.push("/master");
+    router.push(pathname.startsWith("/subadmin") ? "/subadmin" : "/master");
   };
 
   return (
@@ -642,6 +692,24 @@ export default function AdminDashboardPage() {
                   >
                     Make {user.role === "subadmin" ? "User" : "Subadmin"}
                   </button>
+                  {user.role === "subadmin" && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <button
+                        onClick={() => onResetSubAdminPassword(user._id)}
+                        disabled={managingSubAdmin === user._id}
+                        className="rounded border border-blue-300 px-2 py-1 text-xs font-semibold text-blue-700 disabled:opacity-50"
+                      >
+                        Reset Password
+                      </button>
+                      <button
+                        onClick={() => onDeleteSubAdmin(user._id)}
+                        disabled={managingSubAdmin === user._id}
+                        className="rounded border border-rose-300 px-2 py-1 text-xs font-semibold text-rose-700 disabled:opacity-50"
+                      >
+                        Delete Subadmin
+                      </button>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -663,12 +731,32 @@ export default function AdminDashboardPage() {
                     <td className="py-2 pr-3 text-slate-600">{user.email}</td>
                     <td className="py-2 pr-3 uppercase text-xs font-bold text-slate-500">{user.role}</td>
                     <td className="py-2">
-                      <button
-                        onClick={() => onRoleChange(user._id, user.role === "subadmin" ? "user" : "subadmin")}
-                        className="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
-                      >
-                        Make {user.role === "subadmin" ? "User" : "Subadmin"}
-                      </button>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => onRoleChange(user._id, user.role === "subadmin" ? "user" : "subadmin")}
+                          className="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
+                        >
+                          Make {user.role === "subadmin" ? "User" : "Subadmin"}
+                        </button>
+                        {user.role === "subadmin" && (
+                          <>
+                            <button
+                              onClick={() => onResetSubAdminPassword(user._id)}
+                              disabled={managingSubAdmin === user._id}
+                              className="rounded border border-blue-300 px-2 py-1 text-xs font-semibold text-blue-700 disabled:opacity-50"
+                            >
+                              Reset Password
+                            </button>
+                            <button
+                              onClick={() => onDeleteSubAdmin(user._id)}
+                              disabled={managingSubAdmin === user._id}
+                              className="rounded border border-rose-300 px-2 py-1 text-xs font-semibold text-rose-700 disabled:opacity-50"
+                            >
+                              Delete Subadmin
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -684,6 +772,7 @@ export default function AdminDashboardPage() {
         <h2 className="text-xl font-black text-slate-900">Account Settings</h2>
         <p className="mt-1 text-sm text-slate-600">Use these actions to secure or end your admin session.</p>
 
+        {!isSubAdmin ? (
         <form onSubmit={onChangePassword} className="mt-6 grid gap-3 sm:grid-cols-2">
           <input
             type="password"
@@ -726,6 +815,11 @@ export default function AdminDashboardPage() {
             </button>
           </div>
         </form>
+        ) : (
+          <p className="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            Subadmin passwords are managed by superadmin only.
+          </p>
+        )}
 
         {accountMessage && <p className="mt-3 text-sm font-semibold text-slate-700">{accountMessage}</p>}
       </div>
