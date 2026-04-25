@@ -49,11 +49,12 @@ export const createArticleComment = async (
   return response.data.data;
 };
 
-export const loginAdmin = async (email: string, password: string): Promise<LoginPayload> => {
-  const response = await api.post<ApiResponse<LoginPayload>>("/auth/login", {
-    email,
-    password
-  });
+export const loginAdmin = async (payload: {
+  email?: string;
+  userCode?: string;
+  password: string;
+}): Promise<LoginPayload> => {
+  const response = await api.post<ApiResponse<LoginPayload>>("/auth/login", payload);
   return response.data.data;
 };
 

@@ -39,13 +39,32 @@ const generateUniqueUserCode = async (): Promise<string> => {
 };
 
 export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body as { email?: string; password?: string };
+  const { email, userCode, password } = req.body as {
+    email?: string;
+    userCode?: string;
+    password?: string;
+  };
 
-  if (!email || !password) {
-    throw new ApiError(400, "Email and password are required");
+  if (!password || (!email && !userCode)) {
+    throw new ApiError(400, "Email or User_ID and password are required");
   }
 
-  const user = await User.findOne({ email });
+  const normalizedEmail = email?.trim().toLowerCase();
+  const normalizedUserCode = userCode?.trim().toUpperCase();
+
+  let user = null;
+  if (normalizedUserCode) {
+    user = await User.findOne({ userCode: normalizedUserCode });
+    if (!user || user.role !== "subadmin") {
+      throw new ApiError(401, "Invalid credentials");
+    }
+  } else if (normalizedEmail) {
+    user = await User.findOne({ email: normalizedEmail });
+    if (user?.role === "subadmin") {
+      throw new ApiError(403, "Subadmin must login with User_ID and password");
+    }
+  }
+
   if (!user) {
     throw new ApiError(401, "Invalid credentials");
   }

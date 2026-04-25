@@ -12,7 +12,7 @@ export default function AdminLoginPage() {
   const isSubAdminPage = pathname.startsWith("/subadmin");
   const { dictionary } = useLanguage();
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,11 @@ export default function AdminLoginPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await loginAdmin(email, password);
+      const response = await loginAdmin(
+        isSubAdminPage
+          ? { userCode: identifier, password }
+          : { email: identifier, password }
+      );
       localStorage.setItem("hamrobichar_token", response.token);
       localStorage.setItem("hamrobichar_user", JSON.stringify(response.user));
 
@@ -58,17 +62,17 @@ export default function AdminLoginPage() {
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-semibold text-slate-700" htmlFor="email">
-            {dictionary.admin.email}
+          <label className="mb-1 block text-sm font-semibold text-slate-700" htmlFor="identifier">
+            {isSubAdminPage ? "User_ID" : dictionary.admin.email}
           </label>
           <input
-            id="email"
-            type="email"
+            id="identifier"
+            type={isSubAdminPage ? "text" : "email"}
             required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            value={identifier}
+            onChange={(event) => setIdentifier(event.target.value)}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-rose-300 focus:ring"
-            placeholder={dictionary.admin.emailPlaceholder}
+            placeholder={isSubAdminPage ? "HB-123456" : dictionary.admin.emailPlaceholder}
           />
         </div>
 
