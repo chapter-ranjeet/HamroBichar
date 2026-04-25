@@ -43,6 +43,13 @@ export interface AdminUser {
   username: string;
   email: string;
   role: "superadmin" | "admin" | "subadmin" | "user";
+  profileType?: "internship" | "job";
+  address?: string;
+  designation?: string;
+  documentType?: "citizenship" | "passport" | "driving_license";
+  documentFrontImage?: string;
+  documentBackImage?: string;
+  userCode?: string;
   createdAt: string;
 }
 

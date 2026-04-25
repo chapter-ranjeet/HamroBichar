@@ -99,14 +99,43 @@ export const registerAdmin = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const createSubAdmin = asyncHandler(async (req: Request, res: Response) => {
-  const { username, email, password } = req.body as {
+  const {
+    username,
+    email,
+    password,
+    profileType,
+    address,
+    designation,
+    documentType,
+    documentFrontImage,
+    documentBackImage,
+    userCode
+  } = req.body as {
     username?: string;
     email?: string;
     password?: string;
+    profileType?: "internship" | "job";
+    address?: string;
+    designation?: string;
+    documentType?: "citizenship" | "passport" | "driving_license";
+    documentFrontImage?: string;
+    documentBackImage?: string;
+    userCode?: string;
   };
 
-  if (!username || !email || !password) {
-    throw new ApiError(400, "Username, email and password are required");
+  if (!username || !email || !password || !profileType || !address || !designation || !documentType || !documentFrontImage || !documentBackImage || !userCode) {
+    throw new ApiError(
+      400,
+      "Username, email, password, profile type, address, designation, document details and User_ID are required"
+    );
+  }
+
+  if (!["internship", "job"].includes(profileType)) {
+    throw new ApiError(400, "Profile type must be internship or job");
+  }
+
+  if (!["citizenship", "passport", "driving_license"].includes(documentType)) {
+    throw new ApiError(400, "Document type must be citizenship, passport or driving_license");
   }
 
   const exists = await User.findOne({ email });
@@ -114,21 +143,40 @@ export const createSubAdmin = asyncHandler(async (req: Request, res: Response) =
     throw new ApiError(409, "User already exists with this email");
   }
 
+  const codeExists = await User.findOne({ userCode });
+  if (codeExists) {
+    throw new ApiError(409, "User_ID already exists");
+  }
+
   const user = await User.create({
     username,
     email,
     password,
-    role: "subadmin"
+    role: "subadmin",
+    profileType,
+    address,
+    designation,
+    documentType,
+    documentFrontImage,
+    documentBackImage,
+    userCode
   });
 
   res.status(201).json({
     success: true,
-    message: "Subadmin created",
+    message: "Contributor profile created",
     data: {
       id: user._id,
       username: user.username,
       email: user.email,
       role: user.role,
+      profileType: user.profileType,
+      address: user.address,
+      designation: user.designation,
+      documentType: user.documentType,
+      documentFrontImage: user.documentFrontImage,
+      documentBackImage: user.documentBackImage,
+      userCode: user.userCode,
       createdAt: user.createdAt
     }
   });
@@ -171,7 +219,14 @@ export const updateUserRole = asyncHandler(async (req: Request, res: Response) =
       id: user._id,
       username: user.username,
       email: user.email,
-      role: user.role
+      role: user.role,
+      profileType: user.profileType,
+      address: user.address,
+      designation: user.designation,
+      documentType: user.documentType,
+      documentFrontImage: user.documentFrontImage,
+      documentBackImage: user.documentBackImage,
+      userCode: user.userCode
     }
   });
 });

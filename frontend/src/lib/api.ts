@@ -144,7 +144,18 @@ export const updateAdminUserRole = async (
 };
 
 export const createSubAdmin = async (
-  payload: { username: string; email: string; password: string },
+  payload: {
+    username: string;
+    email: string;
+    password: string;
+    profileType: "internship" | "job";
+    address: string;
+    designation: string;
+    documentType: "citizenship" | "passport" | "driving_license";
+    documentFrontImage: string;
+    documentBackImage: string;
+    userCode: string;
+  },
   token: string
 ): Promise<AdminUser> => {
   const response = await api.post<ApiResponse<AdminUser>>("/auth/subadmin", payload, {

@@ -40,6 +40,13 @@ interface SubAdminFormState {
   username: string;
   email: string;
   password: string;
+  profileType: "internship" | "job";
+  address: string;
+  designation: string;
+  documentType: "citizenship" | "passport" | "driving_license";
+  documentFrontImage: string;
+  documentBackImage: string;
+  userCode: string;
 }
 
 const slugify = (value: string): string =>
@@ -70,7 +77,14 @@ const emptyPasswordForm: PasswordFormState = {
 const emptySubAdminForm: SubAdminFormState = {
   username: "",
   email: "",
-  password: ""
+  password: "",
+  profileType: "internship",
+  address: "",
+  designation: "",
+  documentType: "citizenship",
+  documentFrontImage: "",
+  documentBackImage: "",
+  userCode: ""
 };
 
 export default function AdminDashboardPage() {
@@ -94,6 +108,7 @@ export default function AdminDashboardPage() {
   const [passwordForm, setPasswordForm] = useState<PasswordFormState>(emptyPasswordForm);
   const [subAdminForm, setSubAdminForm] = useState<SubAdminFormState>(emptySubAdminForm);
   const [creatingSubAdmin, setCreatingSubAdmin] = useState(false);
+  const [uploadingIdentityDoc, setUploadingIdentityDoc] = useState<"front" | "back" | null>(null);
   const [subAdminMessage, setSubAdminMessage] = useState<string | null>(null);
   const [managingSubAdmin, setManagingSubAdmin] = useState<string | null>(null);
   const [articleSearchTerm, setArticleSearchTerm] = useState("");
@@ -163,6 +178,24 @@ export default function AdminDashboardPage() {
     }
 
     return false;
+  };
+  const formatProfileType = (value?: "internship" | "job"): string => {
+    if (!value) {
+      return "-";
+    }
+
+    return value === "internship" ? "Internship" : "Job Offering";
+  };
+  const formatDocumentType = (value?: "citizenship" | "passport" | "driving_license"): string => {
+    if (!value) {
+      return "-";
+    }
+
+    if (value === "driving_license") {
+      return "Driving Licence";
+    }
+
+    return value.charAt(0).toUpperCase() + value.slice(1);
   };
 
   const syncEditorContent = () => {
@@ -440,7 +473,14 @@ export default function AdminDashboardPage() {
         {
           username: subAdminForm.username,
           email: subAdminForm.email,
-          password: subAdminForm.password
+          password: subAdminForm.password,
+          profileType: subAdminForm.profileType,
+          address: subAdminForm.address,
+          designation: subAdminForm.designation,
+          documentType: subAdminForm.documentType,
+          documentFrontImage: subAdminForm.documentFrontImage,
+          documentBackImage: subAdminForm.documentBackImage,
+          userCode: subAdminForm.userCode
         },
         tokenRef.current
       );
@@ -452,6 +492,32 @@ export default function AdminDashboardPage() {
       setSubAdminMessage(err instanceof Error ? err.message : dictionary.admin.failedCreateSubadmin);
     } finally {
       setCreatingSubAdmin(false);
+    }
+  };
+
+  const onIdentityDocumentUpload = async (
+    event: ChangeEvent<HTMLInputElement>,
+    side: "front" | "back"
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      setUploadingIdentityDoc(side);
+      setSubAdminMessage(null);
+      const imageUrl = await uploadArticleImage(file, tokenRef.current);
+      setSubAdminForm((prev) => ({
+        ...prev,
+        documentFrontImage: side === "front" ? imageUrl : prev.documentFrontImage,
+        documentBackImage: side === "back" ? imageUrl : prev.documentBackImage
+      }));
+    } catch (err) {
+      setSubAdminMessage(err instanceof Error ? err.message : "Failed to upload document image");
+    } finally {
+      setUploadingIdentityDoc(null);
+      event.target.value = "";
     }
   };
 
@@ -820,43 +886,167 @@ export default function AdminDashboardPage() {
       </div>
 
       {isSuperAdmin && (
-        <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-xl font-black text-slate-900">{dictionary.admin.createSubadmin}</h2>
-          <p className="mt-1 text-sm text-slate-600">{dictionary.admin.createSubadminHelp}</p>
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="bg-linear-to-r from-slate-900 via-slate-800 to-rose-800 px-5 py-4 text-white sm:px-6">
+            <h2 className="text-xl font-black">Create Internship / Job Contributor</h2>
+            <p className="mt-1 text-sm text-slate-200">Create complete identity and document-verified access for publishing operations.</p>
+          </div>
 
-          <form onSubmit={onCreateSubAdmin} className="mt-4 grid gap-3 sm:grid-cols-3">
-            <input
-              required
-              value={subAdminForm.username}
-              onChange={(event) => setSubAdminForm((prev) => ({ ...prev, username: event.target.value }))}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-              placeholder={dictionary.admin.username}
-            />
-            <input
-              type="email"
-              required
-              value={subAdminForm.email}
-              onChange={(event) => setSubAdminForm((prev) => ({ ...prev, email: event.target.value }))}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-              placeholder={dictionary.admin.email}
-            />
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={subAdminForm.password}
-              onChange={(event) => setSubAdminForm((prev) => ({ ...prev, password: event.target.value }))}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-              placeholder={dictionary.admin.password}
-            />
-            <div className="sm:col-span-3">
+          <form onSubmit={onCreateSubAdmin} className="space-y-5 p-5 sm:p-6">
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <h3 className="text-sm font-black uppercase tracking-[0.14em] text-slate-600">Identity Details</h3>
+                <div className="mt-3 grid gap-3">
+                  <input
+                    required
+                    value={subAdminForm.username}
+                    onChange={(event) => setSubAdminForm((prev) => ({ ...prev, username: event.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                    placeholder="Name"
+                  />
+                  <input
+                    type="email"
+                    required
+                    value={subAdminForm.email}
+                    onChange={(event) => setSubAdminForm((prev) => ({ ...prev, email: event.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                    placeholder="Email ID"
+                  />
+                  <input
+                    required
+                    value={subAdminForm.address}
+                    onChange={(event) => setSubAdminForm((prev) => ({ ...prev, address: event.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                    placeholder="Address"
+                  />
+                  <input
+                    required
+                    value={subAdminForm.designation}
+                    onChange={(event) => setSubAdminForm((prev) => ({ ...prev, designation: event.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                    placeholder="Designation"
+                  />
+                  <input
+                    required
+                    value={subAdminForm.userCode}
+                    onChange={(event) => setSubAdminForm((prev) => ({ ...prev, userCode: event.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                    placeholder="User_ID"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <h3 className="text-sm font-black uppercase tracking-[0.14em] text-slate-600">Access And Verification</h3>
+                <div className="mt-3 grid gap-3">
+                  <select
+                    value={subAdminForm.profileType}
+                    onChange={(event) =>
+                      setSubAdminForm((prev) => ({ ...prev, profileType: event.target.value as "internship" | "job" }))
+                    }
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                  >
+                    <option value="internship">Internship</option>
+                    <option value="job">Job Offering</option>
+                  </select>
+                  <select
+                    value={subAdminForm.documentType}
+                    onChange={(event) =>
+                      setSubAdminForm((prev) => ({
+                        ...prev,
+                        documentType: event.target.value as "citizenship" | "passport" | "driving_license"
+                      }))
+                    }
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                  >
+                    <option value="citizenship">Citizenship</option>
+                    <option value="passport">Passport</option>
+                    <option value="driving_license">Driving Licence</option>
+                  </select>
+                  <input
+                    type="password"
+                    required
+                    minLength={6}
+                    value={subAdminForm.password}
+                    onChange={(event) => setSubAdminForm((prev) => ({ ...prev, password: event.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                    placeholder="Password"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div className="rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-black uppercase tracking-[0.14em] text-slate-600">Document Front</h3>
+                <div className="mt-3 space-y-2">
+                  <input
+                    required
+                    value={subAdminForm.documentFrontImage}
+                    onChange={(event) => setSubAdminForm((prev) => ({ ...prev, documentFrontImage: event.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                    placeholder="Document front image URL"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => void onIdentityDocumentUpload(event, "front")}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  />
+                  {subAdminForm.documentFrontImage && (
+                    <a
+                      href={subAdminForm.documentFrontImage}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex text-xs font-semibold text-blue-700 hover:text-blue-900"
+                    >
+                      Preview front document
+                    </a>
+                  )}
+                  {uploadingIdentityDoc === "front" && <p className="text-xs text-slate-500">Uploading front document...</p>}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-black uppercase tracking-[0.14em] text-slate-600">Document Back</h3>
+                <div className="mt-3 space-y-2">
+                  <input
+                    required
+                    value={subAdminForm.documentBackImage}
+                    onChange={(event) => setSubAdminForm((prev) => ({ ...prev, documentBackImage: event.target.value }))}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                    placeholder="Document back image URL"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => void onIdentityDocumentUpload(event, "back")}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  />
+                  {subAdminForm.documentBackImage && (
+                    <a
+                      href={subAdminForm.documentBackImage}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex text-xs font-semibold text-blue-700 hover:text-blue-900"
+                    >
+                      Preview back document
+                    </a>
+                  )}
+                  {uploadingIdentityDoc === "back" && <p className="text-xs text-slate-500">Uploading back document...</p>}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-4">
               <button
                 type="submit"
-                disabled={creatingSubAdmin}
-                className="rounded-lg bg-rose-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={creatingSubAdmin || uploadingIdentityDoc !== null}
+                className="rounded-lg bg-rose-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {creatingSubAdmin ? dictionary.admin.creating : dictionary.admin.createSubadminAction}
               </button>
+              <span className="text-xs font-medium text-slate-500">All identity fields and both document images are required.</span>
             </div>
           </form>
 
@@ -867,6 +1057,7 @@ export default function AdminDashboardPage() {
       {isSuperAdmin && showUserManagementPanel && (
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         <h2 className="text-xl font-black text-slate-900">{dictionary.admin.userManagement}</h2>
+        <p className="mt-1 text-sm text-slate-600">Review contributor identity details, documents, and access controls.</p>
         {usersLoading ? (
           <p className="mt-4 text-slate-600">{dictionary.admin.usersLoading}</p>
         ) : (
@@ -874,11 +1065,30 @@ export default function AdminDashboardPage() {
             <ul className="mt-4 space-y-3 md:hidden">
               {users.map((user) => (
                 <li key={user._id} className="rounded-xl border border-slate-200 p-3">
-                  <p className="font-semibold text-slate-800">{user.username}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-semibold text-slate-800">{user.username}</p>
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-slate-600">
+                      {user.role}
+                    </span>
+                  </div>
                   <p className="text-sm text-slate-600">{user.email}</p>
-                  <p className="mt-1 text-xs font-bold uppercase tracking-wide text-slate-500">
-                    {user.role}
-                  </p>
+                  {user.userCode && <p className="text-xs text-slate-600">User_ID: {user.userCode}</p>}
+                  {user.designation && <p className="text-xs text-slate-600">Designation: {user.designation}</p>}
+                  {user.address && <p className="text-xs text-slate-600">Address: {user.address}</p>}
+                  {user.profileType && <p className="text-xs text-slate-600">Profile: {formatProfileType(user.profileType)}</p>}
+                  {user.documentType && <p className="text-xs text-slate-600">Document: {formatDocumentType(user.documentType)}</p>}
+                  <div className="mt-1 flex flex-wrap gap-3 text-xs">
+                    {user.documentFrontImage && (
+                      <a href={user.documentFrontImage} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-700">
+                        Front Doc
+                      </a>
+                    )}
+                    {user.documentBackImage && (
+                      <a href={user.documentBackImage} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-700">
+                        Back Doc
+                      </a>
+                    )}
+                  </div>
                   <button
                     onClick={() => onRoleChange(user._id, user.role === "subadmin" ? "user" : "subadmin")}
                     className="mt-2 rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
@@ -920,9 +1130,17 @@ export default function AdminDashboardPage() {
               <tbody>
                 {users.map((user) => (
                   <tr key={user._id} className="border-b border-slate-100">
-                    <td className="py-2 pr-3 font-semibold text-slate-800">{user.username}</td>
+                    <td className="py-2 pr-3 font-semibold text-slate-800">
+                      <p>{user.username}</p>
+                      {user.userCode && <p className="text-xs font-medium text-slate-500">User_ID: {user.userCode}</p>}
+                      {user.designation && <p className="text-xs font-medium text-slate-500">{user.designation}</p>}
+                      {user.profileType && <p className="text-xs font-medium text-slate-500">{formatProfileType(user.profileType)}</p>}
+                    </td>
                     <td className="py-2 pr-3 text-slate-600">{user.email}</td>
-                    <td className="py-2 pr-3 uppercase text-xs font-bold text-slate-500">{user.role}</td>
+                    <td className="py-2 pr-3 uppercase text-xs font-bold text-slate-500">
+                      <p>{user.role}</p>
+                      {user.documentType && <p className="mt-1 normal-case text-[11px] font-medium text-slate-500">{formatDocumentType(user.documentType)}</p>}
+                    </td>
                     <td className="py-2">
                       <div className="flex flex-wrap gap-2">
                         <button
@@ -933,6 +1151,26 @@ export default function AdminDashboardPage() {
                         </button>
                         {user.role === "subadmin" && (
                           <>
+                            {user.documentFrontImage && (
+                              <a
+                                href={user.documentFrontImage}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
+                              >
+                                Front Doc
+                              </a>
+                            )}
+                            {user.documentBackImage && (
+                              <a
+                                href={user.documentBackImage}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
+                              >
+                                Back Doc
+                              </a>
+                            )}
                             <button
                               onClick={() => onResetSubAdminPassword(user._id)}
                               disabled={managingSubAdmin === user._id}
