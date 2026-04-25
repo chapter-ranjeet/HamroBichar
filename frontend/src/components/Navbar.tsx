@@ -94,7 +94,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setMobileNavOpen((prev) => !prev)}
-            className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:border-rose-300 hover:text-rose-700 lg:hidden"
+            className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:border-rose-300 hover:text-rose-700"
             aria-label={mobileNavOpen ? dictionary.nav.menuClose : dictionary.nav.menuOpen}
             aria-expanded={mobileNavOpen}
           >
@@ -118,7 +118,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        <div className={`relative mt-2 w-full items-center gap-2 sm:mt-3 sm:w-auto sm:gap-3 ${mobileNavOpen ? "flex" : "hidden"} lg:flex`}>
+        <div className={`relative mt-2 w-full items-center gap-2 sm:mt-3 sm:w-auto sm:gap-3 ${mobileNavOpen ? "flex" : "hidden"}`}>
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <Link
               className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:border-rose-300 hover:text-rose-700 sm:px-4 sm:py-2 sm:text-sm"
