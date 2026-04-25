@@ -70,9 +70,9 @@ export default function Footer() {
                         <path d="M13.5 9H16V6h-2.5C10.9 6 9 7.9 9 10.5V13H7v3h2v6h3v-6h2.4l.6-3H12v-2.5c0-.8.7-1.5 1.5-1.5Z" />
                       </svg>
                     </span>
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-white">{dictionary.nav.facebook}</p>
-                      <p className="truncate text-xs text-slate-400">hamrobichar</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-bold text-white sm:text-sm">{dictionary.nav.facebook}</p>
+                      <p className="hidden truncate text-xs text-slate-400 sm:block">hamrobichar</p>
                     </div>
                   </a>
 
@@ -90,9 +90,9 @@ export default function Footer() {
                         <circle cx="16.5" cy="7.5" r="1" fill="currentColor" />
                       </svg>
                     </span>
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-white">{dictionary.nav.instagram}</p>
-                      <p className="truncate text-xs text-slate-400">@hamrobichar</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-bold text-white sm:text-sm">{dictionary.nav.instagram}</p>
+                      <p className="hidden truncate text-xs text-slate-400 sm:block">@hamrobichar</p>
                     </div>
                   </a>
                 </div>

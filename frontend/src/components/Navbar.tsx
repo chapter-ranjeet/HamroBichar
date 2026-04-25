@@ -13,7 +13,7 @@ export default function Navbar() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const { language, dictionary, setLanguage } = useLanguage();
+  const { language, dictionary } = useLanguage();
 
   useEffect(() => {
     const loadArticles = async () => {
@@ -66,28 +66,6 @@ export default function Navbar() {
             </span>
           </p>
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="inline-flex overflow-hidden rounded-full border border-slate-500/60 bg-slate-800 p-0.5">
-              <button
-                type="button"
-                onClick={() => setLanguage("en")}
-                className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition sm:px-2.5 sm:text-[11px] ${
-                  language === "en" ? "bg-rose-600 text-white" : "text-slate-300 hover:text-white"
-                }`}
-                aria-label="Switch language to English"
-              >
-                ENG
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage("np")}
-                className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition sm:px-2.5 sm:text-[11px] ${
-                  language === "np" ? "bg-rose-600 text-white" : "text-slate-300 hover:text-white"
-                }`}
-                aria-label="Switch language to Nepali"
-              >
-                NP
-              </button>
-            </div>
             <p className="flex items-center gap-2 font-semibold uppercase tracking-wider text-emerald-300">
               <span className="h-2 w-2 rounded-full bg-emerald-400" />
               {dictionary.topBar.liveUpdates}
@@ -160,16 +138,18 @@ export default function Navbar() {
               {dictionary.nav.search}
             </Link>
 
-            {categories.map((category) => (
-              <Link
-                key={category}
-                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 sm:px-4 sm:py-2 sm:text-sm"
-                href={`/category/${slugify(category)}`}
-                onClick={() => setMobileNavOpen(false)}
-              >
-                {getCategoryLabel(category)}
-              </Link>
-            ))}
+            <div className="hidden lg:contents">
+              {categories.map((category) => (
+                <Link
+                  key={category}
+                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 sm:px-4 sm:py-2 sm:text-sm"
+                  href={`/category/${slugify(category)}`}
+                  onClick={() => setMobileNavOpen(false)}
+                >
+                  {getCategoryLabel(category)}
+                </Link>
+              ))}
+            </div>
 
             {remainingArticles.length > 0 && (
               <div className="relative">
@@ -211,40 +191,7 @@ export default function Navbar() {
               </div>
             )}
 
-            <div className="ml-auto flex items-start gap-2 rounded-xl border border-slate-200 bg-white px-2 py-1.5">
-              <a
-                href="https://www.facebook.com/profile.php?id=61565276758903"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-w-20 flex-col items-center gap-1 rounded-lg px-2 py-1 text-center text-slate-700 transition hover:bg-rose-50 hover:text-rose-700"
-                onClick={() => setMobileNavOpen(false)}
-              >
-                <Image
-                  src="/HBLogo2.png"
-                  alt="HamroBichar app icon"
-                  width={28}
-                  height={28}
-                  className="h-7 w-7 rounded-full border border-slate-200 bg-white p-0.5 object-contain"
-                />
-                <span className="text-[11px] font-semibold">{dictionary.nav.facebook}</span>
-              </a>
-              <a
-                href="https://www.instagram.com/hamrobichar/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-w-20 flex-col items-center gap-1 rounded-lg px-2 py-1 text-center text-slate-700 transition hover:bg-rose-50 hover:text-rose-700"
-                onClick={() => setMobileNavOpen(false)}
-              >
-                <Image
-                  src="/HBLogo2.png"
-                  alt="HamroBichar app icon"
-                  width={28}
-                  height={28}
-                  className="h-7 w-7 rounded-full border border-slate-200 bg-white p-0.5 object-contain"
-                />
-                <span className="text-[11px] font-semibold">{dictionary.nav.instagram}</span>
-              </a>
-            </div>
+            <div className="ml-auto" />
           </div>
         </div>
       </nav>
