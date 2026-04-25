@@ -154,7 +154,6 @@ export const createSubAdmin = async (
     documentType: "citizenship" | "passport" | "driving_license";
     documentFrontImage: string;
     documentBackImage: string;
-    userCode: string;
   },
   token: string
 ): Promise<AdminUser> => {

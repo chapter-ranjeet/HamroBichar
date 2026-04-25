@@ -46,7 +46,6 @@ interface SubAdminFormState {
   documentType: "citizenship" | "passport" | "driving_license";
   documentFrontImage: string;
   documentBackImage: string;
-  userCode: string;
 }
 
 const slugify = (value: string): string =>
@@ -83,8 +82,7 @@ const emptySubAdminForm: SubAdminFormState = {
   designation: "",
   documentType: "citizenship",
   documentFrontImage: "",
-  documentBackImage: "",
-  userCode: ""
+  documentBackImage: ""
 };
 
 export default function AdminDashboardPage() {
@@ -469,7 +467,7 @@ export default function AdminDashboardPage() {
       setCreatingSubAdmin(true);
       setSubAdminMessage(null);
 
-      await createSubAdmin(
+      const createdUser = await createSubAdmin(
         {
           username: subAdminForm.username,
           email: subAdminForm.email,
@@ -479,14 +477,19 @@ export default function AdminDashboardPage() {
           designation: subAdminForm.designation,
           documentType: subAdminForm.documentType,
           documentFrontImage: subAdminForm.documentFrontImage,
-          documentBackImage: subAdminForm.documentBackImage,
-          userCode: subAdminForm.userCode
+          documentBackImage: subAdminForm.documentBackImage
         },
         tokenRef.current
       );
 
       setSubAdminForm(emptySubAdminForm);
-      setSubAdminMessage(dictionary.admin.subadminCreatedSuccess);
+      setSubAdminMessage(
+        createdUser.credentialsEmailSent
+          ? `Contributor created. User_ID: ${createdUser.userCode ?? "-"}. Credentials sent to ${createdUser.email}.`
+          : `Contributor created. User_ID: ${createdUser.userCode ?? "-"}. Email delivery failed${
+              createdUser.emailDeliveryMessage ? `: ${createdUser.emailDeliveryMessage}` : ""
+            }`
+      );
       await loadUsers();
     } catch (err) {
       setSubAdminMessage(err instanceof Error ? err.message : dictionary.admin.failedCreateSubadmin);
@@ -926,13 +929,9 @@ export default function AdminDashboardPage() {
                     className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
                     placeholder="Designation"
                   />
-                  <input
-                    required
-                    value={subAdminForm.userCode}
-                    onChange={(event) => setSubAdminForm((prev) => ({ ...prev, userCode: event.target.value }))}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-                    placeholder="User_ID"
-                  />
+                  <p className="rounded-lg border border-dashed border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-600">
+                    User_ID is generated automatically and shared by email after account creation.
+                  </p>
                 </div>
               </div>
 

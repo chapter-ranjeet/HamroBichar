@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { randomInt } from "node:crypto";
 
 import User from "../models/User";
+import { sendContributorCredentialsEmail } from "../utils/mailer";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/apiError";
 
@@ -17,6 +19,23 @@ const signToken = (payload: Express.UserPayload): string => {
   return jwt.sign(payload, secret, {
     expiresIn
   });
+};
+
+const generateUserCodeCandidate = (): string => {
+  const suffix = randomInt(100000, 999999);
+  return `HB-${suffix}`;
+};
+
+const generateUniqueUserCode = async (): Promise<string> => {
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const candidate = generateUserCodeCandidate();
+    const exists = await User.exists({ userCode: candidate });
+    if (!exists) {
+      return candidate;
+    }
+  }
+
+  throw new ApiError(500, "Failed to generate unique User_ID");
 };
 
 export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
@@ -108,8 +127,7 @@ export const createSubAdmin = asyncHandler(async (req: Request, res: Response) =
     designation,
     documentType,
     documentFrontImage,
-    documentBackImage,
-    userCode
+    documentBackImage
   } = req.body as {
     username?: string;
     email?: string;
@@ -120,13 +138,12 @@ export const createSubAdmin = asyncHandler(async (req: Request, res: Response) =
     documentType?: "citizenship" | "passport" | "driving_license";
     documentFrontImage?: string;
     documentBackImage?: string;
-    userCode?: string;
   };
 
-  if (!username || !email || !password || !profileType || !address || !designation || !documentType || !documentFrontImage || !documentBackImage || !userCode) {
+  if (!username || !email || !password || !profileType || !address || !designation || !documentType || !documentFrontImage || !documentBackImage) {
     throw new ApiError(
       400,
-      "Username, email, password, profile type, address, designation, document details and User_ID are required"
+      "Username, email, password, profile type, address, designation and document details are required"
     );
   }
 
@@ -143,10 +160,7 @@ export const createSubAdmin = asyncHandler(async (req: Request, res: Response) =
     throw new ApiError(409, "User already exists with this email");
   }
 
-  const codeExists = await User.findOne({ userCode });
-  if (codeExists) {
-    throw new ApiError(409, "User_ID already exists");
-  }
+  const userCode = await generateUniqueUserCode();
 
   const user = await User.create({
     username,
@@ -162,9 +176,19 @@ export const createSubAdmin = asyncHandler(async (req: Request, res: Response) =
     userCode
   });
 
+  const emailResult = await sendContributorCredentialsEmail({
+    to: email,
+    name: username,
+    userCode,
+    password,
+    profileType
+  });
+
   res.status(201).json({
     success: true,
-    message: "Contributor profile created",
+    message: emailResult.sent
+      ? "Contributor profile created and credentials sent by email"
+      : "Contributor profile created, but credential email could not be sent",
     data: {
       id: user._id,
       username: user.username,
@@ -177,6 +201,8 @@ export const createSubAdmin = asyncHandler(async (req: Request, res: Response) =
       documentFrontImage: user.documentFrontImage,
       documentBackImage: user.documentBackImage,
       userCode: user.userCode,
+      credentialsEmailSent: emailResult.sent,
+      emailDeliveryMessage: emailResult.reason,
       createdAt: user.createdAt
     }
   });

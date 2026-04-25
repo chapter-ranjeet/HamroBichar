@@ -50,6 +50,8 @@ export interface AdminUser {
   documentFrontImage?: string;
   documentBackImage?: string;
   userCode?: string;
+  credentialsEmailSent?: boolean;
+  emailDeliveryMessage?: string;
   createdAt: string;
 }
 
