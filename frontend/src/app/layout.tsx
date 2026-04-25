@@ -115,7 +115,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full bg-slate-50 text-slate-900">
         <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+          src="https://www.googletagmanager.com/gtag/js?id=G-STF3X2B450"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -123,7 +123,7 @@ export default async function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${gaId}');
+            gtag('config', 'G-STF3X2B450');
           `}
         </Script>
         <LanguageProvider initialLanguage={initialLanguage}>

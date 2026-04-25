@@ -45,8 +45,6 @@ export default function Navbar() {
   };
   const getArticleTitle = (article: Article): string =>
     language === "np" ? article.titleNp || article.title : article.title;
-  const getArticleCategory = (article: Article): string =>
-    language === "np" ? article.categoryNp || article.category : article.category;
 
   const remainingArticles = articles.slice(6);
   const topBarDate = new Date().toLocaleDateString(language === "np" ? "ne-NP" : "en-US", {
@@ -182,7 +180,6 @@ export default function Navbar() {
                           <p className="line-clamp-2 text-sm font-semibold text-slate-800">
                             {getArticleTitle(article)}
                           </p>
-                          <p className="mt-1 text-xs font-medium text-slate-500">{getArticleCategory(article)}</p>
                         </Link>
                       ))}
                     </div>
