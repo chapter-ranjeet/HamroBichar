@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 
 import { useLanguage } from "@/components/LanguageProvider";
 import { getArticles } from "@/lib/api";
-import { slugify } from "@/lib/slug";
 import { Article } from "@/types";
 
 export default function Navbar() {
@@ -28,21 +27,6 @@ export default function Navbar() {
     void loadArticles();
   }, []);
 
-  const categories = Array.from(
-    new Set(articles.map((article) => article.category).filter(Boolean))
-  ).sort((a, b) => a.localeCompare(b));
-  const categoryLabelMap = new Map(
-    articles
-      .filter((article) => article.category && article.categoryNp)
-      .map((article) => [article.category, article.categoryNp as string])
-  );
-  const getCategoryLabel = (category: string): string => {
-    if (language !== "np") {
-      return category;
-    }
-
-    return categoryLabelMap.get(category) ?? category;
-  };
   const getArticleTitle = (article: Article): string =>
     language === "np" ? article.titleNp || article.title : article.title;
 
@@ -135,19 +119,6 @@ export default function Navbar() {
             >
               {dictionary.nav.search}
             </Link>
-
-            <div className="hidden lg:contents">
-              {categories.map((category) => (
-                <Link
-                  key={category}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 sm:px-4 sm:py-2 sm:text-sm"
-                  href={`/category/${slugify(category)}`}
-                  onClick={() => setMobileNavOpen(false)}
-                >
-                  {getCategoryLabel(category)}
-                </Link>
-              ))}
-            </div>
 
             {remainingArticles.length > 0 && (
               <div className="relative">
