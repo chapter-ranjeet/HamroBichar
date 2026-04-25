@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import Footer from "@/components/Footer";
+import LanguageProvider from "@/components/LanguageProvider";
 import Navbar from "@/components/Navbar";
+import { LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 
 import "./globals.css";
 
@@ -95,22 +98,27 @@ export const metadata: Metadata = {
   category: "news"
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const initialLanguage = normalizeLanguage(cookieStore.get(LANGUAGE_COOKIE)?.value);
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-slate-50 text-slate-900">
-        <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#fff1f2,#f8fafc_42%,#ffffff)]">
-          <Navbar />
-          <main className="w-full flex-1 px-4 sm:px-6 lg:px-10">{children}</main>
-          <Footer />
-        </div>
+        <LanguageProvider initialLanguage={initialLanguage}>
+          <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#fff1f2,#f8fafc_42%,#ffffff)]">
+            <Navbar />
+            <main className="w-full flex-1 px-4 sm:px-6 lg:px-10">{children}</main>
+            <Footer />
+          </div>
+        </LanguageProvider>
       </body>
     </html>
   );

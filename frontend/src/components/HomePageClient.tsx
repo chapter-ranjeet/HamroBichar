@@ -4,10 +4,13 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+import { useLanguage } from "@/components/LanguageProvider";
 import NepaliCalendarWidget from "@/components/NepaliCalendarWidget";
 import NewsCard from "@/components/NewsCard";
 import { slugify } from "@/lib/slug";
 import { Article } from "@/types";
+
+const ALL_CATEGORY = "__all__";
 
 interface HomePageClientProps {
   initialArticles: Article[];
@@ -32,17 +35,18 @@ export default function HomePageClient({
   initialPopularArticles,
   initialBreakingArticles
 }: HomePageClientProps) {
+  const { dictionary } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") ?? "");
-  const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") ?? "All");
+  const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") ?? ALL_CATEGORY);
   const [showMobileCategories, setShowMobileCategories] = useState(false);
   const [visibleCount, setVisibleCount] = useState(6);
 
-  const categories = useMemo(() => ["All", ...initialCategories], [initialCategories]);
+  const categories = useMemo(() => [ALL_CATEGORY, ...initialCategories], [initialCategories]);
 
   const categoryScopedArticles =
-    selectedCategory === "All"
+    selectedCategory === ALL_CATEGORY
       ? initialArticles
       : initialArticles.filter((article) => article.category === selectedCategory);
 
@@ -73,34 +77,33 @@ export default function HomePageClient({
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-3">
           <p className="inline-flex rounded-full border border-rose-200 bg-rose-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-rose-700">
-            Nepal Headlines
+            {dictionary.home.label}
           </p>
           <h1 className="max-w-4xl text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">
-            Breaking Nepal news, analysis, and stories that matter.
+            {dictionary.home.title}
           </h1>
           <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-            A newsroom-style home for politics, business, education, technology, and local updates presented
-            with cleaner spacing, stronger hierarchy, and faster discovery.
+            {dictionary.home.description}
           </p>
         </div>
 
         <form onSubmit={onSearchSubmit} className="w-full max-w-xl">
           <label className="mb-2 block text-xs font-black uppercase tracking-[0.18em] text-slate-500" htmlFor="home-search">
-            Search articles
+            {dictionary.home.searchLabel}
           </label>
           <div className="flex gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
             <input
               id="home-search"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Search politics, articles, authors..."
+              placeholder={dictionary.home.searchPlaceholder}
               className="min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-slate-400"
             />
             <button
               type="submit"
               className="shrink-0 rounded-xl bg-rose-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-rose-800"
             >
-              Search
+              {dictionary.home.searchButton}
             </button>
           </div>
         </form>
@@ -109,8 +112,8 @@ export default function HomePageClient({
       <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:grid-cols-[1.4fr,0.9fr]">
         <div className="p-5 sm:p-6 lg:p-8">
           <div className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">
-            <span className="rounded-full bg-rose-100 px-2.5 py-1 text-rose-700">Breaking News</span>
-            <span>Live editorial picks</span>
+            <span className="rounded-full bg-rose-100 px-2.5 py-1 text-rose-700">{dictionary.home.breakingNews}</span>
+            <span>{dictionary.home.livePicks}</span>
           </div>
 
           {featuredArticle ? (
@@ -128,17 +131,17 @@ export default function HomePageClient({
                   {toExcerpt(featuredArticle.content)}
                 </p>
                 <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
-                  <span>By {featuredArticle.author}</span>
+                  <span>{dictionary.common.by} {featuredArticle.author}</span>
                   <span className="h-1 w-1 rounded-full bg-slate-300" />
                   <span>{new Date(featuredArticle.createdAt).toLocaleDateString()}</span>
                   <span className="h-1 w-1 rounded-full bg-slate-300" />
-                  <span>{featuredArticle.viewCount ?? 0} views</span>
+                  <span>{featuredArticle.viewCount ?? 0} {dictionary.article.viewsSuffix}</span>
                 </div>
                 <Link
                   href={`/article/${featuredArticle.slug}`}
                   className="inline-flex rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-rose-700"
                 >
-                  Read full story
+                  {dictionary.home.readFullStory}
                 </Link>
               </div>
 
@@ -155,7 +158,7 @@ export default function HomePageClient({
                         <img src={article.image} alt={article.title} className="h-full w-full object-cover" />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-500">
-                          No image
+                          {dictionary.home.noImage}
                         </div>
                       )}
                     </div>
@@ -174,7 +177,7 @@ export default function HomePageClient({
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-slate-500">
-              No articles are available yet.
+              {dictionary.home.noArticles}
             </div>
           )}
         </div>
@@ -182,7 +185,7 @@ export default function HomePageClient({
         <aside className="border-t border-slate-200 bg-slate-50 p-5 sm:p-6 lg:border-t-0 lg:border-l lg:p-8">
           <div className="space-y-6">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Popular</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.home.popular}</p>
               <div className="mt-3 space-y-3">
                 {popularArticles.map((article, index) => (
                   <Link
@@ -196,7 +199,7 @@ export default function HomePageClient({
                     <div className="min-w-0">
                       <p className="line-clamp-2 text-sm font-bold text-slate-900">{article.title}</p>
                       <p className="mt-1 text-xs text-slate-500">
-                        {article.category} · {article.viewCount ?? 0} views
+                        {article.category} · {article.viewCount ?? 0} {dictionary.article.viewsSuffix}
                       </p>
                     </div>
                   </Link>
@@ -206,13 +209,13 @@ export default function HomePageClient({
 
             <div>
               <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Categories</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.home.categories}</p>
                 <button
                   type="button"
                   onClick={() => setShowMobileCategories((prev) => !prev)}
                   className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700 lg:hidden"
                 >
-                  {showMobileCategories ? "Hide" : "Show"}
+                  {showMobileCategories ? dictionary.home.hide : dictionary.home.show}
                 </button>
               </div>
               <div className={`mt-3 flex flex-wrap gap-2 ${showMobileCategories ? "" : "hidden lg:flex"}`}>
@@ -226,16 +229,15 @@ export default function HomePageClient({
                         : "border border-slate-200 bg-white text-slate-700 hover:bg-rose-50"
                     }`}
                   >
-                    {category}
+                    {category === ALL_CATEGORY ? dictionary.common.all : category}
                   </button>
                 ))}
               </div>
 
               <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Why this layout</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.home.whyThisLayout}</p>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  The home page now prioritizes the top story, then moves into breaking items, popular reads,
-                  and category filtering to match a real newsroom flow.
+                  {dictionary.home.whyThisLayoutBody}
                 </p>
               </div>
             </div>
@@ -246,11 +248,11 @@ export default function HomePageClient({
       <section className="mb-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-8">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Latest</p>
-            <h2 className="mt-1 text-2xl font-black text-slate-900">Fresh stories by category</h2>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.home.latest}</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-900">{dictionary.home.freshStories}</h2>
           </div>
           <Link href="/search" className="text-sm font-bold text-rose-700 hover:text-rose-800">
-            Search all
+            {dictionary.home.searchAll}
           </Link>
         </div>
 
@@ -265,7 +267,7 @@ export default function HomePageClient({
                   : "border border-slate-200 bg-white text-slate-700 hover:bg-rose-50"
               }`}
             >
-              {category}
+              {category === ALL_CATEGORY ? dictionary.common.all : category}
             </button>
           ))}
         </div>
@@ -275,7 +277,7 @@ export default function HomePageClient({
             <NewsCard key={article._id} article={article} />
           ))}
           {visibleArticles.length === 0 && (
-            <p className="text-slate-600">No articles found for this category.</p>
+            <p className="text-slate-600">{dictionary.home.noCategoryArticles}</p>
           )}
         </div>
 
@@ -287,7 +289,7 @@ export default function HomePageClient({
                 onClick={() => setVisibleCount((prev) => prev + 5)}
                 className="rounded-full bg-rose-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-rose-800"
               >
-                Load More Image Preview (+5)
+                {dictionary.home.loadMore}
               </button>
             )}
 
@@ -297,7 +299,7 @@ export default function HomePageClient({
                 onClick={() => setVisibleCount(6)}
                 className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
               >
-                Re-Load Latest 6
+                {dictionary.home.reloadLatest}
               </button>
             )}
           </div>
@@ -306,7 +308,7 @@ export default function HomePageClient({
 
       <section className="grid gap-5 lg:grid-cols-2">
         <div className="rounded-3xl border border-slate-200 bg-slate-900 p-5 text-white shadow-sm sm:p-6 lg:p-8">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">Breaking News</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">{dictionary.home.breakingBlock}</p>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {breakingArticles.map((article) => (
               <Link key={article._id} href={`/article/${article.slug}`} className="rounded-2xl bg-white/5 p-4 transition hover:bg-white/10">
@@ -318,7 +320,7 @@ export default function HomePageClient({
         </div>
 
         <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-8">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Read Next</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.home.readNext}</p>
           <div className="mt-4 space-y-3">
             {initialArticles.slice(0, 4).map((article) => (
               <Link

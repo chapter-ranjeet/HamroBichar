@@ -1,8 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { dictionary } = useLanguage();
 
   return (
     <footer className="mt-8 border-t border-slate-200 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 sm:mt-10">
@@ -23,12 +28,12 @@ export default function Footer() {
                 </span>
                 <div>
                   <p className="text-base font-extrabold tracking-tight text-white">HamroBichar</p>
-                  <p className="text-xs font-medium text-rose-200/90">Voices and News from Nepal</p>
+                  <p className="text-xs font-medium text-rose-200/90">{dictionary.footer.voices}</p>
                 </div>
               </div>
 
               <p className="max-w-xl text-sm leading-6 text-slate-300 sm:text-[15px]">
-                HamroBichar is a news platform dedicated to delivering authentic and engaging content
+                {dictionary.home.description}
               </p>
 
               
@@ -36,22 +41,22 @@ export default function Footer() {
 
             <div className="grid gap-8 sm:grid-cols-2 xl:col-span-2 xl:grid-cols-2 xl:gap-10">
               <div className="space-y-4 rounded-3xl border border-white/10 bg-slate-900/70 p-5">
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Quick Links</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">{dictionary.footer.quickLinks}</p>
                 <div className="grid gap-3 text-sm font-semibold text-slate-200">
                   <Link className="transition hover:text-white" href="/about">
-                    About HamroBichar
+                    {dictionary.footer.about}
                   </Link>
                   <Link className="transition hover:text-white" href="/contact">
-                    Contact the Team
+                    {dictionary.footer.contact}
                   </Link>
                   <Link className="transition hover:text-white" href="/privacy-policy">
-                    Privacy Policy
+                    {dictionary.footer.privacy}
                   </Link>
                 </div>
               </div>
 
               <div className="space-y-4 rounded-3xl border border-white/10 bg-slate-900/70 p-5">
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Follow Us</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">{dictionary.footer.followUs}</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <a
                     href="https://www.facebook.com/profile.php?id=61565276758903"
@@ -66,7 +71,7 @@ export default function Footer() {
                       </svg>
                     </span>
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-white">Facebook</p>
+                      <p className="text-sm font-bold text-white">{dictionary.nav.facebook}</p>
                       <p className="truncate text-xs text-slate-400">hamrobichar</p>
                     </div>
                   </a>
@@ -86,7 +91,7 @@ export default function Footer() {
                       </svg>
                     </span>
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-white">Instagram</p>
+                      <p className="text-sm font-bold text-white">{dictionary.nav.instagram}</p>
                       <p className="truncate text-xs text-slate-400">@hamrobichar</p>
                     </div>
                   </a>
@@ -96,8 +101,8 @@ export default function Footer() {
           </div>
 
           <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-            <p>© {year} HamroBichar. All rights reserved.</p>
-            <p>Voices and News from Nepal.</p>
+            <p>© {year} HamroBichar. {dictionary.footer.rights}</p>
+            <p>{dictionary.footer.voices}</p>
           </div>
         </div>
       </div>

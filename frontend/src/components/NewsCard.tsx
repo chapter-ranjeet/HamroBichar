@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useLanguage } from "@/components/LanguageProvider";
 import { Article } from "@/types";
 
 interface NewsCardProps {
@@ -16,6 +19,8 @@ const getExcerpt = (content: string): string => {
 };
 
 export default function NewsCard({ article }: NewsCardProps) {
+  const { dictionary } = useLanguage();
+
   return (
     <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
       <Link
@@ -31,7 +36,7 @@ export default function NewsCard({ article }: NewsCardProps) {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-rose-100 to-amber-100 text-sm font-semibold text-slate-600">
-            No image available
+            {dictionary.home.noImage}
           </div>
         )}
       </Link>
@@ -43,11 +48,11 @@ export default function NewsCard({ article }: NewsCardProps) {
         <h2 className="line-clamp-3 text-lg font-extrabold leading-7 text-slate-900">{article.title}</h2>
         <p className="line-clamp-3 text-sm leading-6 text-slate-600">{getExcerpt(article.content)}</p>
         <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
-          <p className="font-medium">By {article.author}</p>
-          <p>{article.viewCount ?? 0} views</p>
+          <p className="font-medium">{dictionary.common.by} {article.author}</p>
+          <p>{article.viewCount ?? 0} {dictionary.article.viewsSuffix}</p>
         </div>
         <Link href={`/article/${article.slug}`} className="inline-flex text-sm font-bold text-rose-700 hover:text-rose-800">
-          Read full article
+          {dictionary.home.readFullArticle}
         </Link>
       </div>
     </article>

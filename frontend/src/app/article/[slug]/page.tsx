@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
 
 import ArticleComments from "@/components/ArticleComments";
 import ArticleViewTracker from "@/components/ArticleViewTracker";
+import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 import { fetchArticleServer, fetchArticlesServer } from "@/lib/server-content";
 import { Article } from "@/types";
 
@@ -155,6 +157,8 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
+  const cookieStore = await cookies();
+  const dictionary = getDictionary(normalizeLanguage(cookieStore.get(LANGUAGE_COOKIE)?.value));
   const { slug } = await params;
   const article = await fetchArticle(slug);
 
@@ -209,7 +213,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         </p>
         <h1 className="break-words text-2xl font-black leading-tight text-slate-900 sm:text-3xl lg:text-4xl">{article.title}</h1>
         <p className="mt-3 text-sm text-slate-500">
-          By {article.author || "HamroBichar Team"} • {formatReadableDate(article.createdAt)}
+          {dictionary.common.by} {article.author || "HamroBichar Team"} • {formatReadableDate(article.createdAt)}
         </p>
         {article.image && (
           <div className="relative my-5 aspect-video w-full min-h-52 overflow-hidden rounded-xl bg-slate-100 sm:my-6 sm:min-h-72">
@@ -228,7 +232,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         />
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr,0.8fr]">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Related Articles</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.article.relatedArticles}</p>
               <div className="mt-4 grid gap-3 sm:gap-4 md:grid-cols-3">
                 {relatedArticles.map((related) => (
                   <Link key={related._id} href={`/article/${related.slug}`} className="rounded-2xl border border-slate-200 bg-white p-3 transition hover:border-rose-200 hover:bg-rose-50 sm:p-4">
@@ -237,13 +241,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   </Link>
                 ))}
                 {relatedArticles.length === 0 && (
-                  <p className="text-sm text-slate-500 md:col-span-3">No related articles found yet.</p>
+                  <p className="text-sm text-slate-500 md:col-span-3">{dictionary.article.noRelated}</p>
                 )}
               </div>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Popular Now</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.article.popularNow}</p>
               <div className="mt-4 space-y-3">
                 {popularArticles.map((popular, index) => (
                   <Link key={popular._id} href={`/article/${popular.slug}`} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 transition hover:border-rose-200 hover:bg-rose-50">
@@ -252,12 +256,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     </span>
                     <div className="min-w-0">
                       <p className="line-clamp-2 break-words text-sm font-bold text-slate-900">{popular.title}</p>
-                      <p className="mt-1 text-xs text-slate-500">{popular.viewCount ?? 0} views</p>
+                      <p className="mt-1 text-xs text-slate-500">{popular.viewCount ?? 0} {dictionary.article.viewsSuffix}</p>
                     </div>
                   </Link>
                 ))}
                 {popularArticles.length === 0 && (
-                  <p className="text-sm text-slate-500">Popular articles are updating.</p>
+                  <p className="text-sm text-slate-500">{dictionary.article.popularUpdating}</p>
                 )}
               </div>
             </div>

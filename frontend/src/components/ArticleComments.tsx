@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 
+import { useLanguage } from "@/components/LanguageProvider";
 import { createArticleComment, getArticleComments } from "@/lib/api";
 import { Comment } from "@/types";
 
@@ -10,6 +11,7 @@ interface ArticleCommentsProps {
 }
 
 export default function ArticleComments({ slug }: ArticleCommentsProps) {
+  const { dictionary } = useLanguage();
   const [comments, setComments] = useState<Comment[]>([]);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
@@ -24,7 +26,7 @@ export default function ArticleComments({ slug }: ArticleCommentsProps) {
         const result = await getArticleComments(slug);
         setComments(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load comments");
+        setError(err instanceof Error ? err.message : dictionary.comments.loadError);
       } finally {
         setLoading(false);
       }
@@ -48,7 +50,7 @@ export default function ArticleComments({ slug }: ArticleCommentsProps) {
       setName("");
       setMessage("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to post comment");
+      setError(err instanceof Error ? err.message : dictionary.comments.postError);
     } finally {
       setPosting(false);
     }
@@ -58,36 +60,38 @@ export default function ArticleComments({ slug }: ArticleCommentsProps) {
     <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Comments</p>
-          <h2 className="mt-1 text-xl font-black text-slate-900 sm:text-2xl">Join the discussion</h2>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.comments.title}</p>
+          <h2 className="mt-1 text-xl font-black text-slate-900 sm:text-2xl">{dictionary.comments.subtitle}</h2>
         </div>
-        <p className="text-sm font-semibold text-slate-500">{comments.length} comments</p>
+        <p className="text-sm font-semibold text-slate-500">
+          {comments.length} {dictionary.comments.countSuffix}
+        </p>
       </div>
 
       <form onSubmit={onSubmit} className="mt-5 grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
         <input
           value={name}
           onChange={(event) => setName(event.target.value)}
-          placeholder="Your name"
+          placeholder={dictionary.comments.namePlaceholder}
           required
           className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-rose-300"
         />
         <textarea
           value={message}
           onChange={(event) => setMessage(event.target.value)}
-          placeholder="Write your comment..."
+          placeholder={dictionary.comments.messagePlaceholder}
           required
           rows={4}
           className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-rose-300"
         />
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-slate-500">Keep comments respectful and on topic.</p>
+          <p className="text-xs text-slate-500">{dictionary.comments.keepRespectful}</p>
           <button
             type="submit"
             disabled={posting}
             className="rounded-full bg-rose-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {posting ? "Posting..." : "Post Comment"}
+            {posting ? dictionary.comments.posting : dictionary.comments.post}
           </button>
         </div>
       </form>
@@ -95,9 +99,9 @@ export default function ArticleComments({ slug }: ArticleCommentsProps) {
       {error && <p className="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p>}
 
       <div className="mt-5 space-y-3">
-        {loading && <p className="text-sm text-slate-600">Loading comments...</p>}
+        {loading && <p className="text-sm text-slate-600">{dictionary.comments.loading}</p>}
 
-        {!loading && comments.length === 0 && <p className="text-sm text-slate-600">No comments yet. Be the first to share your view.</p>}
+        {!loading && comments.length === 0 && <p className="text-sm text-slate-600">{dictionary.comments.none}</p>}
 
         {comments.map((comment) => (
           <div key={comment._id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">

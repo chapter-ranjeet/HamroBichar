@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { useLanguage } from "@/components/LanguageProvider";
 import { getArticles } from "@/lib/api";
 import { slugify } from "@/lib/slug";
 import { Article } from "@/types";
@@ -12,6 +13,7 @@ export default function Navbar() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { language, dictionary, setLanguage } = useLanguage();
 
   useEffect(() => {
     const loadArticles = async () => {
@@ -31,7 +33,7 @@ export default function Navbar() {
   ).sort((a, b) => a.localeCompare(b));
 
   const remainingArticles = articles.slice(6);
-  const englishDate = new Date().toLocaleDateString("en-US", {
+  const topBarDate = new Date().toLocaleDateString(language === "np" ? "ne-NP" : "en-US", {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -43,14 +45,38 @@ export default function Navbar() {
       <div className="border-b border-slate-100 bg-slate-900 text-slate-100">
         <div className="flex w-full items-center justify-between px-4 py-1.5 text-[11px] sm:px-6 sm:text-xs lg:px-10">
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wide">
-            <span>EN: {englishDate}</span>
-            <span className="text-slate-400">|</span>   
-            
+            <span>
+              {dictionary.topBar.today}: {topBarDate}
+            </span>
           </p>
-          <p className="flex items-center gap-2 font-semibold uppercase tracking-wider text-emerald-300">
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
-            Live Updates
-          </p>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="inline-flex overflow-hidden rounded-full border border-slate-500/60 bg-slate-800 p-0.5">
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition sm:px-2.5 sm:text-[11px] ${
+                  language === "en" ? "bg-rose-600 text-white" : "text-slate-300 hover:text-white"
+                }`}
+                aria-label="Switch language to English"
+              >
+                ENG
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("np")}
+                className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide transition sm:px-2.5 sm:text-[11px] ${
+                  language === "np" ? "bg-rose-600 text-white" : "text-slate-300 hover:text-white"
+                }`}
+                aria-label="Switch language to Nepali"
+              >
+                NP
+              </button>
+            </div>
+            <p className="flex items-center gap-2 font-semibold uppercase tracking-wider text-emerald-300">
+              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              {dictionary.topBar.liveUpdates}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -69,37 +95,45 @@ export default function Navbar() {
               <span>HamroBichar</span>
             </Link>
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-[11px]">
-              Voices and News from Nepal
+              {dictionary.footer.voices}
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => setMobileNavOpen((prev) => !prev)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700"
-            aria-label="Toggle navigation"
+            className="group inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:border-rose-300 hover:text-rose-700 lg:hidden"
+            aria-label={mobileNavOpen ? dictionary.nav.menuClose : dictionary.nav.menuOpen}
             aria-expanded={mobileNavOpen}
           >
-            <span className="flex flex-col gap-1.5">
-              <span className="h-0.5 w-5 rounded bg-slate-700" />
-              <span className="h-0.5 w-5 rounded bg-slate-700" />
-              <span className="h-0.5 w-5 rounded bg-slate-700" />
+            <span className="relative h-4 w-4">
+              <span
+                className={`absolute left-0 top-0 block h-[2px] w-4 rounded bg-current transition duration-300 ${
+                  mobileNavOpen ? "translate-y-[7px] rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-[7px] block h-[2px] w-4 rounded bg-current transition duration-300 ${
+                  mobileNavOpen ? "opacity-0" : "opacity-100"
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-[14px] block h-[2px] w-4 rounded bg-current transition duration-300 ${
+                  mobileNavOpen ? "-translate-y-[7px] -rotate-45" : ""
+                }`}
+              />
             </span>
           </button>
         </div>
 
-        <div
-          className={`relative mt-2 w-full items-center gap-2 sm:mt-3 sm:w-auto sm:gap-3 ${
-            mobileNavOpen ? "flex" : "hidden"
-          }`}
-        >
+        <div className={`relative mt-2 w-full items-center gap-2 sm:mt-3 sm:w-auto sm:gap-3 ${mobileNavOpen ? "flex" : "hidden"} lg:flex`}>
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <Link
               className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:border-rose-300 hover:text-rose-700 sm:px-4 sm:py-2 sm:text-sm"
               href="/"
               onClick={() => setMobileNavOpen(false)}
             >
-              Home
+              {dictionary.nav.home}
             </Link>
 
             <Link
@@ -107,7 +141,7 @@ export default function Navbar() {
               href="/search"
               onClick={() => setMobileNavOpen(false)}
             >
-              Search
+              {dictionary.nav.search}
             </Link>
 
             {categories.map((category) => (
@@ -128,17 +162,17 @@ export default function Navbar() {
                   onClick={() => setMenuOpen((prev) => !prev)}
                   className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:border-rose-300 hover:text-rose-700 sm:px-4 sm:py-2 sm:text-sm"
                 >
-                  More News ({remainingArticles.length})
+                  {dictionary.nav.moreNews} ({remainingArticles.length})
                 </button>
 
                 {menuOpen && (
                   <div className="absolute right-0 top-full z-40 mt-2 w-[min(92vw,20rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl sm:w-80">
                     <div className="border-b border-slate-100 bg-slate-50 px-4 py-3">
                       <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
-                        Older Headlines
+                        {dictionary.nav.olderHeadlines}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-slate-700">
-                        Articles beyond the latest six
+                        {dictionary.nav.olderHeadlinesSub}
                       </p>
                     </div>
                     <div className="max-h-80 overflow-y-auto p-2">
@@ -176,7 +210,7 @@ export default function Navbar() {
                   height={28}
                   className="h-7 w-7 rounded-full border border-slate-200 bg-white p-0.5 object-contain"
                 />
-                <span className="text-[11px] font-semibold">Facebook</span>
+                <span className="text-[11px] font-semibold">{dictionary.nav.facebook}</span>
               </a>
               <a
                 href="https://www.instagram.com/hamrobichar/"
@@ -192,7 +226,7 @@ export default function Navbar() {
                   height={28}
                   className="h-7 w-7 rounded-full border border-slate-200 bg-white p-0.5 object-contain"
                 />
-                <span className="text-[11px] font-semibold">Instagram</span>
+                <span className="text-[11px] font-semibold">{dictionary.nav.instagram}</span>
               </a>
             </div>
           </div>

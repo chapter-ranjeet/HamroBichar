@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+
+import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -8,31 +11,31 @@ export const metadata: Metadata = {
   }
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const cookieStore = await cookies();
+  const dictionary = getDictionary(normalizeLanguage(cookieStore.get(LANGUAGE_COOKIE)?.value));
+
   return (
     <section className="mx-auto my-8 w-full max-w-4xl rounded-2xl bg-white p-5 shadow-sm sm:my-10 sm:p-8 lg:p-10">
-      <h1 className="text-3xl font-black text-slate-900">About HamroBichar</h1>
+      <h1 className="text-3xl font-black text-slate-900">{dictionary.about.title}</h1>
       <p className="mt-4 text-base leading-7 text-slate-700">
-        HamroBichar is a Nepal-focused digital news platform dedicated to delivering timely,
-        accurate, and easy-to-read reporting.
+        {dictionary.about.p1}
       </p>
       <p className="mt-4 text-base leading-7 text-slate-700">
-        We cover politics, education, business, technology, and social issues that shape daily
-        life. Our goal is to make important information accessible and useful for everyone.
+        {dictionary.about.p2}
       </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <h2 className="text-lg font-bold text-slate-900">Our Mission</h2>
+          <h2 className="text-lg font-bold text-slate-900">{dictionary.about.missionTitle}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-700">
-            Publish reliable reporting and meaningful views that help readers understand Nepal
-            better.
+            {dictionary.about.missionText}
           </p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <h2 className="text-lg font-bold text-slate-900">Our Promise</h2>
+          <h2 className="text-lg font-bold text-slate-900">{dictionary.about.promiseTitle}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-700">
-            Keep improving quality, speed, and transparency while respecting readers and sources.
+            {dictionary.about.promiseText}
           </p>
         </div>
       </div>

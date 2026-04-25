@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
+import { useLanguage } from "@/components/LanguageProvider";
 import {
   changeAdminPassword,
   createSubAdmin,
@@ -69,6 +70,7 @@ const emptySubAdminForm: SubAdminFormState = {
 export default function AdminDashboardPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const { dictionary } = useLanguage();
 
   const tokenRef = useRef<string>("");
   const editorRef = useRef<HTMLDivElement | null>(null);
@@ -173,7 +175,7 @@ export default function AdminDashboardPage() {
   };
 
   const changeFontSize = (direction: "increase" | "decrease") => {
-    const currentSize = Number(window.prompt("Enter font size in px (for example 16)", "16"));
+    const currentSize = Number(window.prompt(dictionary.admin.fontSizePrompt, "16"));
     if (!currentSize || Number.isNaN(currentSize)) {
       return;
     }
@@ -223,12 +225,12 @@ export default function AdminDashboardPage() {
   };
 
   const addLink = () => {
-    const url = window.prompt("Enter URL", "https://");
+    const url = window.prompt(dictionary.admin.promptEnterUrl, "https://");
     if (!url) {
       return;
     }
 
-    const selectedText = window.getSelection()?.toString() || "link";
+    const selectedText = window.getSelection()?.toString() || dictionary.admin.linkDefaultText;
     execEditorCommand("insertHTML", `<a href=\"${url}\" target=\"_blank\" rel=\"noopener noreferrer\">${selectedText}</a>`);
   };
 
@@ -239,7 +241,7 @@ export default function AdminDashboardPage() {
       const response = await getArticles();
       setArticles(response.articles);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load articles");
+      setError(err instanceof Error ? err.message : dictionary.admin.failedLoadArticles);
     } finally {
       setLoading(false);
     }
@@ -251,7 +253,7 @@ export default function AdminDashboardPage() {
       const result = await getAdminUsers(tokenRef.current);
       setUsers(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load users");
+      setError(err instanceof Error ? err.message : dictionary.admin.failedLoadUsers);
     } finally {
       setUsersLoading(false);
     }
@@ -326,7 +328,7 @@ export default function AdminDashboardPage() {
       resetForm();
       await loadArticles();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit article");
+      setError(err instanceof Error ? err.message : dictionary.admin.submitFailed);
     } finally {
       setSubmitting(false);
     }
@@ -355,7 +357,7 @@ export default function AdminDashboardPage() {
       await deleteArticle(id, tokenRef.current);
       await loadArticles();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete article");
+      setError(err instanceof Error ? err.message : dictionary.admin.failedDeleteArticle);
     }
   };
 
@@ -371,7 +373,7 @@ export default function AdminDashboardPage() {
       const imageUrl = await uploadArticleImage(file, tokenRef.current);
       setForm((prev) => ({ ...prev, image: imageUrl }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload image");
+      setError(err instanceof Error ? err.message : dictionary.admin.failedUploadImage);
     } finally {
       setUploadingImage(false);
       event.target.value = "";
@@ -384,7 +386,7 @@ export default function AdminDashboardPage() {
       await updateAdminUserRole(userId, role, tokenRef.current);
       await loadUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update user role");
+      setError(err instanceof Error ? err.message : dictionary.admin.failedUpdateRole);
     }
   };
 
@@ -392,7 +394,7 @@ export default function AdminDashboardPage() {
     event.preventDefault();
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setAccountMessage("New password and confirm password do not match");
+      setAccountMessage(dictionary.admin.passwordMismatch);
       return;
     }
 
@@ -409,10 +411,10 @@ export default function AdminDashboardPage() {
       setPasswordForm(emptyPasswordForm);
       localStorage.removeItem("hamrobichar_token");
       localStorage.removeItem("hamrobichar_user");
-      setAccountMessage("Password changed. Please sign in again.");
+      setAccountMessage(dictionary.admin.passwordChangedReLogin);
       router.replace("/master");
     } catch (err) {
-      setAccountMessage(err instanceof Error ? err.message : "Failed to change password");
+      setAccountMessage(err instanceof Error ? err.message : dictionary.admin.failedChangePassword);
     } finally {
       setChangingPassword(false);
     }
@@ -435,17 +437,17 @@ export default function AdminDashboardPage() {
       );
 
       setSubAdminForm(emptySubAdminForm);
-      setSubAdminMessage("Subadmin created successfully.");
+      setSubAdminMessage(dictionary.admin.subadminCreatedSuccess);
       await loadUsers();
     } catch (err) {
-      setSubAdminMessage(err instanceof Error ? err.message : "Failed to create subadmin");
+      setSubAdminMessage(err instanceof Error ? err.message : dictionary.admin.failedCreateSubadmin);
     } finally {
       setCreatingSubAdmin(false);
     }
   };
 
   const onResetSubAdminPassword = async (userId: string) => {
-    const nextPassword = window.prompt("Enter new password for subadmin (min 6 chars)");
+    const nextPassword = window.prompt(dictionary.admin.promptNewSubadminPassword);
     if (!nextPassword) {
       return;
     }
@@ -454,16 +456,16 @@ export default function AdminDashboardPage() {
       setManagingSubAdmin(userId);
       setSubAdminMessage(null);
       await resetSubAdminPassword(userId, nextPassword, tokenRef.current);
-      setSubAdminMessage("Subadmin password updated successfully.");
+      setSubAdminMessage(dictionary.admin.subadminPasswordUpdated);
     } catch (err) {
-      setSubAdminMessage(err instanceof Error ? err.message : "Failed to reset password");
+      setSubAdminMessage(err instanceof Error ? err.message : dictionary.admin.failedResetPassword);
     } finally {
       setManagingSubAdmin(null);
     }
   };
 
   const onDeleteSubAdmin = async (userId: string) => {
-    const confirmed = window.confirm("Delete this subadmin account?");
+    const confirmed = window.confirm(dictionary.admin.confirmDeleteSubadmin);
     if (!confirmed) {
       return;
     }
@@ -472,10 +474,10 @@ export default function AdminDashboardPage() {
       setManagingSubAdmin(userId);
       setSubAdminMessage(null);
       await deleteSubAdmin(userId, tokenRef.current);
-      setSubAdminMessage("Subadmin deleted successfully.");
+      setSubAdminMessage(dictionary.admin.subadminDeleted);
       await loadUsers();
     } catch (err) {
-      setSubAdminMessage(err instanceof Error ? err.message : "Failed to delete subadmin");
+      setSubAdminMessage(err instanceof Error ? err.message : dictionary.admin.failedDeleteSubadmin);
     } finally {
       setManagingSubAdmin(null);
     }
@@ -503,7 +505,7 @@ export default function AdminDashboardPage() {
               onClick={onLogout}
               className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
             >
-              Logout
+              {dictionary.admin.logout}
             </button>
             <button
               onClick={() => setShowUserManagementPanel((prev) => !prev)}
@@ -513,7 +515,7 @@ export default function AdminDashboardPage() {
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
-              User Management
+              {dictionary.admin.userManagement}
             </button>
             <button
               onClick={() => setShowAccountSettingsPanel((prev) => !prev)}
@@ -523,7 +525,7 @@ export default function AdminDashboardPage() {
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
-              Account Settings
+              {dictionary.admin.accountSettings}
             </button>
           </div>
         </div>
@@ -531,10 +533,10 @@ export default function AdminDashboardPage() {
 
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-xl font-black text-slate-900">{isEditing ? "Edit Article" : "Create Article"}</h1>
+          <h1 className="text-xl font-black text-slate-900">{isEditing ? dictionary.admin.editArticle : dictionary.admin.createArticle}</h1>
           {!isMasterRoute && (
             <button onClick={onLogout} className="text-sm font-semibold text-rose-700">
-              Logout
+              {dictionary.admin.logout}
             </button>
           )}
         </div>
@@ -545,16 +547,16 @@ export default function AdminDashboardPage() {
             value={form.title}
             onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-            placeholder="Article title"
+            placeholder={dictionary.admin.titlePlaceholder}
           />
           <p className="text-xs font-medium text-slate-500">
-            Slug preview: <span className="font-semibold text-slate-700">{estimatedSlug || "article-title"}</span>
+            {dictionary.admin.slugPreview}: <span className="font-semibold text-slate-700">{estimatedSlug || dictionary.admin.slugDefault}</span>
           </p>
           <input
             value={form.author}
             onChange={(event) => setForm((prev) => ({ ...prev, author: event.target.value }))}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-            placeholder="Writer name (optional)"
+            placeholder={dictionary.admin.writerPlaceholder}
           />
           <div className="rounded-lg border border-slate-300 p-2">
             <div className="mb-2 flex flex-wrap gap-2">
@@ -563,21 +565,21 @@ export default function AdminDashboardPage() {
                 onClick={() => execEditorCommand("bold")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Bold
+                {dictionary.admin.bold}
               </button>
               <button
                 type="button"
                 onClick={() => execEditorCommand("italic")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Italic
+                {dictionary.admin.italic}
               </button>
               <button
                 type="button"
                 onClick={() => execEditorCommand("underline")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Underline
+                {dictionary.admin.underline}
               </button>
               <button
                 type="button"
@@ -598,56 +600,56 @@ export default function AdminDashboardPage() {
                 onClick={() => execEditorCommand("formatBlock", "blockquote")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Quote
+                {dictionary.admin.quote}
               </button>
               <button
                 type="button"
                 onClick={() => execEditorCommand("insertUnorderedList")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Bullet List
+                {dictionary.admin.bulletList}
               </button>
               <button
                 type="button"
                 onClick={() => execEditorCommand("insertOrderedList")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Numbered List
+                {dictionary.admin.numberedList}
               </button>
               <button
                 type="button"
                 onClick={addLink}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Link
+                {dictionary.admin.link}
               </button>
               <button
                 type="button"
                 onClick={() => {
-                  const url = window.prompt("Paste image URL", "https://");
+                  const url = window.prompt(dictionary.admin.promptPasteImageUrl, "https://");
                   if (!url) {
                     return;
                   }
 
-                  execEditorCommand("insertHTML", `<img src=\"${url}\" alt=\"article image\" style=\"max-width:100%;height:auto;\" />`);
+                  execEditorCommand("insertHTML", `<img src=\"${url}\" alt=\"${dictionary.admin.imageAlt}\" style=\"max-width:100%;height:auto;\" />`);
                 }}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                Image Tag
+                {dictionary.admin.imageTag}
               </button>
               <button
                 type="button"
                 onClick={() => changeFontSize("increase")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                A+
+                {dictionary.admin.fontIncrease}
               </button>
               <button
                 type="button"
                 onClick={() => changeFontSize("decrease")}
                 className="rounded border border-slate-200 px-2 py-1 text-xs font-semibold"
               >
-                A-
+                {dictionary.admin.fontDecrease}
               </button>
             </div>
             <div
@@ -657,13 +659,13 @@ export default function AdminDashboardPage() {
               onInput={syncEditorContent}
               dangerouslySetInnerHTML={{ __html: form.content || "" }}
               className="min-h-52 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-              data-placeholder="Write article body. You can use the toolbar like WordPad."
+              data-placeholder={dictionary.admin.editorPlaceholder}
             />
-            <p className="mt-1 text-xs text-slate-500">Use the toolbar to style text directly. Content is saved as formatted HTML.</p>
+            <p className="mt-1 text-xs text-slate-500">{dictionary.admin.editorHelp}</p>
 
             <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="mb-2 text-xs font-black uppercase tracking-[0.15em] text-slate-500">Live Preview</p>
-              <div className="prose prose-slate max-w-none rounded bg-white p-3 text-sm" dangerouslySetInnerHTML={{ __html: form.content || "<p>Preview will appear here...</p>" }} />
+              <p className="mb-2 text-xs font-black uppercase tracking-[0.15em] text-slate-500">{dictionary.admin.livePreview}</p>
+              <div className="prose prose-slate max-w-none rounded bg-white p-3 text-sm" dangerouslySetInnerHTML={{ __html: form.content || `<p>${dictionary.admin.previewPlaceholder}</p>` }} />
             </div>
           </div>
           <input
@@ -672,7 +674,7 @@ export default function AdminDashboardPage() {
             value={form.category}
             onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-            placeholder="Category"
+            placeholder={dictionary.admin.categoryPlaceholder}
           />
           <datalist id="category-suggestions">
             {availableCategories.map((category) => (
@@ -683,7 +685,7 @@ export default function AdminDashboardPage() {
             value={form.image}
             onChange={(event) => setForm((prev) => ({ ...prev, image: event.target.value }))}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-            placeholder="Image URL (optional)"
+            placeholder={dictionary.admin.imageUrlPlaceholder}
           />
           <div className="space-y-1">
             <input
@@ -692,7 +694,7 @@ export default function AdminDashboardPage() {
               onChange={onImageChange}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             />
-            {uploadingImage && <p className="text-xs text-slate-500">Uploading image...</p>}
+            {uploadingImage && <p className="text-xs text-slate-500">{dictionary.admin.uploadingImage}</p>}
           </div>
 
           {error && <p className="text-sm font-semibold text-rose-700">{error}</p>}
@@ -703,7 +705,7 @@ export default function AdminDashboardPage() {
               disabled={submitting || !canSubmit}
               className="rounded-lg bg-rose-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {submitting ? "Submitting..." : isEditing ? "Update Article" : "Create Article"}
+              {submitting ? dictionary.admin.submitting : isEditing ? dictionary.admin.updateArticle : dictionary.admin.createArticleAction}
             </button>
             {isEditing && (
               <button
@@ -711,7 +713,7 @@ export default function AdminDashboardPage() {
                 onClick={resetForm}
                 className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
               >
-                Cancel edit
+                {dictionary.admin.cancelEdit}
               </button>
             )}
           </div>
@@ -719,21 +721,21 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-xl font-black text-slate-900">Existing Articles</h2>
+        <h2 className="text-xl font-black text-slate-900">{dictionary.admin.existingArticles}</h2>
         <div className="mt-4">
           <input
             value={articleSearchTerm}
             onChange={(event) => setArticleSearchTerm(event.target.value)}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-            placeholder="Search posted articles by title, category, or author"
+            placeholder={dictionary.admin.searchArticlesPlaceholder}
           />
         </div>
 
         {loading ? (
-          <p className="mt-4 text-slate-600">Loading articles...</p>
+          <p className="mt-4 text-slate-600">{dictionary.admin.loadingArticles}</p>
         ) : (
           <div className="mt-4 space-y-3">
-            {groupedFilteredArticles.length === 0 && <p className="text-slate-500">No articles found.</p>}
+            {groupedFilteredArticles.length === 0 && <p className="text-slate-500">{dictionary.admin.noArticlesFound}</p>}
 
             {groupedFilteredArticles.map(([category, categoryArticles]) => {
               const isOpen = openCategories[category] ?? false;
@@ -747,7 +749,7 @@ export default function AdminDashboardPage() {
                   >
                     <span className="font-bold text-slate-800">{category}</span>
                     <span className="text-xs font-semibold text-slate-500">
-                      {categoryArticles.length} article{categoryArticles.length > 1 ? "s" : ""} {isOpen ? "▲" : "▼"}
+                      {categoryArticles.length} {categoryArticles.length > 1 ? dictionary.admin.articleCountLabelPlural : dictionary.admin.articleCountLabel} {isOpen ? "▲" : "▼"}
                     </span>
                   </button>
 
@@ -756,26 +758,26 @@ export default function AdminDashboardPage() {
                       {categoryArticles.map((article) => (
                         <li key={article._id} className="rounded-lg border border-slate-200 p-3">
                           <p className="font-bold text-slate-800">{article.title}</p>
-                          <p className="text-xs text-slate-500">Author: {article.author}</p>
+                          <p className="text-xs text-slate-500">{dictionary.admin.authorLabel}: {article.author}</p>
                           <div className="mt-2 flex gap-3 text-sm font-semibold">
                             <button
                               onClick={() => onEdit(article)}
                               disabled={!canModifyArticle(article)}
                               className="text-amber-700 disabled:cursor-not-allowed disabled:opacity-40"
                             >
-                              Edit
+                              {dictionary.admin.edit}
                             </button>
                             <button
                               onClick={() => void onDelete(article._id)}
                               disabled={!isSuperAdmin}
                               className="text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
                             >
-                              Delete
+                              {dictionary.admin.delete}
                             </button>
                           </div>
                           {!isSuperAdmin && !canModifyArticle(article) && (
                             <p className="mt-1 text-xs font-semibold text-slate-500">
-                              Subadmin can edit only own articles.
+                              {dictionary.admin.ownArticlesOnly}
                             </p>
                           )}
                         </li>
@@ -791,8 +793,8 @@ export default function AdminDashboardPage() {
 
       {isSuperAdmin && (
         <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-xl font-black text-slate-900">Create Subadmin</h2>
-          <p className="mt-1 text-sm text-slate-600">Subadmins can post articles and edit only their own posts.</p>
+          <h2 className="text-xl font-black text-slate-900">{dictionary.admin.createSubadmin}</h2>
+          <p className="mt-1 text-sm text-slate-600">{dictionary.admin.createSubadminHelp}</p>
 
           <form onSubmit={onCreateSubAdmin} className="mt-4 grid gap-3 sm:grid-cols-3">
             <input
@@ -800,7 +802,7 @@ export default function AdminDashboardPage() {
               value={subAdminForm.username}
               onChange={(event) => setSubAdminForm((prev) => ({ ...prev, username: event.target.value }))}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-              placeholder="Username"
+              placeholder={dictionary.admin.username}
             />
             <input
               type="email"
@@ -808,7 +810,7 @@ export default function AdminDashboardPage() {
               value={subAdminForm.email}
               onChange={(event) => setSubAdminForm((prev) => ({ ...prev, email: event.target.value }))}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-              placeholder="Email"
+              placeholder={dictionary.admin.email}
             />
             <input
               type="password"
@@ -817,7 +819,7 @@ export default function AdminDashboardPage() {
               value={subAdminForm.password}
               onChange={(event) => setSubAdminForm((prev) => ({ ...prev, password: event.target.value }))}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-              placeholder="Password"
+              placeholder={dictionary.admin.password}
             />
             <div className="sm:col-span-3">
               <button
@@ -825,7 +827,7 @@ export default function AdminDashboardPage() {
                 disabled={creatingSubAdmin}
                 className="rounded-lg bg-rose-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {creatingSubAdmin ? "Creating..." : "Create Subadmin"}
+                {creatingSubAdmin ? dictionary.admin.creating : dictionary.admin.createSubadminAction}
               </button>
             </div>
           </form>
@@ -836,9 +838,9 @@ export default function AdminDashboardPage() {
 
       {isSuperAdmin && showUserManagementPanel && (
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-xl font-black text-slate-900">User Management</h2>
+        <h2 className="text-xl font-black text-slate-900">{dictionary.admin.userManagement}</h2>
         {usersLoading ? (
-          <p className="mt-4 text-slate-600">Loading users...</p>
+          <p className="mt-4 text-slate-600">{dictionary.admin.usersLoading}</p>
         ) : (
           <>
             <ul className="mt-4 space-y-3 md:hidden">
@@ -853,7 +855,7 @@ export default function AdminDashboardPage() {
                     onClick={() => onRoleChange(user._id, user.role === "subadmin" ? "user" : "subadmin")}
                     className="mt-2 rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
                   >
-                    Make {user.role === "subadmin" ? "User" : "Subadmin"}
+                    {user.role === "subadmin" ? dictionary.admin.makeUser : dictionary.admin.makeSubadmin}
                   </button>
                   {user.role === "subadmin" && (
                     <div className="mt-2 flex flex-wrap gap-2">
@@ -862,14 +864,14 @@ export default function AdminDashboardPage() {
                         disabled={managingSubAdmin === user._id}
                         className="rounded border border-blue-300 px-2 py-1 text-xs font-semibold text-blue-700 disabled:opacity-50"
                       >
-                        Reset Password
+                        {dictionary.admin.resetPassword}
                       </button>
                       <button
                         onClick={() => onDeleteSubAdmin(user._id)}
                         disabled={managingSubAdmin === user._id}
                         className="rounded border border-rose-300 px-2 py-1 text-xs font-semibold text-rose-700 disabled:opacity-50"
                       >
-                        Delete Subadmin
+                        {dictionary.admin.deleteSubadmin}
                       </button>
                     </div>
                   )}
@@ -881,10 +883,10 @@ export default function AdminDashboardPage() {
               <table className="min-w-full text-left text-sm">
               <thead className="border-b border-slate-200 text-slate-500">
                 <tr>
-                  <th className="py-2 pr-3">Username</th>
-                  <th className="py-2 pr-3">Email</th>
-                  <th className="py-2 pr-3">Role</th>
-                  <th className="py-2">Action</th>
+                  <th className="py-2 pr-3">{dictionary.admin.username}</th>
+                  <th className="py-2 pr-3">{dictionary.admin.email}</th>
+                  <th className="py-2 pr-3">{dictionary.admin.role}</th>
+                  <th className="py-2">{dictionary.admin.action}</th>
                 </tr>
               </thead>
               <tbody>
@@ -899,7 +901,7 @@ export default function AdminDashboardPage() {
                           onClick={() => onRoleChange(user._id, user.role === "subadmin" ? "user" : "subadmin")}
                           className="rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700"
                         >
-                          Make {user.role === "subadmin" ? "User" : "Subadmin"}
+                          {user.role === "subadmin" ? dictionary.admin.makeUser : dictionary.admin.makeSubadmin}
                         </button>
                         {user.role === "subadmin" && (
                           <>
@@ -908,14 +910,14 @@ export default function AdminDashboardPage() {
                               disabled={managingSubAdmin === user._id}
                               className="rounded border border-blue-300 px-2 py-1 text-xs font-semibold text-blue-700 disabled:opacity-50"
                             >
-                              Reset Password
+                              {dictionary.admin.resetPassword}
                             </button>
                             <button
                               onClick={() => onDeleteSubAdmin(user._id)}
                               disabled={managingSubAdmin === user._id}
                               className="rounded border border-rose-300 px-2 py-1 text-xs font-semibold text-rose-700 disabled:opacity-50"
                             >
-                              Delete Subadmin
+                              {dictionary.admin.deleteSubadmin}
                             </button>
                           </>
                         )}
@@ -933,8 +935,8 @@ export default function AdminDashboardPage() {
 
       {(showAccountSettingsPanel || !isMasterRoute) && (
       <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-xl font-black text-slate-900">Account Settings</h2>
-        <p className="mt-1 text-sm text-slate-600">Use these actions to secure or end your admin session.</p>
+        <h2 className="text-xl font-black text-slate-900">{dictionary.admin.accountSettings}</h2>
+        <p className="mt-1 text-sm text-slate-600">{dictionary.admin.accountHelp}</p>
 
         {!isSubAdmin ? (
         <form onSubmit={onChangePassword} className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -946,7 +948,7 @@ export default function AdminDashboardPage() {
               setPasswordForm((prev) => ({ ...prev, currentPassword: event.target.value }))
             }
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-            placeholder="Current password"
+            placeholder={dictionary.admin.currentPasswordPlaceholder}
           />
           <input
             type="password"
@@ -956,7 +958,7 @@ export default function AdminDashboardPage() {
               setPasswordForm((prev) => ({ ...prev, newPassword: event.target.value }))
             }
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
-            placeholder="New password"
+            placeholder={dictionary.admin.newPasswordPlaceholder}
           />
           <input
             type="password"
@@ -966,7 +968,7 @@ export default function AdminDashboardPage() {
               setPasswordForm((prev) => ({ ...prev, confirmPassword: event.target.value }))
             }
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring sm:col-span-2"
-            placeholder="Confirm new password"
+            placeholder={dictionary.admin.confirmPasswordPlaceholder}
           />
 
           <div className="sm:col-span-2">
@@ -975,13 +977,13 @@ export default function AdminDashboardPage() {
               disabled={changingPassword}
               className="rounded-lg bg-rose-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {changingPassword ? "Changing password..." : "Change Password"}
+              {changingPassword ? dictionary.admin.changingPassword : dictionary.admin.changePassword}
             </button>
           </div>
         </form>
         ) : (
           <p className="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-            Subadmin passwords are managed by superadmin only.
+            {dictionary.admin.subadminPasswordManaged}
           </p>
         )}
 

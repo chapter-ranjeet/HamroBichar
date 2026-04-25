@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 
 import NewsCard from "@/components/NewsCard";
+import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 import { fetchArticlesServer } from "@/lib/server-content";
 import { slugify, unslugify } from "@/lib/slug";
 
@@ -29,6 +31,8 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
+  const cookieStore = await cookies();
+  const dictionary = getDictionary(normalizeLanguage(cookieStore.get(LANGUAGE_COOKIE)?.value));
   const { slug } = await params;
   const data = await fetchArticlesServer();
   const categoryArticles = data.articles.filter((article) => slugify(article.category) === slug);
@@ -38,15 +42,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     <section className="mx-auto my-8 w-full max-w-7xl rounded-3xl bg-white p-5 shadow-sm sm:my-10 sm:p-8 lg:p-10">
       <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Category</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.category.section}</p>
           <h1 className="mt-2 text-3xl font-black text-slate-900 sm:text-5xl">{categoryName}</h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-            Browse all articles in this category. Category pages improve internal linking and help Google
-            understand the site structure.
+            {dictionary.category.description}
           </p>
         </div>
         <Link href="/" className="text-sm font-bold text-rose-700 hover:text-rose-800">
-          Back to home
+          {dictionary.category.back}
         </Link>
       </div>
 
@@ -58,7 +61,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
       {categoryArticles.length === 0 && (
         <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-slate-600">
-          No articles found in this category yet.
+          {dictionary.category.noArticles}
         </div>
       )}
     </section>
