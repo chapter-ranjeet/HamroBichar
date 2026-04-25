@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 
 import Footer from "@/components/Footer";
 import LanguageProvider from "@/components/LanguageProvider";
@@ -20,6 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
+const gaId = "G-STF3X2B450";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -112,6 +114,18 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-slate-50 text-slate-900">
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${gaId}');
+          `}
+        </Script>
         <LanguageProvider initialLanguage={initialLanguage}>
           <div className="flex min-h-screen flex-col bg-[radial-gradient(circle_at_top,#fff1f2,#f8fafc_42%,#ffffff)]">
             <Navbar />

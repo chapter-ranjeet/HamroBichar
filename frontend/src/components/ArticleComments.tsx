@@ -106,10 +106,10 @@ export default function ArticleComments({ slug }: ArticleCommentsProps) {
         {comments.map((comment) => (
           <div key={comment._id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="max-w-full break-words font-bold text-slate-900">{comment.name}</p>
+              <p className="max-w-full wrap-break-word font-bold text-slate-900">{comment.name}</p>
               <p className="text-xs text-slate-500">{new Date(comment.createdAt).toLocaleString()}</p>
             </div>
-            <p className="mt-2 break-words text-sm leading-7 text-slate-700">{comment.message}</p>
+            <p className="mt-2 wrap-break-word text-sm leading-7 text-slate-700">{comment.message}</p>
           </div>
         ))}
       </div>

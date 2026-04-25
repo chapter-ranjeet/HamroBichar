@@ -7,10 +7,13 @@ import { ApiError } from "../utils/apiError";
 import { generateUniqueSlug } from "../utils/slug";
 
 export const createArticle = asyncHandler(async (req: Request, res: Response) => {
-  const { title, content, category, image, author } = req.body as {
+  const { title, titleNp, content, contentNp, category, categoryNp, image, author } = req.body as {
     title?: string;
+    titleNp?: string;
     content?: string;
+    contentNp?: string;
     category?: string;
+    categoryNp?: string;
     image?: string;
     author?: string;
   };
@@ -24,9 +27,12 @@ export const createArticle = asyncHandler(async (req: Request, res: Response) =>
 
   const article = await Article.create({
     title,
+    titleNp,
     slug,
     content,
+    contentNp,
     category,
+    categoryNp,
     image,
     author: normalizedAuthor || req.user?.username || "Admin",
     createdBy: req.user?.userId
@@ -52,9 +58,12 @@ export const getAllArticles = asyncHandler(async (req: Request, res: Response) =
   if (q) {
     filter.$or = [
       { title: { $regex: q, $options: "i" } },
+      { titleNp: { $regex: q, $options: "i" } },
       { content: { $regex: q, $options: "i" } },
+      { contentNp: { $regex: q, $options: "i" } },
       { author: { $regex: q, $options: "i" } },
-      { category: { $regex: q, $options: "i" } }
+      { category: { $regex: q, $options: "i" } },
+      { categoryNp: { $regex: q, $options: "i" } }
     ];
   }
 
@@ -119,10 +128,13 @@ export const updateArticle = asyncHandler(async (req: Request, res: Response) =>
     throw new ApiError(400, "Invalid article id");
   }
 
-  const { title, content, category, image, author } = req.body as {
+  const { title, titleNp, content, contentNp, category, categoryNp, image, author } = req.body as {
     title?: string;
+    titleNp?: string;
     content?: string;
+    contentNp?: string;
     category?: string;
+    categoryNp?: string;
     image?: string;
     author?: string;
   };
@@ -152,8 +164,20 @@ export const updateArticle = asyncHandler(async (req: Request, res: Response) =>
     article.content = content;
   }
 
+  if (contentNp !== undefined) {
+    article.contentNp = contentNp;
+  }
+
   if (category !== undefined) {
     article.category = category;
+  }
+
+  if (categoryNp !== undefined) {
+    article.categoryNp = categoryNp;
+  }
+
+  if (titleNp !== undefined) {
+    article.titleNp = titleNp;
   }
 
   if (image !== undefined) {

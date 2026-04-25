@@ -19,7 +19,10 @@ const getExcerpt = (content: string): string => {
 };
 
 export default function NewsCard({ article }: NewsCardProps) {
-  const { dictionary } = useLanguage();
+  const { language, dictionary } = useLanguage();
+  const localizedTitle = language === "np" ? article.titleNp || article.title : article.title;
+  const localizedContent = language === "np" ? article.contentNp || article.content : article.content;
+  const localizedCategory = language === "np" ? article.categoryNp || article.category : article.category;
 
   return (
     <article className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
@@ -31,7 +34,7 @@ export default function NewsCard({ article }: NewsCardProps) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={article.image}
-            alt={article.title}
+            alt={localizedTitle}
             className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (
@@ -42,11 +45,11 @@ export default function NewsCard({ article }: NewsCardProps) {
       </Link>
       <div className="space-y-3 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-          <span className="rounded-full bg-rose-50 px-2.5 py-1 text-rose-700">{article.category}</span>
+          <span className="rounded-full bg-rose-50 px-2.5 py-1 text-rose-700">{localizedCategory}</span>
           <span>{new Date(article.createdAt).toLocaleDateString()}</span>
         </div>
-        <h2 className="line-clamp-3 text-lg font-extrabold leading-7 text-slate-900">{article.title}</h2>
-        <p className="line-clamp-3 text-sm leading-6 text-slate-600">{getExcerpt(article.content)}</p>
+        <h2 className="line-clamp-3 text-lg font-extrabold leading-7 text-slate-900">{localizedTitle}</h2>
+        <p className="line-clamp-3 text-sm leading-6 text-slate-600">{getExcerpt(localizedContent)}</p>
         <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
           <p className="font-medium">{dictionary.common.by} {article.author}</p>
           <p>{article.viewCount ?? 0} {dictionary.article.viewsSuffix}</p>

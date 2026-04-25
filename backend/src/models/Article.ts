@@ -2,9 +2,12 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IArticle extends Document {
   title: string;
+  titleNp?: string;
   slug: string;
   content: string;
+  contentNp?: string;
   category: string;
+  categoryNp?: string;
   image?: string;
   author: string;
   createdBy?: mongoose.Types.ObjectId;
@@ -18,9 +21,12 @@ interface IArticleModel extends Model<IArticle> {}
 const articleSchema = new Schema<IArticle, IArticleModel>(
   {
     title: { type: String, required: true, trim: true },
+    titleNp: { type: String, trim: true },
     slug: { type: String, unique: true, index: true },
     content: { type: String, required: true },
+    contentNp: { type: String },
     category: { type: String, required: true, trim: true },
+    categoryNp: { type: String, trim: true },
     image: { type: String, trim: true },
     author: { type: String, required: true, trim: true },
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },

@@ -31,6 +31,22 @@ export default function Navbar() {
   const categories = Array.from(
     new Set(articles.map((article) => article.category).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b));
+  const categoryLabelMap = new Map(
+    articles
+      .filter((article) => article.category && article.categoryNp)
+      .map((article) => [article.category, article.categoryNp as string])
+  );
+  const getCategoryLabel = (category: string): string => {
+    if (language !== "np") {
+      return category;
+    }
+
+    return categoryLabelMap.get(category) ?? category;
+  };
+  const getArticleTitle = (article: Article): string =>
+    language === "np" ? article.titleNp || article.title : article.title;
+  const getArticleCategory = (article: Article): string =>
+    language === "np" ? article.categoryNp || article.category : article.category;
 
   const remainingArticles = articles.slice(6);
   const topBarDate = new Date().toLocaleDateString(language === "np" ? "ne-NP" : "en-US", {
@@ -108,18 +124,18 @@ export default function Navbar() {
           >
             <span className="relative h-4 w-4">
               <span
-                className={`absolute left-0 top-0 block h-[2px] w-4 rounded bg-current transition duration-300 ${
-                  mobileNavOpen ? "translate-y-[7px] rotate-45" : ""
+                className={`absolute left-0 top-0 block h-0.5 w-4 rounded bg-current transition duration-300 ${
+                  mobileNavOpen ? "translate-y-1.75 rotate-45" : ""
                 }`}
               />
               <span
-                className={`absolute left-0 top-[7px] block h-[2px] w-4 rounded bg-current transition duration-300 ${
+                className={`absolute left-0 top-1.75 block h-0.5 w-4 rounded bg-current transition duration-300 ${
                   mobileNavOpen ? "opacity-0" : "opacity-100"
                 }`}
               />
               <span
-                className={`absolute left-0 top-[14px] block h-[2px] w-4 rounded bg-current transition duration-300 ${
-                  mobileNavOpen ? "-translate-y-[7px] -rotate-45" : ""
+                className={`absolute left-0 top-3.5 block h-0.5 w-4 rounded bg-current transition duration-300 ${
+                  mobileNavOpen ? "-translate-y-1.75 -rotate-45" : ""
                 }`}
               />
             </span>
@@ -151,7 +167,7 @@ export default function Navbar() {
                 href={`/category/${slugify(category)}`}
                 onClick={() => setMobileNavOpen(false)}
               >
-                {category}
+                {getCategoryLabel(category)}
               </Link>
             ))}
 
@@ -184,9 +200,9 @@ export default function Navbar() {
                           className="block rounded-xl px-3 py-3 transition hover:bg-rose-50"
                         >
                           <p className="line-clamp-2 text-sm font-semibold text-slate-800">
-                            {article.title}
+                            {getArticleTitle(article)}
                           </p>
-                          <p className="mt-1 text-xs font-medium text-slate-500">{article.category}</p>
+                          <p className="mt-1 text-xs font-medium text-slate-500">{getArticleCategory(article)}</p>
                         </Link>
                       ))}
                     </div>

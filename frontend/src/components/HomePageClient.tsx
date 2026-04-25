@@ -35,7 +35,7 @@ export default function HomePageClient({
   initialPopularArticles,
   initialBreakingArticles
 }: HomePageClientProps) {
-  const { dictionary } = useLanguage();
+  const { language, dictionary } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") ?? "");
@@ -44,6 +44,23 @@ export default function HomePageClient({
   const [visibleCount, setVisibleCount] = useState(6);
 
   const categories = useMemo(() => [ALL_CATEGORY, ...initialCategories], [initialCategories]);
+  const categoryLabelMap = useMemo(() => {
+    const pairs = initialArticles.map((article) => [article.category, article.categoryNp] as const);
+    return new Map(pairs.filter((item): item is readonly [string, string] => Boolean(item[0] && item[1])));
+  }, [initialArticles]);
+
+  const localizedTitle = (article: Article): string => (language === "np" ? article.titleNp || article.title : article.title);
+  const localizedContent = (article: Article): string =>
+    language === "np" ? article.contentNp || article.content : article.content;
+  const localizedCategory = (article: Article): string =>
+    language === "np" ? article.categoryNp || article.category : article.category;
+  const localizedCategoryLabel = (category: string): string => {
+    if (language !== "np") {
+      return category;
+    }
+
+    return categoryLabelMap.get(category) ?? category;
+  };
 
   const categoryScopedArticles =
     selectedCategory === ALL_CATEGORY
@@ -120,15 +137,15 @@ export default function HomePageClient({
             <div className="mt-5 grid gap-6 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
               <div className="space-y-4">
                 <p className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-800">
-                  {featuredArticle.category}
+                  {localizedCategory(featuredArticle)}
                 </p>
                 <Link href={`/article/${featuredArticle.slug}`} className="block">
                   <h2 className="text-2xl font-black leading-tight text-slate-900 transition hover:text-rose-700 sm:text-4xl">
-                    {featuredArticle.title}
+                    {localizedTitle(featuredArticle)}
                   </h2>
                 </Link>
                 <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                  {toExcerpt(featuredArticle.content)}
+                  {toExcerpt(localizedContent(featuredArticle))}
                 </p>
                 <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
                   <span>{dictionary.common.by} {featuredArticle.author}</span>
@@ -155,7 +172,7 @@ export default function HomePageClient({
                     <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-200">
                       {article.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={article.image} alt={article.title} className="h-full w-full object-cover" />
+                        <img src={article.image} alt={localizedTitle(article)} className="h-full w-full object-cover" />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-500">
                           {dictionary.home.noImage}
@@ -164,10 +181,10 @@ export default function HomePageClient({
                     </div>
                     <div className="min-w-0">
                       <p className="text-[11px] font-black uppercase tracking-[0.18em] text-rose-700">
-                        {article.category}
+                        {localizedCategory(article)}
                       </p>
                       <h3 className="mt-1 line-clamp-2 text-sm font-bold leading-5 text-slate-900 group-hover:text-rose-700">
-                        {article.title}
+                        {localizedTitle(article)}
                       </h3>
                       <p className="mt-1 text-xs text-slate-500">{article.author}</p>
                     </div>
@@ -197,9 +214,9 @@ export default function HomePageClient({
                       {index + 1}
                     </span>
                     <div className="min-w-0">
-                      <p className="line-clamp-2 text-sm font-bold text-slate-900">{article.title}</p>
+                      <p className="line-clamp-2 text-sm font-bold text-slate-900">{localizedTitle(article)}</p>
                       <p className="mt-1 text-xs text-slate-500">
-                        {article.category} · {article.viewCount ?? 0} {dictionary.article.viewsSuffix}
+                        {localizedCategory(article)} · {article.viewCount ?? 0} {dictionary.article.viewsSuffix}
                       </p>
                     </div>
                   </Link>
@@ -229,7 +246,7 @@ export default function HomePageClient({
                         : "border border-slate-200 bg-white text-slate-700 hover:bg-rose-50"
                     }`}
                   >
-                    {category === ALL_CATEGORY ? dictionary.common.all : category}
+                    {category === ALL_CATEGORY ? dictionary.common.all : localizedCategoryLabel(category)}
                   </button>
                 ))}
               </div>
@@ -267,7 +284,7 @@ export default function HomePageClient({
                   : "border border-slate-200 bg-white text-slate-700 hover:bg-rose-50"
               }`}
             >
-              {category === ALL_CATEGORY ? dictionary.common.all : category}
+              {category === ALL_CATEGORY ? dictionary.common.all : localizedCategoryLabel(category)}
             </button>
           ))}
         </div>
@@ -312,8 +329,8 @@ export default function HomePageClient({
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {breakingArticles.map((article) => (
               <Link key={article._id} href={`/article/${article.slug}`} className="rounded-2xl bg-white/5 p-4 transition hover:bg-white/10">
-                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-300">{article.category}</p>
-                <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-6 text-white">{article.title}</h3>
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-amber-300">{localizedCategory(article)}</p>
+                <h3 className="mt-2 line-clamp-2 text-sm font-bold leading-6 text-white">{localizedTitle(article)}</h3>
               </Link>
             ))}
           </div>
@@ -329,8 +346,8 @@ export default function HomePageClient({
                 className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-rose-200 hover:bg-rose-50"
               >
                 <div className="min-w-0">
-                  <p className="line-clamp-1 text-sm font-bold text-slate-900">{article.title}</p>
-                  <p className="mt-1 text-xs text-slate-500">{article.author} · {article.category}</p>
+                  <p className="line-clamp-1 text-sm font-bold text-slate-900">{localizedTitle(article)}</p>
+                  <p className="mt-1 text-xs text-slate-500">{article.author} · {localizedCategory(article)}</p>
                 </div>
                 <span className="text-sm font-black text-rose-700">↗</span>
               </Link>

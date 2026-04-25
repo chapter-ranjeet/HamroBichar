@@ -32,11 +32,15 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const cookieStore = await cookies();
-  const dictionary = getDictionary(normalizeLanguage(cookieStore.get(LANGUAGE_COOKIE)?.value));
+  const language = normalizeLanguage(cookieStore.get(LANGUAGE_COOKIE)?.value);
+  const dictionary = getDictionary(language);
   const { slug } = await params;
   const data = await fetchArticlesServer();
   const categoryArticles = data.articles.filter((article) => slugify(article.category) === slug);
-  const categoryName = categoryArticles[0]?.category ?? unslugify(slug);
+  const categoryName =
+    language === "np"
+      ? categoryArticles[0]?.categoryNp ?? categoryArticles[0]?.category ?? unslugify(slug)
+      : categoryArticles[0]?.category ?? unslugify(slug);
 
   return (
     <section className="mx-auto my-8 w-full max-w-7xl rounded-3xl bg-white p-5 shadow-sm sm:my-10 sm:p-8 lg:p-10">

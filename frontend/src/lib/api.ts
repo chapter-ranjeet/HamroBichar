@@ -58,7 +58,8 @@ export const loginAdmin = async (email: string, password: string): Promise<Login
 };
 
 export const createArticle = async (
-  payload: Pick<Article, "title" | "content" | "category" | "image" | "author">,
+  payload: Pick<Article, "title" | "content" | "category" | "image" | "author"> &
+    Partial<Pick<Article, "titleNp" | "contentNp" | "categoryNp">>,
   token: string
 ): Promise<Article> => {
   const response = await api.post<ApiResponse<Article>>("/articles", payload, {
@@ -71,7 +72,9 @@ export const createArticle = async (
 
 export const updateArticle = async (
   id: string,
-  payload: Partial<Pick<Article, "title" | "content" | "category" | "image" | "author">>,
+  payload: Partial<
+    Pick<Article, "title" | "content" | "category" | "image" | "author" | "titleNp" | "contentNp" | "categoryNp">
+  >,
   token: string
 ): Promise<Article> => {
   const response = await api.put<ApiResponse<Article>>(`/articles/${id}`, payload, {

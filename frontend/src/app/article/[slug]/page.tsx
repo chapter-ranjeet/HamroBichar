@@ -158,7 +158,8 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const cookieStore = await cookies();
-  const dictionary = getDictionary(normalizeLanguage(cookieStore.get(LANGUAGE_COOKIE)?.value));
+  const language = normalizeLanguage(cookieStore.get(LANGUAGE_COOKIE)?.value);
+  const dictionary = getDictionary(language);
   const { slug } = await params;
   const article = await fetchArticle(slug);
 
@@ -167,8 +168,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   const articleUrl = `${siteUrl}/article/${article.slug}`;
+  const articleTitle = language === "np" ? article.titleNp || article.title : article.title;
+  const articleContent = language === "np" ? article.contentNp || article.content : article.content;
+  const articleCategory = language === "np" ? article.categoryNp || article.category : article.category;
   const imageUrl = resolveImageUrl(article.image);
-  const articleDescription = toTextSnippet(article.content).slice(0, 170);
+  const articleDescription = toTextSnippet(articleContent).slice(0, 170);
   const relatedData = await fetchRelatedData(article.category);
   const relatedArticles = relatedData.relatedArticles.filter((item) => item.slug !== article.slug).slice(0, 3);
   const popularArticles = relatedData.popularArticles
@@ -177,11 +181,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
-    headline: article.title,
+    headline: articleTitle,
     description: articleDescription,
     datePublished: article.createdAt,
     dateModified: article.updatedAt,
-    articleSection: article.category,
+    articleSection: articleCategory,
     author: {
       "@type": "Person",
       name: article.author
@@ -209,9 +213,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <article className="mx-auto my-4 grid w-full max-w-6xl gap-4 sm:my-6 sm:gap-6 lg:grid-cols-[1fr,0.72fr]">
         <div className="overflow-hidden rounded-2xl bg-white p-4 shadow-sm sm:p-6 lg:p-8">
         <p className="mb-3 inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-800">
-          {article.category}
+          {articleCategory}
         </p>
-        <h1 className="break-words text-2xl font-black leading-tight text-slate-900 sm:text-3xl lg:text-4xl">{article.title}</h1>
+        <h1 className="wrap-break-word text-2xl font-black leading-tight text-slate-900 sm:text-3xl lg:text-4xl">{articleTitle}</h1>
         <p className="mt-3 text-sm text-slate-500">
           {dictionary.common.by} {article.author || "HamroBichar Team"} • {formatReadableDate(article.createdAt)}
         </p>
@@ -220,15 +224,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={imageUrl ?? article.image}
-              alt={article.title}
+              alt={articleTitle}
               className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"
             />
           </div>
         )}
         <div
-          className="prose prose-slate max-w-none break-words text-slate-700 prose-img:rounded-xl prose-img:shadow-sm prose-p:leading-7 prose-a:break-all sm:prose-p:leading-8"
-          dangerouslySetInnerHTML={{ __html: toRenderableHtml(article.content) }}
+          className="prose prose-slate max-w-none wrap-break-word text-slate-700 prose-img:rounded-xl prose-img:shadow-sm prose-p:leading-7 prose-a:break-all sm:prose-p:leading-8"
+          dangerouslySetInnerHTML={{ __html: toRenderableHtml(articleContent) }}
         />
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr,0.8fr]">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
@@ -236,8 +240,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <div className="mt-4 grid gap-3 sm:gap-4 md:grid-cols-3">
                 {relatedArticles.map((related) => (
                   <Link key={related._id} href={`/article/${related.slug}`} className="rounded-2xl border border-slate-200 bg-white p-3 transition hover:border-rose-200 hover:bg-rose-50 sm:p-4">
-                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-rose-700">{related.category}</p>
-                    <h2 className="mt-2 line-clamp-3 break-words text-sm font-bold text-slate-900">{related.title}</h2>
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-rose-700">{language === "np" ? related.categoryNp || related.category : related.category}</p>
+                    <h2 className="mt-2 line-clamp-3 wrap-break-word text-sm font-bold text-slate-900">{language === "np" ? related.titleNp || related.title : related.title}</h2>
                   </Link>
                 ))}
                 {relatedArticles.length === 0 && (
@@ -255,7 +259,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                       {index + 1}
                     </span>
                     <div className="min-w-0">
-                      <p className="line-clamp-2 break-words text-sm font-bold text-slate-900">{popular.title}</p>
+                      <p className="line-clamp-2 wrap-break-word text-sm font-bold text-slate-900">{language === "np" ? popular.titleNp || popular.title : popular.title}</p>
                       <p className="mt-1 text-xs text-slate-500">{popular.viewCount ?? 0} {dictionary.article.viewsSuffix}</p>
                     </div>
                   </Link>

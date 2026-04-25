@@ -1,9 +1,12 @@
 export interface Article {
   _id: string;
   title: string;
+  titleNp?: string;
   slug: string;
   content: string;
+  contentNp?: string;
   category: string;
+  categoryNp?: string;
   image?: string;
   author: string;
   createdBy?: string;

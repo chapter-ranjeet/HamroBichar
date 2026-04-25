@@ -21,9 +21,12 @@ import { AdminUser, Article } from "@/types";
 
 interface FormState {
   title: string;
+  titleNp: string;
   author: string;
   content: string;
+  contentNp: string;
   category: string;
+  categoryNp: string;
   image: string;
 }
 
@@ -49,9 +52,12 @@ const slugify = (value: string): string =>
 
 const emptyForm: FormState = {
   title: "",
+  titleNp: "",
   author: "",
   content: "",
+  contentNp: "",
   category: "",
+  categoryNp: "",
   image: ""
 };
 
@@ -338,9 +344,12 @@ export default function AdminDashboardPage() {
     setEditingId(article._id);
     setForm({
       title: article.title,
+      titleNp: article.titleNp ?? "",
       author: article.author,
       content: article.content,
+      contentNp: article.contentNp ?? "",
       category: article.category,
+      categoryNp: article.categoryNp ?? "",
       image: article.image ?? ""
     });
 
@@ -549,6 +558,12 @@ export default function AdminDashboardPage() {
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
             placeholder={dictionary.admin.titlePlaceholder}
           />
+          <input
+            value={form.titleNp}
+            onChange={(event) => setForm((prev) => ({ ...prev, titleNp: event.target.value }))}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+            placeholder={dictionary.admin.nepaliTitlePlaceholder}
+          />
           <p className="text-xs font-medium text-slate-500">
             {dictionary.admin.slugPreview}: <span className="font-semibold text-slate-700">{estimatedSlug || dictionary.admin.slugDefault}</span>
           </p>
@@ -668,6 +683,13 @@ export default function AdminDashboardPage() {
               <div className="prose prose-slate max-w-none rounded bg-white p-3 text-sm" dangerouslySetInnerHTML={{ __html: form.content || `<p>${dictionary.admin.previewPlaceholder}</p>` }} />
             </div>
           </div>
+          <textarea
+            value={form.contentNp}
+            onChange={(event) => setForm((prev) => ({ ...prev, contentNp: event.target.value }))}
+            rows={6}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+            placeholder={dictionary.admin.nepaliContentPlaceholder}
+          />
           <input
             list="category-suggestions"
             required
@@ -675,6 +697,12 @@ export default function AdminDashboardPage() {
             onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
             placeholder={dictionary.admin.categoryPlaceholder}
+          />
+          <input
+            value={form.categoryNp}
+            onChange={(event) => setForm((prev) => ({ ...prev, categoryNp: event.target.value }))}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+            placeholder={dictionary.admin.nepaliCategoryPlaceholder}
           />
           <datalist id="category-suggestions">
             {availableCategories.map((category) => (
