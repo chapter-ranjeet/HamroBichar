@@ -31,7 +31,7 @@ export const dictionaries = {
       label: "Nepal Headlines",
       title: "Breaking Nepal news, analysis, and stories that matter.",
       description:
-        "A newsroom-style home for politics, business, education, technology, and local updates presented with cleaner spacing, stronger hierarchy, and faster discovery.",
+        "Nepal’s top stories in politics, business, education, technology and local news — clear, prioritized, and easy to explore.",
       searchLabel: "Search articles",
       searchPlaceholder: "Search politics, articles, authors...",
       searchButton: "Search",
