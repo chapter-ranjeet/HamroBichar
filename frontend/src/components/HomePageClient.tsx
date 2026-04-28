@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { useLanguage } from "@/components/LanguageProvider";
+import AnimatedHeadline from "@/components/AnimatedHeadline";
 import NepaliCalendarWidget from "@/components/NepaliCalendarWidget";
 import NewsCard from "@/components/NewsCard";
 import { slugify } from "@/lib/slug";
@@ -96,9 +97,12 @@ export default function HomePageClient({
           <p className="inline-flex rounded-full border border-rose-200 bg-rose-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-rose-700">
             {dictionary.home.label}
           </p>
-          <h1 className="max-w-4xl text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">
-            {dictionary.home.title}
-          </h1>
+          <div className="max-w-4xl">
+            {/* Animated headline */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+            {/* using client component for animation */}
+            <AnimatedHeadline text={dictionary.home.title} className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl" />
+          </div>
           <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
             {dictionary.home.description}
           </p>

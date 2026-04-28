@@ -17,3 +17,20 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
 }
+
+/* Animated headline words */
+@keyframes wordIn {
+  0% { transform: translateY(12px) rotateX(25deg); opacity: 0; }
+  60% { transform: translateY(-6px) rotateX(10deg); opacity: 1; }
+  100% { transform: translateY(0) rotateX(0); opacity: 1; }
+}
+.headline-word {
+  display: inline-block;
+  opacity: 0;
+  transform-origin: 50% 50% 0;
+  animation-name: wordIn;
+  animation-duration: 700ms;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(.2,.9,.3,1);
+}
+.headline-container { line-height: 1; }
