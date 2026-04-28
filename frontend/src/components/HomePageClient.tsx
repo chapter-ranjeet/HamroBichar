@@ -261,6 +261,10 @@ export default function HomePageClient({
                   {dictionary.home.whyThisLayoutBody}
                 </p>
               </div>
+
+              <div className="mt-5">
+                <NepaliCalendarWidget className="w-full" showAdDate />
+              </div>
             </div>
           </div>
         </aside>
@@ -360,9 +364,6 @@ export default function HomePageClient({
         </div>
       </section>
 
-      <section className="mt-8">
-        <NepaliCalendarWidget className="mx-auto max-w-5xl" showAdDate />
-      </section>
     </section>
   );
 }

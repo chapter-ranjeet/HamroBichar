@@ -37,6 +37,7 @@ const toNepaliNumber = (value: number): string => {
 const normalizeDate = (date: Date): Date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 type EventStatus = "upcoming" | "today" | "completed";
+type EventFilter = "all" | EventStatus;
 
 interface EventWithMeta {
   id: string;
@@ -61,6 +62,7 @@ export default function NepaliCalendarWidget({ className = "", showAdDate = true
 
   const [viewYear, setViewYear] = useState<number>(todayBS.year);
   const [viewMonth, setViewMonth] = useState<number>(todayBS.month);
+  const [eventFilter, setEventFilter] = useState<EventFilter>("all");
 
   const calendarMeta = useMemo(() => {
     const monthStart = new NepaliDate(viewYear, viewMonth, 1);
@@ -134,12 +136,14 @@ export default function NepaliCalendarWidget({ className = "", showAdDate = true
   const [showOnlyUpcoming, setShowOnlyUpcoming] = useState(false);
 
   const visibleEvents = useMemo(() => {
-    if (!showOnlyUpcoming) {
-      return monthEvents;
+    const filteredEvents = showOnlyUpcoming ? monthEvents.filter((event) => event.status !== "completed") : monthEvents;
+
+    if (eventFilter === "all") {
+      return filteredEvents;
     }
 
-    return monthEvents.filter((event) => event.status !== "completed");
-  }, [monthEvents, showOnlyUpcoming]);
+    return filteredEvents.filter((event) => event.status === eventFilter);
+  }, [eventFilter, monthEvents, showOnlyUpcoming]);
 
   const nearestUpcomingEventId = useMemo(() => {
     const nearest = monthEvents.find((event) => event.status === "today" || event.status === "upcoming");
@@ -240,70 +244,92 @@ export default function NepaliCalendarWidget({ className = "", showAdDate = true
       </div>
 
       <aside className="rounded-3xl border border-rose-200 bg-linear-to-b from-rose-50 to-white p-3.5 shadow-sm sm:p-4 md:p-5">
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700">Events & Festivals</p>
-              <p className="text-xs text-slate-500">{calendarMeta.titleNp}</p>
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700">Calendar, Events & Festivals</p>
+            <p className="text-xs text-slate-500">{calendarMeta.titleNp}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowOnlyUpcoming((prev) => !prev)}
+            className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50"
+          >
+            {showOnlyUpcoming ? "सबै" : "Upcoming"}
+          </button>
+        </div>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {[
+              { key: "all" as const, label: "All" },
+              { key: "today" as const, label: "Today" },
+              { key: "upcoming" as const, label: "Upcoming" },
+              { key: "completed" as const, label: "Festivals" }
+            ].map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setEventFilter(item.key)}
+                className={`rounded-full px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] transition ${
+                  eventFilter === item.key
+                    ? "bg-rose-700 text-white shadow-sm"
+                    : "border border-slate-200 bg-white text-slate-700 hover:border-rose-200 hover:bg-rose-50"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+        <div className="space-y-2.5">
+          {visibleEvents.length === 0 && (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center text-xs text-slate-500">
+              यो महिनामा कुनै चाडपर्व सूची छैन।
             </div>
-            <button
-              type="button"
-              onClick={() => setShowOnlyUpcoming((prev) => !prev)}
-              className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-700 transition hover:border-rose-200 hover:bg-rose-50"
-            >
-              {showOnlyUpcoming ? "सबै" : "Upcoming"}
-            </button>
-          </div>
+          )}
 
-          <div className="space-y-2.5">
-            {visibleEvents.length === 0 && (
-              <div className="rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center text-xs text-slate-500">
-                यो महिनामा कुनै चाडपर्व सूची छैन।
-              </div>
-            )}
+          {visibleEvents.map((event) => {
+            const isNearestUpcoming = event.id === nearestUpcomingEventId;
+            const bs = event.bsDate.getBS();
 
-            {visibleEvents.map((event) => {
-              const isNearestUpcoming = event.id === nearestUpcomingEventId;
-              const bs = event.bsDate.getBS();
+            let statusText = "सम्पन्न";
+            if (event.status === "today") {
+              statusText = "आज";
+            } else if (event.status === "upcoming") {
+              statusText = `${toNepaliNumber(event.remainingDays)} दिन बाँकी`;
+            }
 
-              let statusText = "सम्पन्न";
-              if (event.status === "today") {
-                statusText = "आज";
-              } else if (event.status === "upcoming") {
-                statusText = `${toNepaliNumber(event.remainingDays)} दिन बाँकी`;
-              }
-
-              return (
-                <article
-                  key={event.id}
-                  className={`rounded-xl border bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-sm ${
-                    isNearestUpcoming
-                      ? "border-rose-300 shadow-[inset_0_0_0_1px_rgba(225,29,72,0.15)]"
-                      : "border-slate-200"
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-sm font-black text-slate-900">{event.name}</p>
-                      <p className="mt-0.5 text-xs text-slate-500">
-                        {MONTHS_NP[bs.month]} {toNepaliNumber(bs.date)}, {toNepaliNumber(bs.year)}
-                      </p>
-                    </div>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
-                        event.status === "today"
-                          ? "bg-rose-100 text-rose-700"
-                          : event.status === "upcoming"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-slate-200 text-slate-600"
-                      }`}
-                    >
-                      {statusText}
-                    </span>
+            return (
+              <article
+                key={event.id}
+                className={`rounded-xl border bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-sm ${
+                  isNearestUpcoming
+                    ? "border-rose-300 shadow-[inset_0_0_0_1px_rgba(225,29,72,0.15)]"
+                    : "border-slate-200"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-black text-slate-900">{event.name}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      {MONTHS_NP[bs.month]} {toNepaliNumber(bs.date)}, {toNepaliNumber(bs.year)}
+                    </p>
                   </div>
-                </article>
-              );
-            })}
-          </div>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
+                      event.status === "today"
+                        ? "bg-rose-100 text-rose-700"
+                        : event.status === "upcoming"
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-slate-200 text-slate-600"
+                    }`}
+                  >
+                    {statusText}
+                  </span>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </aside>
     </section>
   );
