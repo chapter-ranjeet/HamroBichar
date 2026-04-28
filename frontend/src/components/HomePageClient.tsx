@@ -261,10 +261,6 @@ export default function HomePageClient({
                   {dictionary.home.whyThisLayoutBody}
                 </p>
               </div>
-
-              <div className="mt-5">
-                <NepaliCalendarWidget className="w-full" showAdDate />
-              </div>
             </div>
           </div>
         </aside>
@@ -362,6 +358,19 @@ export default function HomePageClient({
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="mt-8">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700">
+              Calendar, Events & Festivals
+            </p>
+            <h2 className="mt-1 text-2xl font-black text-slate-900">{dictionary.home.latest}</h2>
+          </div>
+        </div>
+
+        <NepaliCalendarWidget className="w-full" showAdDate />
       </section>
 
     </section>
