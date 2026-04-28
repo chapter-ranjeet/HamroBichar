@@ -7,12 +7,19 @@ import { fetchArticlesServer } from "@/lib/server-content";
 
 export const dynamic = "force-dynamic";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
+
 export const metadata: Metadata = {
-  title: "Latest Nepal News, Breaking Stories, Politics, Business & Technology",
+  title: "Latest Nepal News, Breaking Stories, Politics, Business & Technology | HamroBichar",
   description:
-    "Read the latest Nepal news, breaking stories, politics, business, education, and technology on HamroBichar.",
+    "Read the latest Nepal news, breaking stories, politics, business, education, and technology on HamroBichar.".slice(0, 155),
   alternates: {
-    canonical: "/"
+    canonical: siteUrl
+  },
+  openGraph: {
+    title: "Latest Nepal News, Breaking Stories, Politics, Business & Technology | HamroBichar",
+    description: "Read the latest Nepal news, breaking stories, politics, business, education, and technology on HamroBichar.".slice(0, 155),
+    url: siteUrl
   }
 };
 

@@ -7,6 +7,8 @@ import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 import { fetchArticlesServer } from "@/lib/server-content";
 import { slugify, unslugify } from "@/lib/slug";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
+
 export const dynamic = "force-dynamic";
 
 type CategoryPageProps = {
@@ -17,15 +19,24 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const { slug } = await params;
   const categoryName = unslugify(slug);
 
+  const title = `${categoryName} | HamroBichar`;
+  const description = `Latest ${categoryName.toLowerCase()} news and updates from HamroBichar.`.slice(0, 155);
+  const canonical = `${siteUrl}/category/${slug}`;
+
   return {
-    title: `${categoryName} News`,
-    description: `Latest ${categoryName.toLowerCase()} news and updates from HamroBichar.`,
+    title,
+    description,
     alternates: {
-      canonical: `/category/${slug}`
+      canonical
     },
     robots: {
       index: true,
       follow: true
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonical
     }
   };
 }

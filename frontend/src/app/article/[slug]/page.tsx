@@ -152,8 +152,9 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   }
 
   const articleUrl = `${siteUrl}/article/${article.slug}`;
-  const description = toTextSnippet(article.content).slice(0, 170);
+  const description = toTextSnippet(article.content).slice(0, 155);
   const image = resolveImageUrl(article.image);
+  const formattedTitle = `${article.title} | HamroBichar`;
   const titleTerms = article.title
     .split(/\s+/)
     .map((term) => term.replace(/[^\w-]/g, "").trim())
@@ -172,7 +173,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   );
 
   return {
-    title: article.title,
+    title: formattedTitle,
     description,
     keywords,
     alternates: {
@@ -181,7 +182,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     openGraph: {
       type: "article",
       url: articleUrl,
-      title: article.title,
+      title: formattedTitle,
       description,
       publishedTime: article.createdAt,
       modifiedTime: article.updatedAt,
@@ -191,7 +192,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     },
     twitter: {
       card: image ? "summary_large_image" : "summary",
-      title: article.title,
+      title: formattedTitle,
       description,
       images: image ? [image] : undefined
     }
