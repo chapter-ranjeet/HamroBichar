@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { useLanguage } from "@/components/LanguageProvider";
+import { resolveOriginalUrl, cloudinaryFetch } from "@/lib/image";
 import { Article } from "@/types";
 
 interface NewsCardProps {
@@ -33,8 +34,9 @@ export default function NewsCard({ article }: NewsCardProps) {
         {article.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={article.image}
+            src={cloudinaryFetch(resolveOriginalUrl(article.image), { w: 1200 }) ?? article.image}
             alt={localizedTitle}
+            loading="lazy"
             className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (

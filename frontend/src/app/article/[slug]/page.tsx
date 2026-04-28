@@ -8,6 +8,7 @@ import ArticleComments from "@/components/ArticleComments";
 import ArticleViewTracker from "@/components/ArticleViewTracker";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 import { fetchArticleServer, fetchArticlesServer } from "@/lib/server-content";
+import { resolveOriginalUrl, cloudinaryFetch } from "@/lib/image";
 import { Article } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -274,7 +275,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <div className="relative my-5 aspect-video w-full min-h-52 overflow-hidden rounded-xl bg-slate-100 sm:my-6 sm:min-h-72">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={imageUrl ?? article.image}
+              src={cloudinaryFetch(resolveOriginalUrl(article.image), { w: 1600 }) ?? imageUrl ?? article.image}
               alt={articleTitle}
               className="absolute inset-0 h-full w-full object-cover"
               loading="lazy"

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import HomePageClient from "@/components/HomePageClient";
+import HomeSkeleton from "@/components/HomeSkeleton";
 import { fetchArticlesServer } from "@/lib/server-content";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +20,7 @@ export default async function HomePage() {
   const initialData = await fetchArticlesServer();
 
   return (
-    <Suspense fallback={<p className="py-8 text-slate-600">Loading latest news...</p>}>
+    <Suspense fallback={<HomeSkeleton />}>
       <HomePageClient
         initialArticles={initialData.articles}
         initialCategories={initialData.categories}
