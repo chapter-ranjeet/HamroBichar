@@ -21,6 +21,7 @@ export const dictionaries = {
       olderHeadlines: "Older Headlines",
       olderHeadlinesSub: "Articles beyond the latest six",
       facebook: "Facebook",
+      whatsapp: "WhatsApp",
       instagram: "Instagram",
       language: "ENG",
       menuOpen: "Open navigation",
@@ -67,6 +68,11 @@ export const dictionaries = {
       noResults: "No articles matched your search."
     },
     article: {
+      readingTime: "Reading time",
+      shareArticle: "Share this article",
+      shareOnFacebook: "Facebook",
+      shareOnWhatsApp: "WhatsApp",
+      shareOnInstagram: "Instagram",
       relatedArticles: "Related Articles",
       popularNow: "Popular Now",
       noRelated: "No related articles found yet.",
@@ -231,6 +237,7 @@ export const dictionaries = {
       olderHeadlines: "पुराना शीर्षक",
       olderHeadlinesSub: "पछिल्ला छ वटा बाहेकका समाचारहरू",
       facebook: "फेसबुक",
+      whatsapp: "व्हाट्सएप",
       instagram: "इन्स्टाग्राम",
       language: "NP",
       menuOpen: "नेभिगेसन खोल्नुहोस्",
@@ -277,6 +284,11 @@ export const dictionaries = {
       noResults: "तपाईंको खोजसँग मेल खाने कुनै लेख भेटिएन।"
     },
     article: {
+      readingTime: "पढ्ने समय",
+      shareArticle: "यो लेख सेयर गर्नुहोस्",
+      shareOnFacebook: "फेसबुक",
+      shareOnWhatsApp: "व्हाट्सएप",
+      shareOnInstagram: "इन्स्टाग्राम",
       relatedArticles: "सम्बन्धित समाचारहरू",
       popularNow: "अहिले लोकप्रिय",
       noRelated: "अहिलेसम्म सम्बन्धित समाचार भेटिएन।",

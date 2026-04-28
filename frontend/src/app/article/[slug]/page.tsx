@@ -35,6 +35,11 @@ const toTextSnippet = (content: string): string =>
     .replace(/\s+/g, " ")
     .trim();
 
+const estimateReadingTime = (content: string): number => {
+  const words = toTextSnippet(content).split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+};
+
 const formatReadableDate = (value: string): string => {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
@@ -63,6 +68,42 @@ const resolveImageUrl = (image?: string): string | undefined => {
 
   return `${siteUrl}/${image}`;
 };
+
+const SocialIcon = ({
+  children,
+  className = ""
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <span className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${className}`} aria-hidden="true">
+    {children}
+  </span>
+);
+
+const FacebookIcon = () => (
+  <SocialIcon className="bg-blue-100 text-blue-700">
+    <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" role="img" focusable="false">
+      <path d="M13.5 8.5V7c0-.8.5-1.5 1.5-1.5H17V2h-2c-2.8 0-4.5 1.7-4.5 4.5v2H8v3h2.5V22h3V11.5H16l.5-3z" />
+    </svg>
+  </SocialIcon>
+);
+
+const WhatsAppIcon = () => (
+  <SocialIcon className="bg-emerald-100 text-emerald-700">
+    <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" role="img" focusable="false">
+      <path d="M12 2a9.96 9.96 0 0 0-8.6 15.04L2 22l5.12-1.35A10 10 0 1 0 12 2Zm0 18.2c-1.7 0-3.38-.45-4.84-1.3l-.35-.2-3.04.8.81-2.96-.23-.38A8.2 8.2 0 1 1 12 20.2Zm4.72-6.2c-.25-.12-1.48-.73-1.71-.82-.23-.08-.4-.12-.58.12-.17.25-.66.82-.81.99-.15.17-.3.19-.55.06-.25-.12-1.04-.39-1.98-1.24-.73-.65-1.22-1.46-1.36-1.71-.14-.25-.01-.39.11-.52.11-.12.25-.31.37-.47.12-.16.16-.27.25-.45.08-.17.04-.33-.02-.45-.06-.12-.58-1.39-.8-1.91-.21-.5-.43-.43-.58-.44h-.5c-.17 0-.45.06-.68.31-.23.25-.88.86-.88 2.1s.9 2.43 1.03 2.6c.12.17 1.77 2.71 4.29 3.8.6.26 1.07.42 1.43.54.6.19 1.15.16 1.58.1.48-.07 1.48-.61 1.69-1.2.21-.58.21-1.07.15-1.2-.06-.12-.23-.19-.48-.31Z" />
+    </svg>
+  </SocialIcon>
+);
+
+const InstagramIcon = () => (
+  <SocialIcon className="bg-pink-100 text-pink-700">
+    <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" role="img" focusable="false">
+      <path d="M7 2.5h10A4.5 4.5 0 0 1 21.5 7v10A4.5 4.5 0 0 1 17 21.5H7A4.5 4.5 0 0 1 2.5 17V7A4.5 4.5 0 0 1 7 2.5Zm0 1.5A3 3 0 0 0 4 7v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 2.5A5.5 5.5 0 1 1 6.5 12 5.51 5.51 0 0 1 12 6.5Zm0 1.5A4 4 0 1 0 16 12a4 4 0 0 0-4-4Zm5.25-2a1.25 1.25 0 1 1-1.25 1.25A1.25 1.25 0 0 1 17.25 6Z" />
+    </svg>
+  </SocialIcon>
+);
 
 type ArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -173,11 +214,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const articleCategory = language === "np" ? article.categoryNp || article.category : article.category;
   const imageUrl = resolveImageUrl(article.image);
   const articleDescription = toTextSnippet(articleContent).slice(0, 170);
+  const readingTime = estimateReadingTime(articleContent);
   const relatedData = await fetchRelatedData(article.category);
   const relatedArticles = relatedData.relatedArticles.filter((item) => item.slug !== article.slug).slice(0, 3);
   const popularArticles = relatedData.popularArticles
     .filter((item) => item.slug !== article.slug)
     .slice(0, 4);
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`;
+  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`${articleTitle} ${articleUrl}`)}`;
+  const instagramUrl = "https://www.instagram.com/hamrobichar/";
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -216,9 +261,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {articleCategory}
         </p>
         <h1 className="wrap-break-word text-2xl font-black leading-tight text-slate-900 sm:text-3xl lg:text-4xl">{articleTitle}</h1>
-        <p className="mt-3 text-sm text-slate-500">
-          {dictionary.common.by} {article.author || "HamroBichar Team"} • {formatReadableDate(article.createdAt)}
-        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+          <p>
+            {dictionary.common.by} {article.author || "HamroBichar Team"} • {formatReadableDate(article.createdAt)}
+          </p>
+          <span className="hidden h-1 w-1 rounded-full bg-slate-300 sm:inline-flex" aria-hidden="true" />
+          <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+            {dictionary.article.readingTime}: {readingTime} min
+          </span>
+        </div>
         {article.image && (
           <div className="relative my-5 aspect-video w-full min-h-52 overflow-hidden rounded-xl bg-slate-100 sm:my-6 sm:min-h-72">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -234,6 +285,38 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           className="prose prose-slate max-w-none wrap-break-word text-slate-700 prose-img:rounded-xl prose-img:shadow-sm prose-p:leading-7 prose-a:break-all sm:prose-p:leading-8"
           dangerouslySetInnerHTML={{ __html: toRenderableHtml(articleContent) }}
         />
+        <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.article.shareArticle}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a
+              href={facebookShareUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+            >
+              <FacebookIcon />
+              {dictionary.article.shareOnFacebook}
+            </a>
+            <a
+              href={whatsappShareUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+            >
+              <WhatsAppIcon />
+              {dictionary.article.shareOnWhatsApp}
+            </a>
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-pink-200 hover:bg-pink-50 hover:text-pink-700"
+            >
+              <InstagramIcon />
+              {dictionary.article.shareOnInstagram}
+            </a>
+          </div>
+        </div>
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr,0.8fr]">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.article.relatedArticles}</p>
