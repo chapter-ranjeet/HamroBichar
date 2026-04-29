@@ -217,6 +217,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const articleCategory = language === "np" ? article.categoryNp || article.category : article.category;
   const imageUrl = resolveImageUrl(article.image);
   const articleDescription = toTextSnippet(articleContent).slice(0, 170);
+  const plainTextContent = toTextSnippet(articleContent);
+  const wordCount = plainTextContent.split(/\s+/).filter(Boolean).length;
   const readingTime = estimateReadingTime(articleContent);
   const relatedData = await fetchRelatedData(article.category);
   const relatedArticles = relatedData.relatedArticles.filter((item) => item.slug !== article.slug).slice(0, 3);
@@ -229,11 +231,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
+    "@id": articleUrl,
+    url: articleUrl,
     headline: articleTitle,
     description: articleDescription,
     datePublished: article.createdAt,
     dateModified: article.updatedAt,
     articleSection: articleCategory,
+    inLanguage: language === "np" ? "ne-NP" : "en",
+    isAccessibleForFree: true,
+    wordCount,
     author: {
       "@type": "Person",
       name: article.author
@@ -246,8 +253,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         url: `${siteUrl}/HBLogo2.png`
       }
     },
-    mainEntityOfPage: articleUrl,
-    image: imageUrl ? [imageUrl] : undefined
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": articleUrl
+    },
+    image: imageUrl ? [imageUrl] : undefined,
+    thumbnailUrl: imageUrl,
+    articleBody: plainTextContent.slice(0, 5000),
+    keywords: [articleCategory, "Nepal news", "HamroBichar", article.author].filter(Boolean)
   };
 
   return (
