@@ -120,7 +120,10 @@ export default function Footer() {
 
           <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
             <p>© {year} HamroBichar. {dictionary.footer.rights}</p>
-            <p>{dictionary.footer.voices}</p>
+            <div className="flex flex-col items-start gap-1 sm:items-end">
+              <p>{dictionary.footer.voices}</p>
+              <a href="mailto:info@hamrobichar.com" className="text-slate-300 hover:text-white">info@hamrobichar.com</a>
+            </div>
           </div>
         </div>
       </div>
