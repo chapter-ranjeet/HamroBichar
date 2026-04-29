@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.com";
 const gaId = "G-STF3X2B450";
 
 export const metadata: Metadata = {
@@ -33,6 +33,9 @@ export const metadata: Metadata = {
   applicationName: "HamroBichar",
   keywords: [
     "HamroBichar",
+    "Hamro Bichar",
+    "HamroBichar news",
+    "Today's Nepal news",
     "Nepal news",
     "Nepali news",
     "latest Nepal news",
@@ -113,6 +116,12 @@ export default async function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <meta
+          name="google-site-verification"
+          content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "FFYHpX2TkaGJnZY8r9TrkpJ8hUwK4eNVIsZYJCW-aEk"}
+        />
+      </head>
       <body className="min-h-full bg-slate-50 text-slate-900">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-STF3X2B450"
