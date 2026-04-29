@@ -1,4 +1,5 @@
 import api from "./axios";
+import { getApiBaseUrl } from "./runtime";
 import {
   AdminUser,
   ApiResponse,
@@ -105,7 +106,7 @@ export const uploadArticleImage = async (file: File, token: string): Promise<str
     }
   });
 
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://hamrobichar-backend.onrender.com/api";
+  const base = getApiBaseUrl();
   const backendOrigin = base.replace(/\/api\/?$/, "");
   const imageUrl = response.data.data.imageUrl;
 

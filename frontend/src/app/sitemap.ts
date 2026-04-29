@@ -2,9 +2,10 @@ import type { MetadataRoute } from "next";
 
 import { Article, ArticleListPayload, ApiResponse } from "@/types";
 import { slugify } from "@/lib/slug";
+import { getApiBaseUrl, getSiteUrl } from "@/lib/runtime";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.com";
-const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://hamrobichar-backend.onrender.com/api";
+const siteUrl = getSiteUrl();
+const apiBase = getApiBaseUrl();
 
 const getArticles = async (): Promise<Article[]> => {
   try {

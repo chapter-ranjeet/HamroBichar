@@ -9,6 +9,7 @@ import ArticleViewTracker from "@/components/ArticleViewTracker";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 import { fetchArticleServer, fetchArticlesServer } from "@/lib/server-content";
 import { resolveOriginalUrl, cloudinaryFetch } from "@/lib/image";
+import { getApiBaseUrl, getSiteUrl } from "@/lib/runtime";
 import { Article } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -26,8 +27,8 @@ const toRenderableHtml = (content: string): string => {
   return content.replace(/\n/g, "<br />");
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.com";
-const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://hamrobichar-backend.onrender.com/api";
+const siteUrl = getSiteUrl();
+const apiBase = getApiBaseUrl();
 const backendOrigin = apiBase.replace(/\/api\/?$/, "");
 
 const toTextSnippet = (content: string): string =>

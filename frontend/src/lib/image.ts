@@ -1,5 +1,7 @@
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
-const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://hamrobichar-backend.onrender.com/api";
+import { getApiBaseUrl, getSiteUrl } from "./runtime";
+
+const siteUrl = getSiteUrl();
+const apiBase = getApiBaseUrl();
 const backendOrigin = apiBase.replace(/\/api\/?$/, "");
 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 

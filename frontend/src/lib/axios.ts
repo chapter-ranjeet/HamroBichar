@@ -1,7 +1,8 @@
 import axios from "axios";
+import { getApiBaseUrl } from "./runtime";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://hamrobichar-backend.onrender.com/api",
+  baseURL: getApiBaseUrl(),
   headers: {
     "Content-Type": "application/json"
   }

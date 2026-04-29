@@ -1,6 +1,7 @@
 import { ApiResponse, Article, ArticleListPayload } from "@/types";
+import { getApiBaseUrl } from "./runtime";
 
-const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://hamrobichar-backend.onrender.com/api";
+const apiBase = getApiBaseUrl();
 
 const buildArticlesUrl = (params?: { category?: string; q?: string }): string => {
   const url = new URL(`${apiBase}/articles`);
