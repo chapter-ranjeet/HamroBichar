@@ -122,8 +122,7 @@ export default function Footer() {
             <p>© {year} HamroBichar. {dictionary.footer.rights}</p>
             <div className="flex flex-col items-start gap-1 sm:items-end">
               <p>{dictionary.footer.voices}</p>
-              <p>Email US:-</p>
-              <a href="mailto:info@hamrobichar.com" title="Email HamroBichar" className="text-slate-300 hover:text-white">email us - info@hamrobichar.com</a>
+              <a href="mailto:info@hamrobichar.com" title="Email HamroBichar" className="text-slate-300 hover:text-white">info@hamrobichar.com</a>
             </div>
           </div>
         </div>
