@@ -42,10 +42,7 @@ export const getSiteUrl = (): string => {
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
   if (process.env.NODE_ENV === "production") {
-    if (configured && !isLocalhostUrl(configured)) {
-      return configured.replace(/\/$/, "");
-    }
-
+    // Always enforce the canonical production domain during migration.
     return PRODUCTION_SITE_URL;
   }
 

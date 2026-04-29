@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
+import { getSiteUrl } from "@/lib/runtime";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
+const siteUrl = getSiteUrl();
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -11,6 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin", "/master", "/master/dashboard"]
       }
     ],
+    host: siteUrl,
     sitemap: `${siteUrl}/sitemap.xml`
   };
 }

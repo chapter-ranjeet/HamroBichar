@@ -4,10 +4,11 @@ import Link from "next/link";
 
 import NewsCard from "@/components/NewsCard";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
+import { getSiteUrl } from "@/lib/runtime";
 import { fetchArticlesServer } from "@/lib/server-content";
 import { slugify, unslugify } from "@/lib/slug";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
+const siteUrl = getSiteUrl();
 
 export const dynamic = "force-dynamic";
 

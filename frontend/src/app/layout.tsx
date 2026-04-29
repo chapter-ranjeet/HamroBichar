@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import LanguageProvider from "@/components/LanguageProvider";
 import Navbar from "@/components/Navbar";
 import { LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
+import { getSiteUrl } from "@/lib/runtime";
 
 import "./globals.css";
 
@@ -20,7 +21,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.com";
+const siteUrl = getSiteUrl();
 const gaId = "G-STF3X2B450";
 
 export const metadata: Metadata = {

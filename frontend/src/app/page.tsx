@@ -4,10 +4,11 @@ import type { Metadata } from "next";
 import HomePageClient from "@/components/HomePageClient";
 import HomeSkeleton from "@/components/HomeSkeleton";
 import { fetchArticlesServer } from "@/lib/server-content";
+import { getSiteUrl } from "@/lib/runtime";
 
 export const dynamic = "force-dynamic";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "Latest Nepal News, Breaking Stories, Politics, Business & Technology | HamroBichar",
