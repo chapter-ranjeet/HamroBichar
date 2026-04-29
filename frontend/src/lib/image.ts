@@ -1,8 +1,7 @@
-import { getApiBaseUrl, getSiteUrl } from "./runtime";
+import { getBackendOrigin, getSiteUrl } from "./runtime";
 
 const siteUrl = getSiteUrl();
-const apiBase = getApiBaseUrl();
-const backendOrigin = apiBase.replace(/\/api\/?$/, "");
+const backendOrigin = getBackendOrigin();
 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
 export const resolveOriginalUrl = (image?: string): string | undefined => {
