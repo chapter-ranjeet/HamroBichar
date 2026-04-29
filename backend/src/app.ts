@@ -18,7 +18,7 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-const allowedOrigins = (process.env.CORS_ORIGIN ?? "http://localhost:3000")
+const allowedOrigins = (process.env.CORS_ORIGIN ?? "http://localhost:3000,https://hamrobichar.com,https://www.hamrobichar.com,https://hamrobichar.app,https://www.hamrobichar.app")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);

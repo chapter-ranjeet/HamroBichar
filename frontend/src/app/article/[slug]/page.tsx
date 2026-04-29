@@ -26,8 +26,8 @@ const toRenderableHtml = (content: string): string => {
   return content.replace(/\n/g, "<br />");
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.app";
-const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hamrobichar.com";
+const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://hamrobichar-backend.onrender.com/api";
 const backendOrigin = apiBase.replace(/\/api\/?$/, "");
 
 const toTextSnippet = (content: string): string =>
