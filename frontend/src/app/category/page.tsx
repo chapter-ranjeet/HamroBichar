@@ -10,14 +10,14 @@ export const dynamic = "force-dynamic";
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "News Categories | HamroBichar",
+  title: "News Categories",
   description: "Browse HamroBichar news by category including politics, business, education, technology, and more.",
   robots: {
     index: true,
     follow: true
   },
   openGraph: {
-    title: "News Categories | HamroBichar",
+    title: "News Categories",
     description: "Browse HamroBichar news by category including politics, business, education, technology, and more.",
     url: `${siteUrl}/category`,
     siteName: "HamroBichar",

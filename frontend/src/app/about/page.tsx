@@ -7,14 +7,14 @@ import { getSiteUrl } from "@/lib/runtime";
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "About HamroBichar | Nepal News Mission",
+  title: "About HamroBichar",
   description: "Learn about HamroBichar, our mission, and our commitment to independent journalism in Nepal.",
   robots: {
     index: true,
     follow: true
   },
   openGraph: {
-    title: "About HamroBichar | Nepal News Mission",
+    title: "About HamroBichar",
     description: "Learn about HamroBichar, our mission, and our commitment to independent journalism in Nepal.",
     url: `${siteUrl}/about`,
     siteName: "HamroBichar",

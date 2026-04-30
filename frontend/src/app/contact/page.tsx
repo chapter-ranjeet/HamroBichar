@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: "Contact HamroBichar | Get in Touch",
+  title: "Contact | Get in Touch",
   description:
     "Contact HamroBichar for collaborations, corrections, and publishing inquiries. Reach us by email or through our official social channels.",
   robots: {
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     }
   },
   openGraph: {
-    title: "Contact HamroBichar | Get in Touch",
+    title: "Contact | Get in Touch",
     description:
       "Reach the HamroBichar team for news tips, collaborations, corrections, and publishing inquiries.",
     url: "https://hamrobichar.com/contact",

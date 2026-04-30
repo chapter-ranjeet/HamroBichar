@@ -4,14 +4,14 @@ import { getSiteUrl } from "@/lib/runtime";
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | HamroBichar",
+  title: "Privacy Policy",
   description: "Read HamroBichar's privacy policy about data collection, usage, and user rights.",
   robots: {
     index: true,
     follow: true
   },
   openGraph: {
-    title: "Privacy Policy | HamroBichar",
+    title: "Privacy Policy",
     description: "Read HamroBichar's privacy policy about data collection, usage, and user rights.",
     url: `${siteUrl}/privacy-policy`,
     siteName: "HamroBichar",

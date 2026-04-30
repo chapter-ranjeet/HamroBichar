@@ -15,14 +15,14 @@ type SearchPageProps = {
 };
 
 export const metadata: Metadata = {
-  title: "Search News | HamroBichar",
+  title: "Search News",
   description: "Search HamroBichar articles by keyword, category, topic, or author.",
   robots: {
     index: false,
     follow: false
   },
   openGraph: {
-    title: "Search News | HamroBichar",
+    title: "Search News",
     description: "Search HamroBichar articles by keyword, category, topic, or author.",
     url: `${siteUrl}/search`,
     siteName: "HamroBichar",
