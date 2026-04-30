@@ -4,8 +4,29 @@ import { cookies } from "next/headers";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description: "Contact HamroBichar and follow our official social media profiles.",
+  title: "Contact HamroBichar | Get in Touch",
+  description:
+    "Contact HamroBichar for collaborations, corrections, and publishing inquiries. Reach us by email or through our official social channels.",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1
+    }
+  },
+  openGraph: {
+    title: "Contact HamroBichar | Get in Touch",
+    description:
+      "Reach the HamroBichar team for news tips, collaborations, corrections, and publishing inquiries.",
+    url: "https://hamrobichar.com/contact",
+    siteName: "HamroBichar",
+    locale: "en_US",
+    type: "website"
+  },
   alternates: {
     canonical: "/contact"
   }
