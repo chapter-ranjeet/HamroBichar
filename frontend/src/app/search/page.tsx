@@ -4,20 +4,33 @@ import Link from "next/link";
 
 import NewsCard from "@/components/NewsCard";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
+import { getSiteUrl } from "@/lib/runtime";
 import { fetchArticlesServer } from "@/lib/server-content";
 
 export const dynamic = "force-dynamic";
+const siteUrl = getSiteUrl();
 
 type SearchPageProps = {
   searchParams: Promise<{ q?: string }>;
 };
 
 export const metadata: Metadata = {
-  title: "Search Articles",
-  description: "Search HamroBichar articles by keyword, category, or author.",
+  title: "Search News | HamroBichar",
+  description: "Search HamroBichar articles by keyword, category, topic, or author.",
   robots: {
     index: false,
     follow: false
+  },
+  openGraph: {
+    title: "Search News | HamroBichar",
+    description: "Search HamroBichar articles by keyword, category, topic, or author.",
+    url: `${siteUrl}/search`,
+    siteName: "HamroBichar",
+    locale: "en_US",
+    type: "website"
+  },
+  alternates: {
+    canonical: "/search"
   }
 };
 

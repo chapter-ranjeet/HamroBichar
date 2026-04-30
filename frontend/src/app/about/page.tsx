@@ -2,10 +2,25 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
+import { getSiteUrl } from "@/lib/runtime";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "About Us",
+  title: "About HamroBichar | Nepal News Mission",
   description: "Learn about HamroBichar, our mission, and our commitment to independent journalism in Nepal.",
+  robots: {
+    index: true,
+    follow: true
+  },
+  openGraph: {
+    title: "About HamroBichar | Nepal News Mission",
+    description: "Learn about HamroBichar, our mission, and our commitment to independent journalism in Nepal.",
+    url: `${siteUrl}/about`,
+    siteName: "HamroBichar",
+    locale: "en_US",
+    type: "website"
+  },
   alternates: {
     canonical: "/about"
   }

@@ -2,14 +2,31 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { getDictionary } from "@/lib/i18n";
+import { getSiteUrl } from "@/lib/runtime";
 import { fetchArticlesServer } from "@/lib/server-content";
 import { slugify, unslugify } from "@/lib/slug";
 
 export const dynamic = "force-dynamic";
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Categories - HamroBichar",
-  description: "Browse articles by category on HamroBichar."
+  title: "News Categories | HamroBichar",
+  description: "Browse HamroBichar news by category including politics, business, education, technology, and more.",
+  robots: {
+    index: true,
+    follow: true
+  },
+  openGraph: {
+    title: "News Categories | HamroBichar",
+    description: "Browse HamroBichar news by category including politics, business, education, technology, and more.",
+    url: `${siteUrl}/category`,
+    siteName: "HamroBichar",
+    locale: "en_US",
+    type: "website"
+  },
+  alternates: {
+    canonical: "/category"
+  }
 };
 
 export default async function CategoriesIndex() {

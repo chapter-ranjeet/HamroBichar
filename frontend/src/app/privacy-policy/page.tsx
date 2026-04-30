@@ -1,8 +1,23 @@
 import type { Metadata } from "next";
+import { getSiteUrl } from "@/lib/runtime";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
+  title: "Privacy Policy | HamroBichar",
   description: "Read HamroBichar's privacy policy about data collection, usage, and user rights.",
+  robots: {
+    index: true,
+    follow: true
+  },
+  openGraph: {
+    title: "Privacy Policy | HamroBichar",
+    description: "Read HamroBichar's privacy policy about data collection, usage, and user rights.",
+    url: `${siteUrl}/privacy-policy`,
+    siteName: "HamroBichar",
+    locale: "en_US",
+    type: "website"
+  },
   alternates: {
     canonical: "/privacy-policy"
   }
