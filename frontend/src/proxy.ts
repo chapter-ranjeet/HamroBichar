@@ -11,9 +11,7 @@ export function proxy(request: NextRequest) {
   }
 
   if (LEGACY_HOSTS.has(host)) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.protocol = "https:";
-    redirectUrl.host = CANONICAL_HOST;
+    const redirectUrl = new URL(`${request.nextUrl.pathname}${request.nextUrl.search}`, `https://${CANONICAL_HOST}`);
 
     return NextResponse.redirect(redirectUrl, 301);
   }
