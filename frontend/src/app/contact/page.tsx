@@ -33,6 +33,16 @@ export default async function ContactPage() {
         {dictionary.contact.description}
       </p>
 
+      <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-500">Email</p>
+        <a
+          href="mailto:info@hamrobichar.com"
+          className="mt-1 inline-block text-base font-semibold text-rose-700 hover:text-rose-800"
+        >
+          info@hamrobichar.com
+        </a>
+      </div>
+
       <div className="mt-6 space-y-3">
         {socialLinks.map((social) => (
           <a
