@@ -98,10 +98,12 @@ export default function HomePageClient({
             {dictionary.home.label}
           </p>
           <div className="max-w-4xl">
-            {/* Animated headline */}
+            {/* Brand H1 for SEO */}
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">HamroBichar</h1>
+            {/* Animated headline (subheading) */}
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             {/* using client component for animation */}
-            <AnimatedHeadline text={dictionary.home.title} className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl" />
+            <AnimatedHeadline text={dictionary.home.title} className="mt-2 text-2xl font-extrabold tracking-tight text-slate-800 sm:text-4xl" />
           </div>
           <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
             {dictionary.home.description}
