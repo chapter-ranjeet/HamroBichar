@@ -66,6 +66,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.5
     },
+    {
+      url: `${siteUrl}/category`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "daily",
+      priority: 0.7
+    },
     ...categoryRoutes,
     ...articleRoutes
   ];

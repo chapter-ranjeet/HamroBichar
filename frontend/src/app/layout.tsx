@@ -23,6 +23,8 @@ const geistMono = Geist_Mono({
 
 const siteUrl = getSiteUrl();
 const gaId = "G-STF3X2B450";
+const googleSiteVerification =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "FFYHpX2TkaGJnZY8r9TrkpJ8hUwK4eNVIsZYJCW-aEk";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -32,6 +34,13 @@ export const metadata: Metadata = {
   },
   description: "HamroBichar brings you timely Nepal news, politics, education, business, and technology updates.",
   applicationName: "HamroBichar",
+  referrer: "origin-when-cross-origin",
+  creator: "HamroBichar Editorial Team",
+  publisher: "HamroBichar",
+  authors: [{ name: "HamroBichar" }],
+  verification: {
+    google: googleSiteVerification
+  },
   keywords: [
     "HamroBichar",
     "Hamro Bichar",
@@ -111,19 +120,38 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const initialLanguage = normalizeLanguage(cookieStore.get(LANGUAGE_COOKIE)?.value);
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "HamroBichar",
+    url: siteUrl,
+    inLanguage: ["en", "ne-NP"],
+    publisher: {
+      "@type": "Organization",
+      name: "HamroBichar",
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/HBLogo2.png`
+      }
+    },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${siteUrl}/search?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  };
 
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        <meta
-          name="google-site-verification"
-          content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "FFYHpX2TkaGJnZY8r9TrkpJ8hUwK4eNVIsZYJCW-aEk"}
-        />
-      </head>
       <body className="min-h-full bg-slate-50 text-slate-900">
+        <Script
+          id="website-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-STF3X2B450"
           strategy="afterInteractive"

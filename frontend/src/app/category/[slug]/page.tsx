@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import NewsCard from "@/components/NewsCard";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
@@ -19,10 +20,24 @@ type CategoryPageProps = {
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
   const categoryName = unslugify(slug);
+  const data = await fetchArticlesServer();
+  const normalizedCategories = new Set((data.categories ?? []).map((category) => slugify(category)));
+  const categoryExists = normalizedCategories.has(slug);
 
   const title = `${categoryName} | HamroBichar`;
   const description = `Latest ${categoryName.toLowerCase()} news and updates from HamroBichar.`.slice(0, 155);
   const canonical = `${siteUrl}/category/${slug}`;
+
+  if (!categoryExists) {
+    return {
+      title: "Category Not Found | HamroBichar",
+      description: "The requested category does not exist.",
+      robots: {
+        index: false,
+        follow: false
+      }
+    };
+  }
 
   return {
     title,
@@ -48,6 +63,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const dictionary = getDictionary(language);
   const { slug } = await params;
   const data = await fetchArticlesServer();
+  const normalizedCategories = new Set((data.categories ?? []).map((category) => slugify(category)));
+
+  if (!normalizedCategories.has(slug)) {
+    notFound();
+  }
+
   const categoryArticles = data.articles.filter((article) => slugify(article.category) === slug);
   const categoryName =
     language === "np"
