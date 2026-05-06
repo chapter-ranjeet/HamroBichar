@@ -140,6 +140,22 @@ export default async function RootLayout({
       "query-input": "required name=search_term_string"
     }
   };
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "NewsMediaOrganization",
+    name: "HamroBichar",
+    url: siteUrl,
+    logo: {
+      "@type": "ImageObject",
+      url: `${siteUrl}/HBLogo2.png`,
+      width: 512,
+      height: 512
+    },
+    sameAs: [
+      "https://www.facebook.com/hamrobichar",
+      "https://www.instagram.com/hamrobichar/"
+    ]
+  };
 
   return (
     <html
@@ -151,6 +167,11 @@ export default async function RootLayout({
           id="website-schema"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <Script
+          id="organization-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-STF3X2B450"

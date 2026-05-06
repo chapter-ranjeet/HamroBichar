@@ -257,6 +257,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       "@type": "WebPage",
       "@id": articleUrl
     },
+    isPartOf: {
+      "@type": "NewsMediaOrganization",
+      name: "HamroBichar",
+      url: siteUrl
+    },
     image: imageUrl ? [imageUrl] : undefined,
     thumbnailUrl: imageUrl,
     articleBody: plainTextContent.slice(0, 5000),
