@@ -178,7 +178,12 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     description,
     keywords,
     alternates: {
-      canonical: articleUrl
+      canonical: articleUrl,
+      // provide language alternates for search engines
+      languages: {
+        en: articleUrl,
+        ne: `${articleUrl}?lang=ne`
+      }
     },
     openGraph: {
       type: "article",

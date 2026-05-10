@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import NewsCard from "@/components/NewsCard";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/runtime";
+import { siteTitle, categoryDescription } from "@/lib/seo";
 import { fetchArticlesServer } from "@/lib/server-content";
 import { slugify, unslugify } from "@/lib/slug";
 
@@ -24,8 +25,8 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const normalizedCategories = new Set((data.categories ?? []).map((category) => slugify(category)));
   const categoryExists = normalizedCategories.has(slug);
 
-  const title = `${categoryName} | HamroBichar`;
-  const description = `Latest ${categoryName.toLowerCase()} news and updates from HamroBichar.`.slice(0, 155);
+  const title = siteTitle(categoryName);
+  const description = categoryDescription(categoryName).slice(0, 155);
   const canonical = `${siteUrl}/category/${slug}`;
 
   if (!categoryExists) {

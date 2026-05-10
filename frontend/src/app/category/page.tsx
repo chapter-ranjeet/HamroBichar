@@ -5,27 +5,33 @@ import { getDictionary } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/runtime";
 import { fetchArticlesServer } from "@/lib/server-content";
 import { slugify, unslugify } from "@/lib/slug";
+import { siteTitle, pageDescription } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "News Categories",
-  description: "Browse HamroBichar news by category including politics, business, education, technology, and more.",
+  title: siteTitle('News Categories'),
+  description: pageDescription('Browse HamroBichar news by category including politics, business, education, technology, and more.'),
   robots: {
     index: true,
     follow: true
   },
   openGraph: {
-    title: "News Categories",
-    description: "Browse HamroBichar news by category including politics, business, education, technology, and more.",
+    title: siteTitle('News Categories'),
+    description: pageDescription('Browse HamroBichar news by category including politics, business, education, technology, and more.'),
     url: `${siteUrl}/category`,
     siteName: "HamroBichar",
     locale: "en_US",
-    type: "website"
+    type: "website",
+    images: [{ url: `${siteUrl}/HBLogo2.png`, alt: 'HamroBichar' }]
   },
   alternates: {
-    canonical: "/category"
+    canonical: `${siteUrl}/category`,
+    languages: {
+      en: `${siteUrl}/category`,
+      ne: `${siteUrl}/category?lang=ne`
+    }
   }
 };
 

@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
+import { getSiteUrl } from "@/lib/runtime";
+import { siteTitle, pageDescription } from "@/lib/seo";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Contact | Get in Touch",
-  description:
-    "Contact HamroBichar for collaborations, corrections, and publishing inquiries. Reach us by email or through our official social channels.",
+  title: siteTitle('Contact Us'),
+  description: pageDescription('Contact HamroBichar for collaborations, corrections, and publishing inquiries. Reach us by email or through our official social channels.'),
   robots: {
     index: true,
     follow: true,
@@ -19,16 +22,20 @@ export const metadata: Metadata = {
     }
   },
   openGraph: {
-    title: "Contact | Get in Touch",
-    description:
-      "Reach the HamroBichar team for news tips, collaborations, corrections, and publishing inquiries.",
-    url: "https://hamrobichar.com/contact",
+    title: siteTitle('Contact Us'),
+    description: pageDescription('Reach the HamroBichar team for news tips, collaborations, corrections, and publishing inquiries.'),
+    url: `${siteUrl}/contact`,
     siteName: "HamroBichar",
     locale: "en_US",
-    type: "website"
+    type: "website",
+    images: [{ url: `${siteUrl}/HBLogo2.png`, alt: 'HamroBichar' }]
   },
   alternates: {
-    canonical: "/contact"
+    canonical: `${siteUrl}/contact`,
+    languages: {
+      en: `${siteUrl}/contact`,
+      ne: `${siteUrl}/contact?lang=ne`
+    }
   }
 };
 

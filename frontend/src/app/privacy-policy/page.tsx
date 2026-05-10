@@ -1,25 +1,31 @@
 import type { Metadata } from "next";
 import { getSiteUrl } from "@/lib/runtime";
+import { siteTitle, pageDescription } from "@/lib/seo";
 
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "Read HamroBichar's privacy policy about data collection, usage, and user rights.",
+  title: siteTitle('Privacy Policy'),
+  description: pageDescription('Read HamroBichar\'s privacy policy about data collection, usage, and user rights.'),
   robots: {
     index: true,
     follow: true
   },
   openGraph: {
-    title: "Privacy Policy",
-    description: "Read HamroBichar's privacy policy about data collection, usage, and user rights.",
+    title: siteTitle('Privacy Policy'),
+    description: pageDescription('Read HamroBichar\'s privacy policy about data collection, usage, and user rights.'),
     url: `${siteUrl}/privacy-policy`,
     siteName: "HamroBichar",
     locale: "en_US",
-    type: "website"
+    type: "website",
+    images: [{ url: `${siteUrl}/HBLogo2.png`, alt: 'HamroBichar' }]
   },
   alternates: {
-    canonical: "/privacy-policy"
+    canonical: `${siteUrl}/privacy-policy`,
+    languages: {
+      en: `${siteUrl}/privacy-policy`,
+      ne: `${siteUrl}/privacy-policy?lang=ne`
+    }
   }
 };
 

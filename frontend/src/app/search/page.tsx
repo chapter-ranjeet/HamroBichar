@@ -6,6 +6,7 @@ import NewsCard from "@/components/NewsCard";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/runtime";
 import { fetchArticlesServer } from "@/lib/server-content";
+import { siteTitle, pageDescription } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 const siteUrl = getSiteUrl();
@@ -15,22 +16,27 @@ type SearchPageProps = {
 };
 
 export const metadata: Metadata = {
-  title: "Search News",
-  description: "Search HamroBichar articles by keyword, category, topic, or author.",
+  title: siteTitle('Search'),
+  description: pageDescription('Search HamroBichar articles by keyword, category, topic, or author.'),
   robots: {
     index: false,
     follow: false
   },
   openGraph: {
-    title: "Search News",
-    description: "Search HamroBichar articles by keyword, category, topic, or author.",
+    title: siteTitle('Search'),
+    description: pageDescription('Search HamroBichar articles by keyword, category, topic, or author.'),
     url: `${siteUrl}/search`,
     siteName: "HamroBichar",
     locale: "en_US",
-    type: "website"
+    type: "website",
+    images: [{ url: `${siteUrl}/HBLogo2.png`, alt: 'HamroBichar' }]
   },
   alternates: {
-    canonical: "/search"
+    canonical: `${siteUrl}/search`,
+    languages: {
+      en: `${siteUrl}/search`,
+      ne: `${siteUrl}/search?lang=ne`
+    }
   }
 };
 

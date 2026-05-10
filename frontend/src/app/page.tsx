@@ -5,22 +5,31 @@ import HomePageClient from "@/components/HomePageClient";
 import HomeSkeleton from "@/components/HomeSkeleton";
 import { fetchArticlesServer } from "@/lib/server-content";
 import { getSiteUrl } from "@/lib/runtime";
+import { siteTitle, pageDescription } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Latest Nepal News, Breaking Stories, Politics, Business & Technology | HamroBichar",
-  description:
-    "Read the latest Nepal news, breaking stories, politics, business, education, and technology on HamroBichar.".slice(0, 155),
+  title: siteTitle(),
+  description: pageDescription(
+    "Read the latest Nepal news, breaking stories, politics, business, education, and technology on HamroBichar."
+  ),
   alternates: {
-    canonical: siteUrl
+    canonical: siteUrl,
+    languages: {
+      en: siteUrl,
+      ne: `${siteUrl}/?lang=ne`
+    }
   },
   openGraph: {
-    title: "Latest Nepal News, Breaking Stories, Politics, Business & Technology | HamroBichar",
-    description: "Read the latest Nepal news, breaking stories, politics, business, education, and technology on HamroBichar.".slice(0, 155),
-    url: siteUrl
+    title: siteTitle(),
+    description: pageDescription(
+      "Read the latest Nepal news, breaking stories, politics, business, education, and technology on HamroBichar."
+    ),
+    url: siteUrl,
+    images: [{ url: `${siteUrl}/HBLogo2.png`, alt: "HamroBichar" }]
   }
 };
 

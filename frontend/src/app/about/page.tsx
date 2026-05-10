@@ -3,26 +3,32 @@ import { cookies } from "next/headers";
 
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/runtime";
+import { siteTitle, pageDescription } from "@/lib/seo";
 
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "About HamroBichar",
-  description: "Learn about HamroBichar, our mission, and our commitment to independent journalism in Nepal.",
+  title: siteTitle('About HamroBichar'),
+  description: pageDescription('Learn about HamroBichar, our mission, and our commitment to independent journalism in Nepal.'),
   robots: {
     index: true,
     follow: true
   },
   openGraph: {
-    title: "About HamroBichar",
-    description: "Learn about HamroBichar, our mission, and our commitment to independent journalism in Nepal.",
+    title: siteTitle('About HamroBichar'),
+    description: pageDescription('Learn about HamroBichar, our mission, and our commitment to independent journalism in Nepal.'),
     url: `${siteUrl}/about`,
     siteName: "HamroBichar",
     locale: "en_US",
-    type: "website"
+    type: "website",
+    images: [{ url: `${siteUrl}/HBLogo2.png`, alt: 'HamroBichar' }]
   },
   alternates: {
-    canonical: "/about"
+    canonical: `${siteUrl}/about`,
+    languages: {
+      en: `${siteUrl}/about`,
+      ne: `${siteUrl}/about?lang=ne`
+    }
   }
 };
 

@@ -66,7 +66,13 @@ export const metadata: Metadata = {
     "Technology"
   ],
   alternates: {
-    canonical: "/"
+    canonical: "/",
+    languages: {
+      // English is default; Nepali pages served via language cookie or localized routes
+      "en": "/",
+      "ne": "/",
+      "ne-NP": "/"
+    }
   },
   openGraph: {
     type: "website",
