@@ -1,6 +1,4 @@
 const SITE_URL = process.env.SITE_URL || 'http://localhost:3000';
-const sitemaps = ['/sitemap.xml', '/news-sitemap.xml', '/sitemap-index.xml', '/sitemap-index.xml'];
-const fetch = global.fetch || require('node-fetch');
 
 async function countUrls(sitemapPath) {
   try {

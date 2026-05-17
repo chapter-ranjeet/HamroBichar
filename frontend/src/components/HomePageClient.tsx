@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -8,7 +8,6 @@ import { useLanguage } from "@/components/LanguageProvider";
 import AnimatedHeadline from "@/components/AnimatedHeadline";
 import NepaliCalendarWidget from "@/components/NepaliCalendarWidget";
 import NewsCard from "@/components/NewsCard";
-import { slugify } from "@/lib/slug";
 import { Article } from "@/types";
 
 const ALL_CATEGORY = "__all__";
@@ -43,6 +42,11 @@ export default function HomePageClient({
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") ?? ALL_CATEGORY);
   const [showMobileCategories, setShowMobileCategories] = useState(false);
   const [visibleCount, setVisibleCount] = useState(6);
+
+  const onSelectCategory = (category: string) => {
+    setSelectedCategory(category);
+    setVisibleCount(6);
+  };
 
   const categories = useMemo(() => [ALL_CATEGORY, ...initialCategories], [initialCategories]);
   const categoryLabelMap = useMemo(() => {
@@ -79,10 +83,6 @@ export default function HomePageClient({
   const visibleArticles = categoryScopedArticles.slice(0, visibleCount);
   const hasMoreArticles = visibleCount < categoryScopedArticles.length;
 
-  useEffect(() => {
-    setVisibleCount(6);
-  }, [selectedCategory]);
-
   const onSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -101,8 +101,6 @@ export default function HomePageClient({
             {/* Brand H1 for SEO */}
             <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-5xl">HamroBichar</h1>
             {/* Animated headline (subheading) */}
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            {/* using client component for animation */}
             <AnimatedHeadline text={dictionary.home.title} className="mt-2 text-2xl font-extrabold tracking-tight text-slate-800 sm:text-4xl" />
           </div>
           <p className="max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
@@ -245,7 +243,7 @@ export default function HomePageClient({
                 {categories.map((category) => (
                   <button
                     key={category}
-                    onClick={() => setSelectedCategory(category)}
+                    onClick={() => onSelectCategory(category)}
                     className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
                       selectedCategory === category
                         ? "bg-rose-700 text-white shadow-sm"
@@ -283,7 +281,7 @@ export default function HomePageClient({
           {categories.map((category) => (
             <button
               key={category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => onSelectCategory(category)}
               className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold transition ${
                 selectedCategory === category
                   ? "bg-rose-700 text-white shadow-sm"

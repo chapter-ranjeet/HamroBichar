@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { dictionaries, Dictionary, LANGUAGE_COOKIE, Language, normalizeLanguage } from "@/lib/i18n";
+import { dictionaries, Dictionary, LANGUAGE_COOKIE, Language } from "@/lib/i18n";
 
 type LanguageContextValue = {
   language: Language;
@@ -20,14 +20,6 @@ type LanguageProviderProps = {
 
 export default function LanguageProvider({ initialLanguage, children }: LanguageProviderProps) {
   const [language, setLanguage] = useState<Language>(initialLanguage);
-
-  useEffect(() => {
-    const fromStorage = normalizeLanguage(window.localStorage.getItem(LANGUAGE_COOKIE));
-    if (fromStorage !== language) {
-      setLanguage(fromStorage);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     document.documentElement.lang = language === "np" ? "ne" : "en";

@@ -33,7 +33,7 @@ export default function ArticleComments({ slug }: ArticleCommentsProps) {
     };
 
     void loadComments();
-  }, [slug]);
+  }, [slug, dictionary.comments.loadError]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

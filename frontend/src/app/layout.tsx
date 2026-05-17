@@ -180,7 +180,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-STF3X2B450"
+          src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -188,7 +188,7 @@ export default async function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-STF3X2B450');
+            gtag('config', '${gaId}');
           `}
         </Script>
         <LanguageProvider initialLanguage={initialLanguage}>

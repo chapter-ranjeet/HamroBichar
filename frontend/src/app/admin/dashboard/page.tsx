@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useLanguage } from "@/components/LanguageProvider";
 import {
@@ -234,33 +234,6 @@ export default function AdminDashboardPage() {
     syncEditorContent();
   };
 
-  const insertAtCursor = (value: string) => {
-    const editor = editorRef.current;
-    if (!editor) {
-      setForm((prev) => ({ ...prev, content: `${prev.content}${value}` }));
-      return;
-    }
-
-    editor.focus();
-    const selection = window.getSelection();
-    const selectedText = selection?.toString() || "";
-    const html = value.replace("{{text}}", selectedText || "text");
-    document.execCommand("insertHTML", false, html);
-    syncEditorContent();
-  };
-
-  const wrapSelection = (openTag: string, closeTag: string) => {
-    const editor = editorRef.current;
-    if (!editor) {
-      return;
-    }
-
-    editor.focus();
-    const selectedText = window.getSelection()?.toString() || "text";
-    document.execCommand("insertHTML", false, `${openTag}${selectedText}${closeTag}`);
-    syncEditorContent();
-  };
-
   const addLink = () => {
     const url = window.prompt(dictionary.admin.promptEnterUrl, "https://");
     if (!url) {
@@ -271,7 +244,7 @@ export default function AdminDashboardPage() {
     execEditorCommand("insertHTML", `<a href=\"${url}\" target=\"_blank\" rel=\"noopener noreferrer\">${selectedText}</a>`);
   };
 
-  const loadArticles = async () => {
+  const loadArticles = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -282,9 +255,9 @@ export default function AdminDashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dictionary.admin.failedLoadArticles]);
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       setUsersLoading(true);
       const result = await getAdminUsers(tokenRef.current);
@@ -294,7 +267,7 @@ export default function AdminDashboardPage() {
     } finally {
       setUsersLoading(false);
     }
-  };
+  }, [dictionary.admin.failedLoadUsers]);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("hamrobichar_token");
@@ -339,7 +312,7 @@ export default function AdminDashboardPage() {
         void loadUsers();
       }
     });
-  }, [pathname, router]);
+  }, [pathname, router, loadArticles, loadUsers]);
 
   const resetForm = () => {
     setForm(emptyForm);

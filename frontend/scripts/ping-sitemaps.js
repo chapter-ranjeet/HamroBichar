@@ -25,7 +25,6 @@ async function ping(url) {
     for (const agent of agents) {
       const target = agent.url + encodeURIComponent(sitemap);
       process.stdout.write(`- ${agent.name}: `);
-      // eslint-disable-next-line no-await-in-loop
       const result = await ping(target);
       if (result.ok) console.log(`OK (${result.status})`);
       else if (result.error) console.log(`ERROR: ${result.error}`);
