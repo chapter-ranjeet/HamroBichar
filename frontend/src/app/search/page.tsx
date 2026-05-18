@@ -15,30 +15,39 @@ type SearchPageProps = {
   searchParams: Promise<{ q?: string }>;
 };
 
-export const metadata: Metadata = {
-  title: siteTitle('Search'),
-  description: pageDescription('Search HamroBichar articles by keyword, category, topic, or author.'),
-  robots: {
-    index: false,
-    follow: false
-  },
-  openGraph: {
-    title: siteTitle('Search'),
-    description: pageDescription('Search HamroBichar articles by keyword, category, topic, or author.'),
-    url: `${siteUrl}/search`,
-    siteName: "HamroBichar",
-    locale: "en_US",
-    type: "website",
-    images: [{ url: `${siteUrl}/HBLogo2.png`, alt: 'HamroBichar' }]
-  },
-  alternates: {
-    canonical: `${siteUrl}/search`,
-    languages: {
-      en: `${siteUrl}/search`,
-      ne: `${siteUrl}/search?lang=ne`
+export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
+  const { q = "" } = await searchParams;
+  const query = q.trim();
+  const title = query ? siteTitle(`Search: ${query}`) : siteTitle("Search");
+  const description = query
+    ? pageDescription(`Search results for "${query}" on HamroBichar.`)
+    : pageDescription("Search HamroBichar articles by keyword, category, topic, or author.");
+
+  return {
+    title,
+    description,
+    robots: {
+      index: false,
+      follow: true
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/search`,
+      siteName: "HamroBichar",
+      locale: "en_US",
+      type: "website",
+      images: [{ url: `${siteUrl}/HBLogo2.png`, alt: "HamroBichar" }]
+    },
+    alternates: {
+      canonical: `${siteUrl}/search`,
+      languages: {
+        en: `${siteUrl}/search`,
+        ne: `${siteUrl}/search?lang=ne`
+      }
     }
-  }
-};
+  };
+}
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const cookieStore = await cookies();

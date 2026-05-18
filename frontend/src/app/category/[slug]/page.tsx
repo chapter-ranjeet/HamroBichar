@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 
 import NewsCard from "@/components/NewsCard";
 import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
@@ -44,7 +45,11 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     title,
     description,
     alternates: {
-      canonical
+      canonical,
+      languages: {
+        en: canonical,
+        ne: `${canonical}?lang=ne`
+      }
     },
     robots: {
       index: true,
@@ -53,7 +58,17 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     openGraph: {
       title,
       description,
-      url: canonical
+      url: canonical,
+      siteName: "HamroBichar",
+      locale: "en_US",
+      type: "website",
+      images: [{ url: `${siteUrl}/HBLogo2.png`, alt: "HamroBichar" }]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${siteUrl}/HBLogo2.png`]
     }
   };
 }
@@ -75,9 +90,56 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     language === "np"
       ? categoryArticles[0]?.categoryNp ?? categoryArticles[0]?.category ?? unslugify(slug)
       : categoryArticles[0]?.category ?? unslugify(slug);
+  const categoryUrl = `${siteUrl}/category/${slug}`;
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Categories",
+        item: `${siteUrl}/category`
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: categoryName,
+        item: categoryUrl
+      }
+    ]
+  };
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${categoryName} articles`,
+    itemListElement: categoryArticles.slice(0, 10).map((article, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `${siteUrl}/article/${article.slug}`,
+      name: article.title
+    }))
+  };
 
   return (
-    <section className="mx-auto my-8 w-full max-w-7xl rounded-3xl bg-white p-5 shadow-sm sm:my-10 sm:p-8 lg:p-10">
+    <>
+      <Script
+        id={`category-breadcrumb-${slug}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <Script
+        id={`category-itemlist-${slug}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
+      <section className="mx-auto my-8 w-full max-w-7xl rounded-3xl bg-white p-5 shadow-sm sm:my-10 sm:p-8 lg:p-10">
       <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{dictionary.category.section}</p>
@@ -102,6 +164,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           {dictionary.category.noArticles}
         </div>
       )}
-    </section>
+      </section>
+    </>
   );
 }

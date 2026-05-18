@@ -10,6 +10,7 @@ import { getDictionary, LANGUAGE_COOKIE, normalizeLanguage } from "@/lib/i18n";
 import { fetchArticleServer, fetchArticlesServer } from "@/lib/server-content";
 import { resolveOriginalUrl, cloudinaryFetch } from "@/lib/image";
 import { getApiBaseUrl, getSiteUrl } from "@/lib/runtime";
+import { slugify } from "@/lib/slug";
 import { Article } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -185,11 +186,17 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
         ne: `${articleUrl}?lang=ne`
       }
     },
+    robots: {
+      index: true,
+      follow: true
+    },
     openGraph: {
       type: "article",
       url: articleUrl,
       title: formattedTitle,
       description,
+      siteName: "HamroBichar",
+      locale: "en_US",
       publishedTime: article.createdAt,
       modifiedTime: article.updatedAt,
       section: article.category,
@@ -272,10 +279,39 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     articleBody: plainTextContent.slice(0, 5000),
     keywords: [articleCategory, "Nepal news", "HamroBichar", article.author].filter(Boolean)
   };
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: articleCategory,
+        item: `${siteUrl}/category/${slugify(article.category || "news")}`
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: articleTitle,
+        item: articleUrl
+      }
+    ]
+  };
 
   return (
     <>
       <ArticleViewTracker slug={article.slug} />
+      <Script
+        id={`article-breadcrumb-${article.slug}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <Script
         id={`article-schema-${article.slug}`}
         type="application/ld+json"

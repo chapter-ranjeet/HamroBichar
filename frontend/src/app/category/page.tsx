@@ -26,6 +26,12 @@ export const metadata: Metadata = {
     type: "website",
     images: [{ url: `${siteUrl}/HBLogo2.png`, alt: 'HamroBichar' }]
   },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitle("News Categories"),
+    description: pageDescription("Browse HamroBichar news by category including politics, business, education, technology, and more."),
+    images: [`${siteUrl}/HBLogo2.png`]
+  },
   alternates: {
     canonical: `${siteUrl}/category`,
     languages: {

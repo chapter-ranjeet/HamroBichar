@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import Script from "next/script";
 
 import HomePageClient from "@/components/HomePageClient";
 import HomeSkeleton from "@/components/HomeSkeleton";
@@ -35,15 +36,33 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const initialData = await fetchArticlesServer();
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Latest news from HamroBichar",
+    itemListElement: (initialData.articles ?? []).slice(0, 10).map((article, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `${siteUrl}/article/${article.slug}`,
+      name: article.title
+    }))
+  };
 
   return (
-    <Suspense fallback={<HomeSkeleton />}>
-      <HomePageClient
-        initialArticles={initialData.articles}
-        initialCategories={initialData.categories}
-        initialPopularArticles={initialData.popularArticles ?? []}
-        initialBreakingArticles={initialData.breakingArticles ?? []}
+    <>
+      <Script
+        id="homepage-itemlist"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
-    </Suspense>
+      <Suspense fallback={<HomeSkeleton />}>
+        <HomePageClient
+          initialArticles={initialData.articles}
+          initialCategories={initialData.categories}
+          initialPopularArticles={initialData.popularArticles ?? []}
+          initialBreakingArticles={initialData.breakingArticles ?? []}
+        />
+      </Suspense>
+    </>
   );
 }
