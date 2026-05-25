@@ -166,6 +166,31 @@ export default function AdminDashboardPage() {
     () => Array.from(new Set(articles.map((article) => article.category).filter(Boolean))).sort((a, b) => a.localeCompare(b)),
     [articles]
   );
+  const dashboardStats = useMemo(
+    () => [
+      {
+        label: "Articles",
+        value: articles.length,
+        tone: "from-rose-500 to-rose-600"
+      },
+      {
+        label: "Contributors",
+        value: users.length,
+        tone: "from-slate-700 to-slate-900"
+      },
+      {
+        label: "Certificates",
+        value: certificates.length,
+        tone: "from-emerald-500 to-emerald-700"
+      },
+      {
+        label: "Categories",
+        value: availableCategories.length,
+        tone: "from-amber-500 to-amber-600"
+      }
+    ],
+    [articles.length, availableCategories.length, certificates.length, users.length]
+  );
   const estimatedSlug = useMemo(() => slugify(form.title), [form.title]);
   const canSubmit = Boolean(form.title.trim() && form.content.trim() && form.category.trim()) && !uploadingImage;
   const isMasterRoute = pathname.startsWith("/master");
@@ -642,53 +667,86 @@ export default function AdminDashboardPage() {
   return (
     <section className="mx-auto my-6 w-full max-w-6xl space-y-6 px-4 lg:my-8 sm:px-6">
       {isSuperAdmin && isMasterRoute && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={onLogout}
-              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
-            >
-              {dictionary.admin.logout}
-            </button>
-            <button
-              onClick={() => setShowUserManagementPanel((prev) => !prev)}
-              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                showUserManagementPanel
-                  ? "border-rose-300 bg-rose-50 text-rose-700"
-                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              {dictionary.admin.userManagement}
-            </button>
-            <button
-              onClick={() => setShowCertificatePanel((prev) => !prev)}
-              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                showCertificatePanel
-                  ? "border-rose-300 bg-rose-50 text-rose-700"
-                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              Certificate Management
-            </button>
-            <button
-              onClick={() => setShowAccountSettingsPanel((prev) => !prev)}
-              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                showAccountSettingsPanel
-                  ? "border-rose-300 bg-rose-50 text-rose-700"
-                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              {dictionary.admin.accountSettings}
-            </button>
+        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.12)]">
+          <div className="relative overflow-hidden bg-linear-to-r from-slate-950 via-slate-900 to-rose-900 px-5 py-6 text-white sm:px-6 sm:py-7">
+            <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.55),transparent_0),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.35),transparent_0)]" />
+            <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-rose-100/80">Super Admin Console</p>
+                <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Operations dashboard</h1>
+                <p className="mt-3 text-sm leading-7 text-slate-200 sm:text-base">
+                  Manage stories, contributors, and certificate verification from one premium control surface.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={onLogout}
+                  className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+                >
+                  {dictionary.admin.logout}
+                </button>
+                <button
+                  onClick={() => setShowUserManagementPanel((prev) => !prev)}
+                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                    showUserManagementPanel
+                      ? "border-white bg-white text-slate-900"
+                      : "border-white/25 bg-white/10 text-white hover:bg-white/15"
+                  }`}
+                >
+                  {dictionary.admin.userManagement}
+                </button>
+                <button
+                  onClick={() => setShowCertificatePanel((prev) => !prev)}
+                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                    showCertificatePanel
+                      ? "border-white bg-white text-slate-900"
+                      : "border-white/25 bg-white/10 text-white hover:bg-white/15"
+                  }`}
+                >
+                  Certificate Management
+                </button>
+                <button
+                  onClick={() => setShowAccountSettingsPanel((prev) => !prev)}
+                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                    showAccountSettingsPanel
+                      ? "border-white bg-white text-slate-900"
+                      : "border-white/25 bg-white/10 text-white hover:bg-white/15"
+                  }`}
+                >
+                  {dictionary.admin.accountSettings}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 border-t border-slate-200 bg-slate-50 p-4 sm:grid-cols-2 xl:grid-cols-4">
+            {dashboardStats.map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-2xl border border-white bg-white p-4 shadow-sm"
+              >
+                <div className={`inline-flex rounded-full bg-linear-to-r ${stat.tone} px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-white`}>
+                  {stat.label}
+                </div>
+                <p className="mt-3 text-3xl font-black tracking-tight text-slate-900">{stat.value}</p>
+                <p className="mt-1 text-xs font-medium text-slate-500">
+                  Updated in real time from the content and access controls below.
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-xl font-black text-slate-900">{isEditing ? dictionary.admin.editArticle : dictionary.admin.createArticle}</h1>
+      <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Publishing</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-900">{isEditing ? dictionary.admin.editArticle : dictionary.admin.createArticle}</h2>
+          </div>
           {!isMasterRoute && (
-            <button onClick={onLogout} className="text-sm font-semibold text-rose-700">
+            <button onClick={onLogout} className="self-start text-sm font-semibold text-rose-700">
               {dictionary.admin.logout}
             </button>
           )}
@@ -892,8 +950,14 @@ export default function AdminDashboardPage() {
         </form>
       </div>
 
-      <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-xl font-black text-slate-900">{dictionary.admin.existingArticles}</h2>
+      <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Content Library</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-900">{dictionary.admin.existingArticles}</h2>
+          </div>
+          <p className="text-sm text-slate-500">Sorted by category for faster editorial review.</p>
+        </div>
         <div className="mt-4">
           <input
             value={articleSearchTerm}
@@ -964,7 +1028,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {isSuperAdmin && (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
           <div className="bg-linear-to-r from-slate-900 via-slate-800 to-rose-800 px-5 py-4 text-white sm:px-6">
             <h2 className="text-xl font-black">Create Internship / Job Contributor</h2>
             <p className="mt-1 text-sm text-slate-200">Create complete identity and document-verified access for publishing operations.</p>
@@ -1129,9 +1193,14 @@ export default function AdminDashboardPage() {
       )}
 
       {isSuperAdmin && showUserManagementPanel && (
-      <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-xl font-black text-slate-900">{dictionary.admin.userManagement}</h2>
-        <p className="mt-1 text-sm text-slate-600">Review contributor identity details, documents, and access controls.</p>
+      <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">People</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-900">{dictionary.admin.userManagement}</h2>
+          </div>
+          <p className="text-sm text-slate-500">Review contributor identity details, documents, and access controls.</p>
+        </div>
         {usersLoading ? (
           <p className="mt-4 text-slate-600">{dictionary.admin.usersLoading}</p>
         ) : (
@@ -1274,7 +1343,7 @@ export default function AdminDashboardPage() {
       )}
 
       {isSuperAdmin && showCertificatePanel && (
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
           <div className="bg-linear-to-r from-rose-700 via-rose-800 to-slate-900 px-5 py-4 text-white sm:px-6">
             <h2 className="text-xl font-black">Certificate Verification</h2>
             <p className="mt-1 text-sm text-rose-50">Create certificate IDs that verify on the public /verify page.</p>
@@ -1414,9 +1483,12 @@ export default function AdminDashboardPage() {
       )}
 
       {(showAccountSettingsPanel || !isMasterRoute) && (
-      <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-xl font-black text-slate-900">{dictionary.admin.accountSettings}</h2>
-        <p className="mt-1 text-sm text-slate-600">{dictionary.admin.accountHelp}</p>
+      <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Access</p>
+          <h2 className="mt-1 text-2xl font-black text-slate-900">{dictionary.admin.accountSettings}</h2>
+          <p className="mt-1 text-sm text-slate-600">{dictionary.admin.accountHelp}</p>
+        </div>
 
         {!isSubAdmin ? (
         <form onSubmit={onChangePassword} className="mt-6 grid gap-3 sm:grid-cols-2">
