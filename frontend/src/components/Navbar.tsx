@@ -13,6 +13,7 @@ export default function Navbar() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [topBarDate, setTopBarDate] = useState("");
   const { language, dictionary } = useLanguage();
 
   useEffect(() => {
@@ -27,6 +28,17 @@ export default function Navbar() {
 
     void loadArticles();
   }, []);
+
+  useEffect(() => {
+    setTopBarDate(
+      new Date().toLocaleDateString(language === "np" ? "ne-NP" : "en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      })
+    );
+  }, [language]);
 
   const getArticleTitle = (article: Article): string =>
     language === "np" ? article.titleNp || article.title : article.title;
@@ -47,12 +59,6 @@ export default function Navbar() {
   };
 
   const remainingArticles = articles.slice(6);
-  const topBarDate = new Date().toLocaleDateString(language === "np" ? "ne-NP" : "en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md">
@@ -60,7 +66,8 @@ export default function Navbar() {
         <div className="flex w-full items-center justify-between px-4 py-1.5 text-[11px] sm:px-6 sm:text-xs lg:px-10">
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold tracking-wide">
             <span>
-              {dictionary.topBar.today}: {topBarDate}
+              {dictionary.topBar.today}:{" "}
+              <span suppressHydrationWarning>{topBarDate || ""}</span>
             </span>
           </p>
           <div className="flex items-center gap-2 sm:gap-3">
