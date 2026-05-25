@@ -6,18 +6,21 @@ import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useSta
 import { useLanguage } from "@/components/LanguageProvider";
 import {
   changeAdminPassword,
+  createCertificate,
   createSubAdmin,
   deleteSubAdmin,
+  deleteCertificate,
   createArticle,
   deleteArticle,
   getAdminUsers,
+  getCertificates,
   getArticles,
   resetSubAdminPassword,
   updateAdminUserRole,
   updateArticle,
   uploadArticleImage
 } from "@/lib/api";
-import { AdminUser, Article } from "@/types";
+import { AdminUser, Article, Certificate } from "@/types";
 
 interface FormState {
   title: string;
@@ -46,6 +49,16 @@ interface SubAdminFormState {
   documentType: "citizenship" | "passport" | "driving_license";
   documentFrontImage: string;
   documentBackImage: string;
+}
+
+interface CertificateFormState {
+  certificateId: string;
+  name: string;
+  age: string;
+  designation: string;
+  role: string;
+  issueDate: string;
+  expiryDate: string;
 }
 
 const slugify = (value: string): string =>
@@ -85,6 +98,16 @@ const emptySubAdminForm: SubAdminFormState = {
   documentBackImage: ""
 };
 
+const emptyCertificateForm: CertificateFormState = {
+  certificateId: "",
+  name: "",
+  age: "",
+  designation: "",
+  role: "",
+  issueDate: "",
+  expiryDate: ""
+};
+
 export default function AdminDashboardPage() {
   const router = useRouter();
   const pathname = usePathname();
@@ -109,10 +132,16 @@ export default function AdminDashboardPage() {
   const [uploadingIdentityDoc, setUploadingIdentityDoc] = useState<"front" | "back" | null>(null);
   const [subAdminMessage, setSubAdminMessage] = useState<string | null>(null);
   const [managingSubAdmin, setManagingSubAdmin] = useState<string | null>(null);
+  const [certificateForm, setCertificateForm] = useState<CertificateFormState>(emptyCertificateForm);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [certificateMessage, setCertificateMessage] = useState<string | null>(null);
+  const [creatingCertificate, setCreatingCertificate] = useState(false);
+  const [managingCertificate, setManagingCertificate] = useState<string | null>(null);
   const [articleSearchTerm, setArticleSearchTerm] = useState("");
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
   const [showUserManagementPanel, setShowUserManagementPanel] = useState(false);
   const [showAccountSettingsPanel, setShowAccountSettingsPanel] = useState(false);
+  const [showCertificatePanel, setShowCertificatePanel] = useState(false);
 
   const isEditing = useMemo(() => Boolean(editingId), [editingId]);
   const currentUser = useMemo(() => {
@@ -269,6 +298,15 @@ export default function AdminDashboardPage() {
     }
   }, [dictionary.admin.failedLoadUsers]);
 
+  const loadCertificates = useCallback(async () => {
+    try {
+      const result = await getCertificates(tokenRef.current);
+      setCertificates(result);
+    } catch (err) {
+      setCertificateMessage(err instanceof Error ? err.message : "Failed to load certificates");
+    }
+  }, []);
+
   useEffect(() => {
     const savedToken = localStorage.getItem("hamrobichar_token");
     const savedUser = localStorage.getItem("hamrobichar_user");
@@ -310,9 +348,10 @@ export default function AdminDashboardPage() {
       void loadArticles();
       if (isSuper) {
         void loadUsers();
+        void loadCertificates();
       }
     });
-  }, [pathname, router, loadArticles, loadUsers]);
+  }, [pathname, router, loadArticles, loadUsers, loadCertificates]);
 
   const resetForm = () => {
     setForm(emptyForm);
@@ -541,6 +580,59 @@ export default function AdminDashboardPage() {
     }));
   };
 
+  const resetCertificateForm = () => {
+    setCertificateForm(emptyCertificateForm);
+  };
+
+  const onCreateCertificate = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+      setCreatingCertificate(true);
+      setCertificateMessage(null);
+
+      await createCertificate(
+        {
+          certificateId: certificateForm.certificateId,
+          name: certificateForm.name,
+          age: Number(certificateForm.age),
+          designation: certificateForm.designation,
+          role: certificateForm.role || undefined,
+          issueDate: certificateForm.issueDate,
+          expiryDate: certificateForm.expiryDate || undefined
+        },
+        tokenRef.current
+      );
+
+      setCertificateMessage(`Certificate ${certificateForm.certificateId.toUpperCase()} created successfully.`);
+      setCertificateForm(emptyCertificateForm);
+      await loadCertificates();
+    } catch (err) {
+      setCertificateMessage(err instanceof Error ? err.message : "Failed to create certificate");
+    } finally {
+      setCreatingCertificate(false);
+    }
+  };
+
+  const onDeleteCertificate = async (certificateId: string) => {
+    const confirmed = window.confirm(`Delete certificate ${certificateId}?`);
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setManagingCertificate(certificateId);
+      setCertificateMessage(null);
+      await deleteCertificate(certificateId, tokenRef.current);
+      setCertificateMessage("Certificate deleted successfully.");
+      await loadCertificates();
+    } catch (err) {
+      setCertificateMessage(err instanceof Error ? err.message : "Failed to delete certificate");
+    } finally {
+      setManagingCertificate(null);
+    }
+  };
+
   const onLogout = () => {
     localStorage.removeItem("hamrobichar_token");
     localStorage.removeItem("hamrobichar_user");
@@ -567,6 +659,16 @@ export default function AdminDashboardPage() {
               }`}
             >
               {dictionary.admin.userManagement}
+            </button>
+            <button
+              onClick={() => setShowCertificatePanel((prev) => !prev)}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                showCertificatePanel
+                  ? "border-rose-300 bg-rose-50 text-rose-700"
+                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              Certificate Management
             </button>
             <button
               onClick={() => setShowAccountSettingsPanel((prev) => !prev)}
@@ -1169,6 +1271,146 @@ export default function AdminDashboardPage() {
           </>
         )}
       </div>
+      )}
+
+      {isSuperAdmin && showCertificatePanel && (
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="bg-linear-to-r from-rose-700 via-rose-800 to-slate-900 px-5 py-4 text-white sm:px-6">
+            <h2 className="text-xl font-black">Certificate Verification</h2>
+            <p className="mt-1 text-sm text-rose-50">Create certificate IDs that verify on the public /verify page.</p>
+          </div>
+
+          <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1fr,1.2fr]">
+            <form onSubmit={onCreateCertificate} className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div>
+                <h3 className="text-sm font-black uppercase tracking-[0.14em] text-slate-600">Create Certificate</h3>
+                <p className="mt-1 text-sm text-slate-600">The certificate ID must be unique and will be used on the verification page.</p>
+              </div>
+              <input
+                required
+                value={certificateForm.certificateId}
+                onChange={(event) => setCertificateForm((prev) => ({ ...prev, certificateId: event.target.value }))}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm uppercase outline-none ring-rose-300 focus:ring"
+                placeholder="Certificate ID, e.g. HB-CERT-001"
+              />
+              <input
+                required
+                value={certificateForm.name}
+                onChange={(event) => setCertificateForm((prev) => ({ ...prev, name: event.target.value }))}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                placeholder="Full name"
+              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <input
+                  required
+                  type="number"
+                  min={0}
+                  value={certificateForm.age}
+                  onChange={(event) => setCertificateForm((prev) => ({ ...prev, age: event.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                  placeholder="Age"
+                />
+                <input
+                  required
+                  value={certificateForm.designation}
+                  onChange={(event) => setCertificateForm((prev) => ({ ...prev, designation: event.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                  placeholder="Designation / Role"
+                />
+              </div>
+              <input
+                value={certificateForm.role}
+                onChange={(event) => setCertificateForm((prev) => ({ ...prev, role: event.target.value }))}
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                placeholder="Role label, optional"
+              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <input
+                  required
+                  type="date"
+                  value={certificateForm.issueDate}
+                  onChange={(event) => setCertificateForm((prev) => ({ ...prev, issueDate: event.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                />
+                <input
+                  type="date"
+                  value={certificateForm.expiryDate}
+                  onChange={(event) => setCertificateForm((prev) => ({ ...prev, expiryDate: event.target.value }))}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-rose-300 focus:ring"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="submit"
+                  disabled={creatingCertificate}
+                  className="rounded-lg bg-rose-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {creatingCertificate ? "Creating..." : "Create Certificate"}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetCertificateForm}
+                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
+                >
+                  Reset
+                </button>
+              </div>
+
+              <p className="text-xs font-medium text-slate-500">
+                Public verify link: <span className="font-semibold text-slate-700">/verify?certificateId=YOUR_ID</span>
+              </p>
+
+              {certificateMessage && <p className="text-sm font-semibold text-slate-700">{certificateMessage}</p>}
+            </form>
+
+            <div className="rounded-2xl border border-slate-200 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-black uppercase tracking-[0.14em] text-slate-600">Recent Certificates</h3>
+                  <p className="mt-1 text-sm text-slate-600">Latest created IDs and their public verification links.</p>
+                </div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{certificates.length}</span>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {certificates.map((certificate) => (
+                  <div key={certificate._id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">{certificate.name}</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">{certificate.certificateId}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => void onDeleteCertificate(certificate._id)}
+                        disabled={managingCertificate === certificate._id}
+                        className="rounded-full border border-rose-300 px-3 py-1 text-xs font-semibold text-rose-700 disabled:opacity-50"
+                      >
+                        {managingCertificate === certificate._id ? "Removing..." : "Delete"}
+                      </button>
+                    </div>
+                    <div className="mt-2 grid gap-1 text-xs text-slate-600 sm:grid-cols-2">
+                      <p>Age: {certificate.age}</p>
+                      <p>Designation: {certificate.designation}</p>
+                      <p>Issue: {new Date(certificate.issueDate).toLocaleDateString()}</p>
+                      <p>Expiry: {certificate.expiryDate ? new Date(certificate.expiryDate).toLocaleDateString() : "No expiry"}</p>
+                    </div>
+                    <a
+                      href={`/verify?certificateId=${encodeURIComponent(certificate.certificateId)}`}
+                      className="mt-3 inline-flex text-xs font-semibold text-blue-700 hover:text-blue-900"
+                    >
+                      Open public verification page
+                    </a>
+                  </div>
+                ))}
+                {certificates.length === 0 && (
+                  <p className="text-sm text-slate-500">No certificates have been created yet.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {(showAccountSettingsPanel || !isMasterRoute) && (

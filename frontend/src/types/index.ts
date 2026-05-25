@@ -71,3 +71,16 @@ export interface Comment {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Certificate {
+  _id: string;
+  certificateId: string;
+  name: string;
+  age: number;
+  designation: string;
+  role?: string;
+  issueDate: string;
+  expiryDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}

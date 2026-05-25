@@ -17,6 +17,7 @@ export const dictionaries = {
     nav: {
       home: "Home",
       search: "Search",
+      verify: "Verify",
       moreNews: "More News",
       olderHeadlines: "Older Headlines",
       olderHeadlinesSub: "Articles beyond the latest six",
@@ -233,6 +234,7 @@ export const dictionaries = {
     nav: {
       home: "गृहपृष्ठ",
       search: "खोज्नुहोस्",
+      verify: "प्रमाणित",
       moreNews: "थप समाचार",
       olderHeadlines: "पुराना शीर्षक",
       olderHeadlinesSub: "पछिल्ला छ वटा बाहेकका समाचारहरू",

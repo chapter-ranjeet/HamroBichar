@@ -136,6 +136,14 @@ export default function Navbar() {
               {dictionary.nav.search}
             </Link>
 
+            <Link
+              className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 sm:px-4 sm:py-2 sm:text-sm"
+              href="/verify"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              {dictionary.nav.verify}
+            </Link>
+
             <div className="hidden lg:contents">
               {categories.map((category) => (
                 <Link

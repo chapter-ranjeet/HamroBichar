@@ -7,6 +7,7 @@ import path from "path";
 import { errorHandler, notFound } from "./middlewares/error.middleware";
 import articleRoutes from "./routes/article.routes";
 import authRoutes from "./routes/auth.routes";
+import certificateRoutes from "./routes/certificate.routes";
 import uploadRoutes from "./routes/upload.routes";
 
 dotenv.config();
@@ -63,6 +64,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
+app.use("/api/certificates", certificateRoutes);
 app.use("/api/upload", uploadRoutes);
 
 app.use(notFound);

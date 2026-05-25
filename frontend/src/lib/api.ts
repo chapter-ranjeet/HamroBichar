@@ -6,6 +6,7 @@ import {
   Article,
   ArticleListPayload,
   ArticleViewPayload,
+  Certificate,
   Comment,
   LoginPayload,
   UploadImagePayload
@@ -209,4 +210,48 @@ export const changeAdminPassword = async (
       }
     }
   );
+};
+
+export const getCertificates = async (token: string): Promise<Certificate[]> => {
+  const response = await api.get<ApiResponse<Certificate[]>>("/certificates", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.data.data;
+};
+
+export const createCertificate = async (
+  payload: {
+    certificateId: string;
+    name: string;
+    age: number;
+    designation: string;
+    role?: string;
+    issueDate: string;
+    expiryDate?: string;
+  },
+  token: string
+): Promise<Certificate> => {
+  const response = await api.post<ApiResponse<Certificate>>("/certificates", payload, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.data.data;
+};
+
+export const verifyCertificate = async (certificateId: string): Promise<Certificate> => {
+  const response = await api.get<ApiResponse<Certificate>>(`/certificates/verify/${encodeURIComponent(certificateId)}`);
+  return response.data.data;
+};
+
+export const deleteCertificate = async (id: string, token: string): Promise<void> => {
+  await api.delete(`/certificates/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
 };
