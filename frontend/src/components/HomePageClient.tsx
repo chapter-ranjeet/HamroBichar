@@ -8,6 +8,7 @@ import { useLanguage } from "@/components/LanguageProvider";
 import AnimatedHeadline from "@/components/AnimatedHeadline";
 import NepaliCalendarWidget from "@/components/NepaliCalendarWidget";
 import NewsCard from "@/components/NewsCard";
+import { formatDisplayDate } from "@/lib/date";
 import { Article } from "@/types";
 
 const ALL_CATEGORY = "__all__";
@@ -154,7 +155,7 @@ export default function HomePageClient({
                 <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
                   <span>{dictionary.common.by} {featuredArticle.author}</span>
                   <span className="h-1 w-1 rounded-full bg-slate-300" />
-                  <span>{new Date(featuredArticle.createdAt).toLocaleDateString()}</span>
+                  <span>{formatDisplayDate(featuredArticle.createdAt, language === "np" ? "ne-NP" : "en-US")}</span>
                   <span className="h-1 w-1 rounded-full bg-slate-300" />
                   <span>{featuredArticle.viewCount ?? 0} {dictionary.article.viewsSuffix}</span>
                 </div>

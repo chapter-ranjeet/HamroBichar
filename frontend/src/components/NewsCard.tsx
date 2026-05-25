@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { useLanguage } from "@/components/LanguageProvider";
 import { resolveOriginalUrl, cloudinaryFetch } from "@/lib/image";
+import { formatDisplayDate } from "@/lib/date";
 import { Article } from "@/types";
 
 interface NewsCardProps {
@@ -48,7 +49,7 @@ export default function NewsCard({ article }: NewsCardProps) {
       <div className="space-y-3 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
           <span className="rounded-full bg-rose-50 px-2.5 py-1 text-rose-700">{localizedCategory}</span>
-          <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+          <span>{formatDisplayDate(article.createdAt, language === "np" ? "ne-NP" : "en-US")}</span>
         </div>
         <h2 className="line-clamp-3 text-lg font-extrabold leading-7 text-slate-900">{localizedTitle}</h2>
         <p className="line-clamp-3 text-sm leading-6 text-slate-600">{getExcerpt(localizedContent)}</p>
