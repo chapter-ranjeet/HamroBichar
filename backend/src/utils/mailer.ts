@@ -47,7 +47,7 @@ export const sendContributorCredentialsEmail = async (
     };
   }
 
-  const from = process.env.SMTP_FROM ?? process.env.SMTP_USER;
+  const from = process.env.SMTP_FROM ?? '"HamroBichar" <info@hamrobichar.com>';
   if (!from) {
     return {
       sent: false,
@@ -63,17 +63,23 @@ export const sendContributorCredentialsEmail = async (
     await transporter.sendMail({
       from,
       to: input.to,
-      subject: "HamroBichar Contributor Account Credentials",
+      subject: "Congratulations and welcome to HamroBichar",
       text: [
         `Hello ${input.name},`,
         "",
-        `Your ${portalLabel} contributor account has been created on HamroBichar.`,
+        `Congratulations on being added as a ${portalLabel} contributor at HamroBichar.`,
+        "We are glad to have you on board and wish you success in your new role.",
+        "",
+        "Your contributor account has been created with the following login details:",
         "Use the following credentials to sign in:",
         `Email: ${input.to}`,
         `User_ID: ${input.userCode}`,
         `Password: ${input.password}`,
         "",
         "Please change your password after first login.",
+        "",
+        "Warm regards,",
+        "HamroBichar Team",
         ""
       ].join("\n")
     });
