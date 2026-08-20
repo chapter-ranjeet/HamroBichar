@@ -2,12 +2,17 @@
   "name": "hamrobichar",
   "version": "1.0.0",
   "description": "HamroBichar full-stack news platform",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
+    "build": "npm --prefix frontend run build",
+    "vercel-build": "npm --prefix frontend run build",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "build:backend": "npm --prefix backend run build",
     "build:frontend": "npm --prefix frontend run build",
-    "vercel-build": "npm --prefix frontend run vercel-build",
     "smoke:test": "npm --prefix backend run smoke:test"
   },
   "keywords": [],
