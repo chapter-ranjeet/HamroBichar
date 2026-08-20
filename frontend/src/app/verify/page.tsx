@@ -42,7 +42,11 @@ const formatDate = (value?: string): string => {
     return value;
   }
 
-  return parsed.toLocaleDateString();
+  return parsed.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric"
+  });
 };
 
 export default async function VerifyPage({ searchParams }: VerifyPageProps) {

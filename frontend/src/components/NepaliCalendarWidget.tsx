@@ -177,7 +177,13 @@ export default function NepaliCalendarWidget({ className = "", showAdDate = true
           <div>
             <p className="text-xs font-black uppercase tracking-[0.2em] text-rose-700">आजको मिति</p>
             <p className="mt-1 text-base font-black text-slate-900">{today.format("ddd, DD MMMM YYYY", "np")}</p>
-            <p className="text-xs text-slate-500">{today.toJsDate().toLocaleDateString()}</p>
+            <p className="text-xs text-slate-500" suppressHydrationWarning>
+              {today.toJsDate().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric"
+              })}
+            </p>
           </div>
 
           <div className="flex gap-2">
